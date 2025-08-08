@@ -91,7 +91,8 @@ public final class SourceRemapperService extends Service<SourceRemapperService.O
 		// Create a temp directory with all of the sources
 		if (!Files.isDirectory(source)) {
 			isSrcTmp = true;
-			srcPath = Files.createTempDirectory("fabric-loom-src");
+			// VANITY: Change from `fabric-loom-src` to `vanity-loom-src`.
+			srcPath = Files.createTempDirectory("vanity-loom-src");
 			ZipUtils.unpackAll(source, srcPath);
 		}
 

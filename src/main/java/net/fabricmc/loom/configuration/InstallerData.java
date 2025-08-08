@@ -40,8 +40,12 @@ import net.fabricmc.loom.LoomRepositoryPlugin;
 import net.fabricmc.loom.configuration.ide.idea.IdeaUtils;
 import net.fabricmc.loom.util.Constants;
 
-public record InstallerData(String version, JsonObject installerJson) {
+public record InstallerData(String version, JsonObject installerJson, InstallerKind installerKind) {
 	private static final Logger LOGGER = LoggerFactory.getLogger(InstallerData.class);
+
+	public boolean countsAsQuilt() {
+		return installerKind != InstallerKind.FABRIC;
+	}
 
 	public void applyToProject(Project project) {
 		LoomGradleExtension extension = LoomGradleExtension.get(project);

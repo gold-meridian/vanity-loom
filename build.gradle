@@ -22,7 +22,7 @@ tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
 	}
 }
 
-group = 'net.fabricmc'
+group = 'dev.tomat'
 def baseVersion = '1.11'
 
 def ENV = System.getenv()
@@ -241,8 +241,16 @@ codenarc {
 
 gradlePlugin {
 	plugins {
+		vanityLoom {
+			id = 'dev.tomat.loom'
+			implementationClass = 'net.fabricmc.loom.LoomGradlePlugin'
+		}
+		quiltLoom {
+			id = 'org.quiltmc.loom'
+			implementationClass = 'net.fabricmc.loom.LoomGradlePlugin'
+		}
 		fabricLoom {
-			id = 'fabric-loom'
+			id = "fabric-loom"
 			implementationClass = 'net.fabricmc.loom.LoomGradlePlugin'
 		}
 	}
@@ -302,8 +310,8 @@ publishing {
 
 			// Manually crate the plugin marker for snapshot versions
 			snapshotPlugin(MavenPublication) { publication ->
-				groupId = 'fabric-loom'
-				artifactId = 'fabric-loom.gradle.plugin'
+				groupId = 'dev.tomat.loom'
+				artifactId = 'dev.tomat.loom.gradle.plugin'
 				version = baseVersion + '-SNAPSHOT'
 
 				pom.withXml({
@@ -313,9 +321,9 @@ publishing {
 					Node dependencies = root.appendChild(document.createElement('dependencies'))
 					Node dependency = dependencies.appendChild(document.createElement('dependency'))
 					Node groupId = dependency.appendChild(document.createElement('groupId'))
-					groupId.setTextContent('net.fabricmc')
+					groupId.setTextContent('dev.tomat')
 					Node artifactId = dependency.appendChild(document.createElement('artifactId'))
-					artifactId.setTextContent('fabric-loom')
+					artifactId.setTextContent('loom')
 					Node version = dependency.appendChild(document.createElement('version'))
 					version.setTextContent(baseVersion + '-SNAPSHOT')
 				})

@@ -129,15 +129,22 @@ public abstract class GenerateDLIConfigTask extends AbstractLoomTask {
 		}
 
 		final LaunchConfig launchConfig = new LaunchConfig()
-				.property("fabric.development", "true")
-				.property("fabric.remapClasspathFile", getRemapClasspathFile().get().getAsFile().getAbsolutePath())
+				// QUILT: Change from `fabric.x` to `loader.x`.
+				.property("loader.development", "true")
+				.property("loader.remapClasspathFile", getRemapClasspathFile().get().getAsFile().getAbsolutePath())
+
 				.property("log4j.configurationFile", getLog4jConfigPaths().get())
 				.property("log4j2.formatMsgNoLookups", "true")
 
 				.argument("client", "--assetIndex")
 				.argument("client", versionInfo.assetIndex().fabricId(getMinecraftVersion().get()))
 				.argument("client", "--assetsDir")
-				.argument("client", assetsDirectory.getAbsolutePath());
+				.argument("client", assetsDirectory.getAbsolutePath())
+
+				// QUILT: add --version "Quilt Loom"
+				// TODO(vanity): Should we change this? Side effects?
+				.argument("client", "--version")
+				.argument("client", "Quilt Loom");
 
 		if (versionInfo.hasNativesToExtract()) {
 			String nativesPath = getNativesDirectoryPath().get();
@@ -148,12 +155,14 @@ public abstract class GenerateDLIConfigTask extends AbstractLoomTask {
 		}
 
 		if (getSplitSourceSets().get()) {
-			launchConfig.property("client", "fabric.gameJarPath.client", getClientGameJarPath().get());
-			launchConfig.property("fabric.gameJarPath", getCommonGameJarPath().get());
+			// QUILT: Change from `fabric.x` to `loader.x`.
+			launchConfig.property("client", "loader.gameJarPath.client", getClientGameJarPath().get());
+			launchConfig.property("loader.gameJarPath", getCommonGameJarPath().get());
 		}
 
 		if (getClassPathGroups().isPresent()) {
-			launchConfig.property("fabric.classPathGroups", getClassPathGroups().get());
+			// QUILT: Change from `fabric.x` to `loader.x`.
+			launchConfig.property("loader.classPathGroups", getClassPathGroups().get());
 		}
 
 		//Enable ansi by default for idea and vscode when gradle is not ran with plain console.
@@ -209,6 +218,11 @@ public abstract class GenerateDLIConfigTask extends AbstractLoomTask {
 		}
 
 		public LaunchConfig property(String side, String key, String value) {
+			// QUILT: Add `fabric.x` equivalents for changed `loader.x` keys.
+			if (key.startsWith("loader.")) {
+				property(side, "fabric." + key.substring("loader.".length()), value);
+			}
+
 			values.computeIfAbsent(side + "Properties", (s -> new ArrayList<>()))
 					.add(String.format("%s=%s", key, value));
 			return this;

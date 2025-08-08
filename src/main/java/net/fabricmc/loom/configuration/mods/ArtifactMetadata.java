@@ -38,6 +38,9 @@ import java.util.jar.Attributes;
 import java.util.jar.Manifest;
 
 import com.google.gson.JsonObject;
+
+import net.fabricmc.loom.configuration.InstallerKind;
+
 import org.jetbrains.annotations.Nullable;
 
 import net.fabricmc.loom.LoomGradlePlugin;
@@ -47,7 +50,9 @@ import net.fabricmc.loom.util.FileSystemUtil;
 import net.fabricmc.loom.util.fmj.FabricModJsonFactory;
 
 public record ArtifactMetadata(boolean isFabricMod, RemapRequirements remapRequirements, @Nullable InstallerData installerData, MixinRemapType mixinRemapType, List<String> knownIdyBsms) {
-	private static final String INSTALLER_PATH = "fabric-installer.json";
+	private static final String VANITY_INSTALLER_PATH = "vanity_installer.json";
+	private static final String QUILT_INSTALLER_PATH = "quilt_installer.json";
+	private static final String FABRIC_INSTALLER_PATH = "fabric-installer.json";
 
 	public static ArtifactMetadata create(ArtifactRef artifact, String currentLoomVersion) throws IOException {
 		boolean isFabricMod;
@@ -90,11 +95,23 @@ public record ArtifactMetadata(boolean isFabricMod, RemapRequirements remapRequi
 				}
 			}
 
-			final Path installerPath = fs.getPath(INSTALLER_PATH);
+			// VANITY: Search for vanity, quilt, and fabric installer files.
+			Path installerPath = fs.getPath(VANITY_INSTALLER_PATH);
+			InstallerKind installerKind = InstallerKind.VANITY;
+
+			if (!Files.exists(installerPath)) {
+				installerPath = fs.getPath(QUILT_INSTALLER_PATH);
+				installerKind = InstallerKind.QUILT;
+			}
+
+			if (!Files.exists(installerPath)) {
+				installerPath = fs.getPath(FABRIC_INSTALLER_PATH);
+				installerKind = InstallerKind.FABRIC;
+			}
 
 			if (isFabricMod && Files.exists(installerPath)) {
 				final JsonObject jsonObject = LoomGradlePlugin.GSON.fromJson(Files.readString(installerPath, StandardCharsets.UTF_8), JsonObject.class);
-				installerData = new InstallerData(artifact.version(), jsonObject);
+				installerData = new InstallerData(artifact.version(), jsonObject, installerKind);
 			}
 		}
 

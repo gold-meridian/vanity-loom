@@ -124,7 +124,8 @@ public class SourceRemapper {
 		if (!source.isDirectory()) {
 			// create tmp directory
 			isSrcTmp = true;
-			srcPath = Files.createTempDirectory("fabric-loom-src");
+			// VANITY: Change from `fabric-loom-src` to `vanity-loom-src`.
+			srcPath = Files.createTempDirectory("vanity-loom-src");
 			ZipUtils.unpackAll(source.toPath(), srcPath);
 		}
 

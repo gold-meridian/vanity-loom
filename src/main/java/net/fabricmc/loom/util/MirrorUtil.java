@@ -66,4 +66,13 @@ public class MirrorUtil {
 
 		return Constants.FABRIC_REPOSITORY;
 	}
+
+	// QUILT: Add Quilt repository.
+	public static String getQuiltRepository(ExtensionAware aware) {
+		if (aware.getExtensions().getExtraProperties().has("loom_quilt_repository")) {
+			return String.valueOf(aware.getExtensions().getExtraProperties().get("loom_quilt_repository"));
+		}
+
+		return Constants.QUILT_REPOSITORY;
+	}
 }

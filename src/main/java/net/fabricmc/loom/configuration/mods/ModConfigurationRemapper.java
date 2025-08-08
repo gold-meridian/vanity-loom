@@ -32,10 +32,12 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 
 import org.gradle.api.Project;
@@ -152,17 +154,27 @@ public class ModConfigurationRemapper {
 		// Go through all the configs to find artifacts to remap and
 		// the installer data. The installer data has to be added before
 		// any mods are remapped since remapping needs the dependencies provided by that data.
+
 		final Map<Configuration, List<ModDependency>> dependenciesBySourceConfig = new HashMap<>();
 		final Map<ArtifactRef, ArtifactMetadata> metaCache = new HashMap<>();
-		configsToRemap.forEach((sourceConfig, remappedConfig) -> {
-			/*
-			sourceConfig - The source configuration where the intermediary named artifacts come from. i.e "modApi"
-			remappedConfig - The target configuration where the remapped artifacts go
-			 */
-			final Configuration clientRemappedConfig = clientConfigsToRemap.get(sourceConfig);
-			final List<ModDependency> modDependencies = new ArrayList<>();
 
-			for (ArtifactRef artifact : resolveArtifacts(project, sourceConfig)) {
+		final Map<Configuration, List<ArtifactRef>> artifactsBySourceConfig = new HashMap<>();
+		final Set<Configuration> sourceConfigsWithQsl = new HashSet<>();
+		// todo clean this up
+		AtomicReference<ArtifactMetadata> installer = new AtomicReference<>();
+		AtomicReference<Configuration> installerConfigToApply = new AtomicReference<>();
+		AtomicReference<ArtifactRef> installerArtifactToApply = new AtomicReference<>();
+
+		configsToRemap.forEach((sourceConfig, remappedConfig) -> {
+			// /*
+			// sourceConfig - The source configuration where the intermediary named artifacts come from. i.e "modApi"
+			// remappedConfig - The target configuration where the remapped artifacts go
+			//  */
+			// final Configuration clientRemappedConfig = clientConfigsToRemap.get(sourceConfig);
+			// final List<ModDependency> modDependencies = new ArrayList<>();
+			List<ArtifactRef> artifacts = resolveArtifacts(project, sourceConfig);
+
+			for (ArtifactRef artifact : artifacts) {
 				final ArtifactMetadata artifactMetadata;
 
 				artifactMetadata = metaCache.computeIfAbsent(artifact, a -> {
@@ -174,22 +186,87 @@ public class ModConfigurationRemapper {
 				});
 
 				if (artifactMetadata.installerData() != null) {
-					if (extension.getInstallerData() != null) {
+					/*if (extension.getInstallerData() != null) {
 						project.getLogger().info("Found another installer JSON in ({}), ignoring", artifact.path());
 					} else {
 						project.getLogger().info("Applying installer data from {}", artifact.path());
 						artifactMetadata.installerData().applyToProject(project);
+					}*/
+
+					if (installer.get() == null) {
+						installer.set(artifactMetadata);
+					} else if (!installer.get().installerData().countsAsQuilt() && artifactMetadata.installerData().countsAsQuilt()) {
+						// Prefer Quilt over Fabric loader
+						installer.set(artifactMetadata);
+					} else {
+						project.getLogger().info("Found another installer JSON in ({}), ignoring", artifact.path());
 					}
 				}
 
 				if (!artifactMetadata.shouldRemap()) {
+					if (artifactMetadata.installerData() != null) {
+						installerConfigToApply.set(remappedConfig);
+						installerArtifactToApply.set(artifact);
+						continue; // we'll apply the installer later
+					}
+
 					// Note: not applying to any type of vanilla Gradle target config like
 					// api or implementation to fix https://github.com/FabricMC/fabric-loom/issues/572.
 					artifact.applyToConfiguration(project, remappedConfig);
 					continue;
 				}
 
-				final ModDependency modDependency = ModDependencyFactory.create(artifact, artifactMetadata, remappedConfig, clientRemappedConfig, modDependencyOptions, project);
+				// final ModDependency modDependency = ModDependencyFactory.create(artifact, artifactMetadata, remappedConfig, clientRemappedConfig, modDependencyOptions, project);
+				if (artifact.group().startsWith("org.quiltmc.qsl")) {
+					sourceConfigsWithQsl.add(sourceConfig);
+				}
+			}
+
+			artifactsBySourceConfig.put(sourceConfig, artifacts);
+		});
+
+		boolean quiltLoader;
+
+		// Apply the installer.
+		// We do this outside Round 1, unlike Fabric Loom, because we need to prioritize Quilt Loader over Fabric Loader.
+		if (installer.get() != null) {
+			project.getLogger().info("Applying installer data");
+
+			if (installer.get().installerData().countsAsQuilt()) {
+				quiltLoader = true;
+			} else {
+				quiltLoader = false;
+				project.getLogger().lifecycle("Warning: Quilt Loader not detected. Using Fabric Loader.");
+			}
+
+			if (!installer.get().shouldRemap()) {
+				installerArtifactToApply.get().applyToConfiguration(project, installerConfigToApply.get());
+			}
+
+			installer.get().installerData().applyToProject(project);
+		} else {
+			project.getLogger().lifecycle("Warning: No loader detected.");
+			quiltLoader = false;
+		}
+
+		// Round 1.5: Proposal
+		// Propose everything to be remapped, excluding anything we want to hide.
+		configsToRemap.forEach((sourceConfig, remappedConfig) -> {
+			/*
+			sourceConfig - The source configuration where the intermediary named artifacts come from. i.e "modApi"
+			remappedConfig - The target configuration where the remapped artifacts go
+			 */
+			final Configuration clientRemappedConfig = clientConfigsToRemap.get(sourceConfig);
+			final List<ModDependency> modDependencies = new ArrayList<>();
+
+			for (ArtifactRef artifact : artifactsBySourceConfig.get(sourceConfig)) {
+				if (quiltLoader && artifact.group().equals("net.fabricmc") && artifact.name().equals("fabric-loader")) {
+					continue;
+				} else if (sourceConfigsWithQsl.contains(sourceConfig) && artifact.group().equals("net.fabricmc.fabric-api")) {
+					continue;
+				}
+				// final ModDependency modDependency = ModDependencyFactory.create(artifact, artifactMetadata, remappedConfig, clientRemappedConfig, modDependencyOptions, project);
+				final ModDependency modDependency = ModDependencyFactory.create(artifact, metaCache.get(artifact), remappedConfig, clientRemappedConfig, modDependencyOptions, project);
 				scheduleSourcesRemapping(project, sourceRemapper, modDependency);
 				modDependencies.add(modDependency);
 			}

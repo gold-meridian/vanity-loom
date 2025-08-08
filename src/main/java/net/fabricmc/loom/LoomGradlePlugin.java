@@ -77,7 +77,7 @@ public class LoomGradlePlugin implements Plugin<PluginAware> {
 	}
 
 	private void apply(Project project) {
-		project.getLogger().lifecycle("Fabric Loom: " + LOOM_VERSION);
+		project.getLogger().lifecycle("Vanity Loom: " + LOOM_VERSION);
 
 		LibraryLocationLogger.logLibraryVersions();
 

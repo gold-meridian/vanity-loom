@@ -34,6 +34,9 @@ public class Constants {
 	public static final String EXPERIMENTAL_VERSIONS = "https://maven.fabricmc.net/net/minecraft/experimental_versions.json";
 	public static final String FABRIC_REPOSITORY = "https://maven.fabricmc.net/";
 
+	// QUILT: Add Quilt repository.
+	public static final String QUILT_REPOSITORY = "https://maven.quiltmc.org/repository/release/";
+
 	public static final int ASM_VERSION = Opcodes.ASM9;
 	public static final String RELEASE_TIME_1_3 = "2012-07-25T22:00:00+00:00";
 

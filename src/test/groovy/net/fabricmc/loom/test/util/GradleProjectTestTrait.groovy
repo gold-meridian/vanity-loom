@@ -262,7 +262,8 @@ trait GradleProjectTestTrait {
 		}
 
 		File getGeneratedSources(String mappings, String jarType = "merged") {
-			return new File(getGradleHomeDir(), "caches/fabric-loom/minecraftMaven/net/minecraft/minecraft-${jarType}/${mappings}/minecraft-${jarType}-${mappings}-sources.jar")
+			// VANITY: Change directory from `fabric-loom` to `vanity-loom`.
+			return new File(getGradleHomeDir(), "caches/vanity-loom/minecraftMaven/net/minecraft/minecraft-${jarType}/${mappings}/minecraft-${jarType}-${mappings}-sources.jar")
 		}
 
 		File getGeneratedLocalSources(String mappings) {

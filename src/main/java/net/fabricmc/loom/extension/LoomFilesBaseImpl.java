@@ -46,22 +46,26 @@ public abstract class LoomFilesBaseImpl implements LoomFiles {
 
 	@Override
 	public File getUserCache() {
-		return createFile(getGradleUserHomeDir(), "caches" + File.separator + "fabric-loom");
+		// VANITY: Changed from `fabric-loom` to `vanity-loom`.
+		return createFile(getGradleUserHomeDir(), "caches" + File.separator + "vanity-loom");
 	}
 
 	@Override
 	public File getRootProjectPersistentCache() {
-		return createFile(getRootDir(), ".gradle" + File.separator + "loom-cache");
+		// VANITY: Changed from `loom-cache` to `vanity-loom-cache`.
+		return createFile(getRootDir(), ".gradle" + File.separator + "vanity-loom-cache");
 	}
 
 	@Override
 	public File getProjectPersistentCache() {
-		return createFile(getProjectDir(), ".gradle" + File.separator + "loom-cache");
+		// VANITY: Changed from `loom-cache` to `vanity-loom-cache`.
+		return createFile(getProjectDir(), ".gradle" + File.separator + "vanity-loom-cache");
 	}
 
 	@Override
 	public File getProjectBuildCache() {
-		return createFile(getBuildDir(), "loom-cache");
+		// VANITY: Changed from `loom-cache` to `vanity-loom-cache`.
+		return createFile(getBuildDir(), "vanity-loom-cache");
 	}
 
 	@Override

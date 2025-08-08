@@ -59,7 +59,8 @@ public final class GradleUtils {
 	}
 
 	public static boolean isLoomProject(Project project) {
-		return project.getPluginManager().hasPlugin("fabric-loom");
+		// VANITY: Change check from `fabric-loom` to `dev.tomat.loom`.
+		return project.getPluginManager().hasPlugin("dev.tomat.loom");
 	}
 
 	public static Provider<Boolean> getBooleanPropertyProvider(Project project, String key) {
