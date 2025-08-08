@@ -60,8 +60,8 @@ public record DependencyFileSpec(Dependency dependency) implements FileSpec {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (obj instanceof DependencyFileSpec other) {
-			return other.dependency().contentEquals(this.dependency());
+		if (obj instanceof DependencyFileSpec(Dependency dependency1)) {
+			return dependency1.contentEquals(this.dependency());
 		}
 
 		return false;

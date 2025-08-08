@@ -82,11 +82,7 @@ public final class LibraryContext {
 			}
 
 			// LWJGL 3.3.2 or newer
-			if (versionSplit[0] == 3 && versionSplit[1] == 3 && versionSplit[2] >= 2) {
-				return true;
-			}
-
-			return false;
+			return versionSplit[0] == 3 && versionSplit[1] == 3 && versionSplit[2] >= 2;
 		});
 	}
 

@@ -266,7 +266,7 @@ public abstract class CompileConfiguration implements Runnable {
 									.map(File::getAbsolutePath)
 									.collect(Collectors.joining(File.pathSeparator))
 					)
-					.collect(Collectors.joining(File.pathSeparator+File.pathSeparator));;
+					.collect(Collectors.joining(File.pathSeparator+File.pathSeparator));
 
 			test.systemProperty("fabric.classPathGroups", classPathGroups);
 		});

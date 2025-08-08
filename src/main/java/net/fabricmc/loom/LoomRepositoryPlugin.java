@@ -54,7 +54,6 @@ public class LoomRepositoryPlugin implements Plugin<PluginAware> {
 
 			declareRepositories(project.getRepositories(), LoomFiles.create(project), project);
 		} else if (target instanceof Gradle) {
-			return;
 		} else {
 			throw new IllegalArgumentException("Expected target to be a Project or Settings, but was a " + target.getClass());
 		}

@@ -153,9 +153,9 @@ public record CachedJarProcessor(CachedFileStore<CachedData> fileStore, String b
 	}
 
 	public void completeJob(Path output, WorkJob workJob, ClassLineNumbers lineNumbers) throws IOException {
-		if (workJob instanceof CompletedWorkJob completedWorkJob) {
+		if (workJob instanceof CompletedWorkJob(Path completed)) {
 			// Fully complete, nothing new to cache
-			Files.move(completedWorkJob.completed(), output);
+			Files.move(completed, output);
 			return;
 		}
 

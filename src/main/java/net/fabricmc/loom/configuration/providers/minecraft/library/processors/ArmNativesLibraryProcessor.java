@@ -89,10 +89,8 @@ public class ArmNativesLibraryProcessor extends LibraryProcessor {
 				// Add the arm64 natives.
 				dependencyConsumer.accept(library.withClassifier(library.classifier() + "-arm64"));
 
-				if (!context.hasClasspathNatives()) {
-					// Remove the none arm64 natives when extracting.
-					return false;
-				}
+				// Remove the none arm64 natives when extracting.
+				return context.hasClasspathNatives();
 			}
 
 			return true;

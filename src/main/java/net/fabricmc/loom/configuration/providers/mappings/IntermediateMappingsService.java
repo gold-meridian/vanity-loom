@@ -133,7 +133,7 @@ public final class IntermediateMappingsService extends Service<IntermediateMappi
 		}
 
 		if (!expectedSrcNs.equals(tree.getSrcNamespace())) {
-			throw new RuntimeException("Invalid intermediate mappings: expected source namespace '" + expectedSrcNs + "' but found '" + tree.getSrcNamespace() + "\'");
+			throw new RuntimeException("Invalid intermediate mappings: expected source namespace '" + expectedSrcNs + "' but found '" + tree.getSrcNamespace() + "'");
 		}
 
 		return tree;

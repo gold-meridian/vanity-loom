@@ -41,20 +41,17 @@ public interface ModJson {
 
 	String getModVersion();
 
-	@Nullable
-	String getModName();
+	@Nullable String getModName();
 
 	List<String> getMixinConfigurations();
 
 	Map<String, ModEnvironment> getClassTweakers();
 
-	@Nullable
-	JsonElement getInjectedInterfaces();
+	@Nullable JsonElement getInjectedInterfaces();
 
 	FabricModJsonSource getSource();
 
-	@Nullable
-	String getProvidedJavadocPath();
+	@Nullable String getProvidedJavadocPath();
 
 	JsonObject stripNestedJars(JsonObject json);
 

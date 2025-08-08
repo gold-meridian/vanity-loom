@@ -115,7 +115,7 @@ public class ThreadSafeResultSaver implements IResultSaver {
 				}
 
 				lineMapWriter.println(qualifiedName + "\t" + maxLine + "\t" + maxLineDest);
-				lineMapWriter.println(builder.toString());
+				lineMapWriter.println(builder);
 			}
 		});
 	}

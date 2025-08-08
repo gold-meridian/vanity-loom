@@ -45,8 +45,8 @@ public record MinimalExternalModuleDependencyFileSpec(MinimalExternalModuleDepen
 
 	@Override
 	public boolean equals(Object obj) {
-		if (obj instanceof MinimalExternalModuleDependencyFileSpec other) {
-			return other.dependency().equals(this.dependency());
+		if (obj instanceof MinimalExternalModuleDependencyFileSpec(MinimalExternalModuleDependency dependency1)) {
+			return dependency1.equals(this.dependency());
 		}
 
 		return false;

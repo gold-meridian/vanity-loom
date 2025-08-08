@@ -31,7 +31,7 @@ import net.fabricmc.mappingio.MappingVisitor;
 import net.fabricmc.mappingio.adapter.ForwardingMappingVisitor;
 
 public final class ParchmentPrefixStripingMappingVisitor extends ForwardingMappingVisitor {
-	protected ParchmentPrefixStripingMappingVisitor(MappingVisitor next) {
+	ParchmentPrefixStripingMappingVisitor(MappingVisitor next) {
 		super(next);
 	}
 

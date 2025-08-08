@@ -45,8 +45,8 @@ public class MinecraftJarSplitter implements AutoCloseable {
 	private final Path serverInputJar;
 
 	private EntryData entryData;
-	private Set<String> sharedEntries = new HashSet<>();
-	private Set<String> forcedClientEntries = new HashSet<>();
+	private final Set<String> sharedEntries = new HashSet<>();
+	private final Set<String> forcedClientEntries = new HashSet<>();
 
 	public MinecraftJarSplitter(Path clientInputJar, Path serverInputJar) {
 		this.clientInputJar = Objects.requireNonNull(clientInputJar);
