@@ -39,6 +39,9 @@ import java.util.Objects;
 import javax.inject.Inject;
 
 import com.google.gson.JsonElement;
+
+import net.fabricmc.loom.api.metadata.ModJson;
+
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,8 +76,8 @@ public abstract class ModJavadocProcessor implements MinecraftJarProcessor<ModJa
 	public @Nullable ModJavadocProcessor.Spec buildSpec(SpecContext context) {
 		List<ModJavadoc> javadocs = new ArrayList<>();
 
-		for (FabricModJson fabricModJson : context.allMods()) {
-			ModJavadoc javadoc = ModJavadoc.create(fabricModJson);
+		for (ModJson modJson : context.allMods()) {
+			ModJavadoc javadoc = ModJavadoc.create(modJson);
 
 			if (javadoc != null) {
 				javadocs.add(javadoc);
@@ -110,20 +113,19 @@ public abstract class ModJavadocProcessor implements MinecraftJarProcessor<ModJa
 
 	public record ModJavadoc(String modId, MemoryMappingTree mappingTree, String mappingsHash) {
 		@Nullable
-		public static ModJavadoc create(FabricModJson fabricModJson) {
-			final String modId = fabricModJson.getId();
-			final JsonElement customElement = fabricModJson.getCustom(Constants.CustomModJsonKeys.PROVIDED_JAVADOC);
+		public static ModJavadoc create(ModJson modJson) {
+			final String modId = modJson.getId();
+			final String javaDocPath = modJson.getProvidedJavadocPath();
 
-			if (customElement == null) {
+			if (javaDocPath == null) {
 				return null;
 			}
 
-			final String javaDocPath = customElement.getAsString();
 			final MemoryMappingTree mappings = new MemoryMappingTree();
 			final String mappingsHash;
 
 			try {
-				final byte[] data = fabricModJson.getSource().read(javaDocPath);
+				final byte[] data = modJson.getSource().read(javaDocPath);
 				mappingsHash = Checksum.of(data).sha1().hex();
 
 				try (Reader reader = new InputStreamReader(new ByteArrayInputStream(data))) {

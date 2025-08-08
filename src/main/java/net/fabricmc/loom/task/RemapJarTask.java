@@ -34,6 +34,10 @@ import java.util.stream.Stream;
 import javax.inject.Inject;
 
 import com.google.gson.JsonObject;
+
+import net.fabricmc.loom.api.metadata.ModJson;
+import net.fabricmc.loom.util.metadata.ModJsonFactory;
+
 import org.gradle.api.artifacts.ConfigurationContainer;
 import org.gradle.api.file.ConfigurableFileCollection;
 import org.gradle.api.file.FileCollection;
@@ -253,16 +257,18 @@ public abstract class RemapJarTask extends AbstractRemapJarTask {
 				return;
 			}
 
-			final AccessWidenerFile accessWidenerFile = AccessWidenerFile.fromModJar(inputFile);
+			final ModJson metadata = ModJsonFactory.createFromZipNullable(inputFile);
 
-			if (accessWidenerFile == null) {
+			if (metadata == null) {
 				return;
 			}
 
-			byte[] remapped = remapAccessWidener(accessWidenerFile.content());
+			for (String awPath : metadata.getClassTweakers().keySet()) {
+				byte[] remapped = remapAccessWidener(ZipUtils.unpack(inputFile, awPath));
 
-			// Finally, replace the output with the remaped aw
-			ZipUtils.replace(outputFile, accessWidenerFile.path(), remapped);
+				// Finally, replace the output with the remaped aw
+				ZipUtils.replace(outputFile, awPath, remapped);
+			}
 		}
 
 		private byte[] remapAccessWidener(byte[] input) {

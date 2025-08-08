@@ -24,17 +24,8 @@
 
 package net.fabricmc.loom.configuration.accesswidener;
 
-import java.io.IOException;
-import java.io.UncheckedIOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Objects;
-
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-
-import net.fabricmc.loom.util.ZipUtils;
 
 public record AccessWidenerFile(
 		String path,
@@ -44,7 +35,7 @@ public record AccessWidenerFile(
 	/**
 	 * Reads the access-widener contained in a mod jar, or returns null if there is none.
 	 */
-	public static AccessWidenerFile fromModJar(Path modJarPath) {
+	/*public static AccessWidenerFile fromModJar(Path modJarPath) {
 		byte[] modJsonBytes;
 
 		try {
@@ -79,7 +70,7 @@ public record AccessWidenerFile(
 				modId,
 				content
 		);
-	}
+	}*/
 
 	@Override
 	public int hashCode() {

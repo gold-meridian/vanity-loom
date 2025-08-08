@@ -26,6 +26,7 @@ package net.fabricmc.loom.configuration;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.function.Function;
 
 import org.gradle.api.Action;
@@ -171,6 +172,8 @@ public final class RemapConfigurations {
 		if (settings.getOnCompileClasspath().get()) {
 			extendsFrom(Constants.Configurations.MOD_COMPILE_CLASSPATH, configuration, project);
 		}
+
+		configuration.exclude(Map.of("group", "org.quiltmc", "module", "quilt-loader-dependencies"));
 
 		for (String outgoingConfigurationName : settings.getPublishingMode().get().outgoingConfigurations()) {
 			extendsFrom(outgoingConfigurationName, configuration, project);

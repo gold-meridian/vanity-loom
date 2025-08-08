@@ -28,6 +28,11 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 
+import net.fabricmc.loom.api.metadata.ModJson;
+
+import net.fabricmc.loom.util.metadata.ModJsonFactory;
+
+import org.jetbrains.annotations.Nullable;
 import org.objectweb.asm.commons.Remapper;
 
 import net.fabricmc.accesswidener.AccessWidenerReader;
@@ -56,13 +61,14 @@ public class AccessWidenerUtils {
 		return writer.write();
 	}
 
+	@Nullable
 	public static AccessWidenerData readAccessWidenerData(Path inputJar) throws IOException {
 		if (!FabricModJsonFactory.isModJar(inputJar)) {
 			return null;
 		}
 
-		final FabricModJson fabricModJson = FabricModJsonFactory.createFromZip(inputJar);
-		final List<String> classTweakers = List.copyOf(fabricModJson.getClassTweakers().keySet());
+		final ModJson modJson = ModJsonFactory.createFromZip(inputJar);
+		final List<String> classTweakers = List.copyOf(modJson.getClassTweakers().keySet());
 
 		if (classTweakers.isEmpty()) {
 			return null;
@@ -73,7 +79,7 @@ public class AccessWidenerUtils {
 		}
 
 		final String accessWidenerPath = classTweakers.get(0);
-		final byte[] accessWidener = fabricModJson.getSource().read(accessWidenerPath);
+		final byte[] accessWidener = modJson.getSource().read(accessWidenerPath);
 		final AccessWidenerReader.Header header = AccessWidenerReader.readHeader(accessWidener);
 
 		return new AccessWidenerData(accessWidenerPath, header, accessWidener);

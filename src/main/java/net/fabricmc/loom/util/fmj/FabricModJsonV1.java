@@ -36,6 +36,9 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+
+import net.fabricmc.loom.util.Constants;
+
 import org.jetbrains.annotations.Nullable;
 
 public final class FabricModJsonV1 extends FabricModJson {
@@ -97,6 +100,11 @@ public final class FabricModJsonV1 extends FabricModJson {
 			return Collections.emptyMap();
 		}
 
-		return Map.of(readString(jsonObject, "accessWidener"), ModEnvironment.UNIVERSAL);
+		return Map.of(FabricModJsonUtils.readString(jsonObject, "accessWidener"), ModEnvironment.UNIVERSAL);
+	}
+
+	@Override
+	public JsonElement getInjectedInterfaces() {
+		return getCustom(Constants.CustomModJsonKeys.INJECTED_INTERFACE);
 	}
 }

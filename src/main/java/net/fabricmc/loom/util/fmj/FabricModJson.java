@@ -30,12 +30,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+
+import net.fabricmc.loom.api.metadata.ModJson;
+
+import net.fabricmc.loom.util.Constants;
+
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.VisibleForTesting;
 
-public abstract sealed class FabricModJson permits FabricModJsonV0, FabricModJsonV1, FabricModJsonV2, FabricModJson.Mockable {
+public abstract sealed class FabricModJson implements ModJson permits FabricModJsonV0, FabricModJsonV1, FabricModJsonV2, FabricModJson.Mockable {
 	protected final JsonObject jsonObject;
 	private final FabricModJsonSource source;
 
@@ -44,30 +50,46 @@ public abstract sealed class FabricModJson permits FabricModJsonV0, FabricModJso
 		this.source = Objects.requireNonNull(source);
 	}
 
-	public abstract int getVersion();
-
+	@Override
 	public String getId() {
-		return readString(jsonObject, "id");
+		return FabricModJsonUtils.readString(jsonObject, "id");
 	}
 
+	@Override
 	public String getModVersion() {
-		return readString(jsonObject, "version");
+		return FabricModJsonUtils.readString(jsonObject, "version");
 	}
+
+	public abstract int getVersion();
 
 	@Nullable
 	public abstract JsonElement getCustom(String key);
 
-	public abstract List<String> getMixinConfigurations();
+	@Override
 
-	public abstract Map<String, ModEnvironment> getClassTweakers();
+	public JsonElement getInjectedInterfaces() {
+		return getCustom(Constants.CustomModJsonKeys.INJECTED_INTERFACE);
+	}
 
+	@Override
+	public @Nullable String getProvidedJavadocPath() {
+		JsonElement ret = getCustom(Constants.CustomModJsonKeys.PROVIDED_JAVADOC);
+		return ret != null ? ret.getAsString() : null;
+	}
+
+	@Override
+	public @Nullable String getModName() {
+		return FabricModJsonUtils.readStringOrNull(jsonObject, "name");
+	}
+
+	@Override
 	public FabricModJsonSource getSource() {
 		return source;
 	}
 
 	@Override
 	public final String toString() {
-		return getClass().getName() + "[id=%s, version=%s, classTweakers=%s]".formatted(getId(), getVersion(), getClassTweakers());
+		return getClass().getName() + "[id=%s, version=%s]".formatted(getId(), getVersion());
 	}
 
 	@Override
@@ -81,5 +103,34 @@ public abstract sealed class FabricModJson permits FabricModJsonV0, FabricModJso
 			super(null, null);
 			throw new AssertionError();
 		}
+	}
+
+	@Override
+	public JsonObject stripNestedJars(JsonObject json) {
+		json.remove("jars");
+		return json;
+	}
+
+	@Override
+	public JsonObject addNestedJars(JsonObject json, List<String> files) {
+		JsonArray nestedJars = json.has("jars") ? json.getAsJsonArray("jars") : new JsonArray();
+
+		for (String nestedJarPath: files) {
+			for (JsonElement nestedJar : nestedJars) {
+				JsonObject jarObject = nestedJar.getAsJsonObject();
+
+				if (jarObject.has("file") && jarObject.get("file").getAsString().equals(nestedJarPath)) {
+					throw new IllegalStateException("Cannot nest 2 jars at the same path: " + nestedJarPath);
+				}
+			}
+
+			JsonObject entry = new JsonObject();
+			entry.addProperty("file", nestedJarPath);
+			nestedJars.add(entry);
+		}
+
+		json.add("jars", nestedJars);
+
+		return json;
 	}
 }

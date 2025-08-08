@@ -43,6 +43,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.google.gson.JsonObject;
+
+import net.fabricmc.loom.util.fmj.FabricModJsonFactory;
+
+import net.fabricmc.loom.util.metadata.ModJsonFactory;
+
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.attributes.Usage;
@@ -127,10 +132,7 @@ public class ModProcessor {
 	private void stripNestedJars(Path path) {
 		// Strip out all contained jar info as we dont want loader to try and load the jars contained in dev.
 		try {
-			ZipUtils.transformJson(JsonObject.class, path, Map.of("fabric.mod.json", json -> {
-				json.remove("jars");
-				return json;
-			}));
+			ZipUtils.transformJson(JsonObject.class, path, Map.of(FabricModJsonFactory.getMetadataPath(path), json -> ModJsonFactory.createFromZip(path).stripNestedJars(json)));
 		} catch (IOException e) {
 			throw new UncheckedIOException("Failed to strip nested jars from %s".formatted(path), e);
 		}

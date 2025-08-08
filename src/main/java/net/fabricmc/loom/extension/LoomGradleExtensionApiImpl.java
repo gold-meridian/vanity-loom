@@ -30,6 +30,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import net.fabricmc.loom.api.metadata.ModJson;
+
+import net.fabricmc.loom.util.metadata.ModJsonFactory;
+
 import org.gradle.api.Action;
 import org.gradle.api.NamedDomainObjectContainer;
 import org.gradle.api.NamedDomainObjectList;
@@ -295,7 +299,7 @@ public abstract class LoomGradleExtensionApiImpl implements LoomGradleExtensionA
 	@Override
 	public String getModVersion() {
 		try {
-			final FabricModJson fabricModJson = FabricModJsonFactory.createFromSourceSetsNullable(getProject(), SourceSetHelper.getMainSourceSet(getProject()));
+			final ModJson fabricModJson = ModJsonFactory.createFromSourceSetsNullable(getProject(), SourceSetHelper.getMainSourceSet(getProject()));
 
 			if (fabricModJson == null) {
 				throw new RuntimeException("Could not find a fabric.mod.json file in the main sourceset");

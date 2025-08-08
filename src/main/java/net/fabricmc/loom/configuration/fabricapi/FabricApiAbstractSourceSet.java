@@ -28,6 +28,10 @@ import java.io.IOException;
 
 import javax.inject.Inject;
 
+import net.fabricmc.loom.api.metadata.ModJson;
+
+import net.fabricmc.loom.util.metadata.ModJsonFactory;
+
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.ConfigurationContainer;
 import org.gradle.api.provider.Property;
@@ -36,8 +40,6 @@ import org.gradle.api.tasks.SourceSetContainer;
 
 import net.fabricmc.loom.LoomGradleExtension;
 import net.fabricmc.loom.configuration.providers.minecraft.MinecraftSourceSets;
-import net.fabricmc.loom.util.fmj.FabricModJson;
-import net.fabricmc.loom.util.fmj.FabricModJsonFactory;
 import net.fabricmc.loom.util.gradle.SourceSetHelper;
 
 abstract class FabricApiAbstractSourceSet {
@@ -65,10 +67,11 @@ abstract class FabricApiAbstractSourceSet {
 
 		modId.convention(getProject().provider(() -> {
 			try {
-				final FabricModJson fabricModJson = FabricModJsonFactory.createFromSourceSetsNullable(getProject(), sourceSet);
+				// final FabricModJson fabricModJson = FabricModJsonFactory.createFromSourceSetsNullable(getProject(), sourceSet);
+				final ModJson fabricModJson = ModJsonFactory.createFromSourceSetsNullable(getProject(), sourceSet);
 
 				if (fabricModJson == null) {
-					throw new RuntimeException("Could not find a fabric.mod.json file in the data source set or a value for DataGenerationSettings.getModId()");
+					throw new RuntimeException("Could not find a mod metadata file in the data source set or a value for DataGenerationSettings.getModId()");
 				}
 
 				return fabricModJson.getId();

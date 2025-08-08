@@ -87,4 +87,9 @@ public final class FabricModJsonV0 extends FabricModJson {
 	public Map<String, ModEnvironment> getClassTweakers() {
 		return Collections.emptyMap();
 	}
+
+	@Override
+	public JsonElement getInjectedInterfaces() {
+		return null;
+	}
 }

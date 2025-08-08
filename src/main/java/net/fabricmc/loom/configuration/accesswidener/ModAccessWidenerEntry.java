@@ -30,6 +30,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import net.fabricmc.loom.api.metadata.ModJson;
+
 import org.jetbrains.annotations.Nullable;
 
 import net.fabricmc.accesswidener.AccessWidenerReader;
@@ -45,8 +47,8 @@ import net.fabricmc.tinyremapper.TinyRemapper;
 /**
  * {@link AccessWidenerEntry} implementation for a {@link FabricModJson}.
  */
-public record ModAccessWidenerEntry(FabricModJson mod, String path, ModEnvironment environment, boolean transitiveOnly) implements AccessWidenerEntry {
-	public static List<ModAccessWidenerEntry> readAll(FabricModJson modJson, boolean transitiveOnly) {
+public record ModAccessWidenerEntry(ModJson mod, String path, ModEnvironment environment, boolean transitiveOnly) implements AccessWidenerEntry {
+	public static List<ModAccessWidenerEntry> readAll(ModJson modJson, boolean transitiveOnly) {
 		var entries = new ArrayList<ModAccessWidenerEntry>();
 
 		for (Map.Entry<String, ModEnvironment> entry : modJson.getClassTweakers().entrySet()) {

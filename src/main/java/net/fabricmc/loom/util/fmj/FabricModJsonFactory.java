@@ -32,6 +32,7 @@ import java.io.Reader;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.util.Optional;
 
@@ -51,6 +52,8 @@ import net.fabricmc.loom.util.gradle.SourceSetHelper;
 
 public final class FabricModJsonFactory {
 	public static final String FABRIC_MOD_JSON = "fabric.mod.json";
+	public static final String QUILT_MOD_JSON = "quilt.mod.json";
+	public static final String VANITY_MOD_JSON = "vanity.mod.json";
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(FabricModJsonFactory.class);
 
@@ -70,7 +73,7 @@ public final class FabricModJsonFactory {
 		case 0 -> new FabricModJsonV0(jsonObject, source);
 		case 1 -> new FabricModJsonV1(jsonObject, source);
 		case 2 -> new FabricModJsonV2(jsonObject, source);
-		default -> throw new UnsupportedOperationException(String.format("This version of fabric-loom doesn't support the newer fabric.mod.json schema version of (%s) Please update fabric-loom to be able to read this.", schemaVersion));
+			default -> throw new UnsupportedOperationException(String.format("This version of vanity-loom doesn't support the newer fabric.mod.json schema version of (%s) Please update vanity-loom to be able to read this.", schemaVersion));
 		};
 	}
 
@@ -126,7 +129,7 @@ public final class FabricModJsonFactory {
 
 			return create(modJson, new FabricModJsonSource.SourceSetSource(project, sourceSets));
 		} catch (JsonSyntaxException e) {
-			LOGGER.warn("Failed to parse fabric.mod.json: {}", file.getAbsolutePath());
+			LOGGER.warn("Failed to parse mod json: {}", file.getAbsolutePath());
 			return null;
 		} catch (IOException e) {
 			throw new UncheckedIOException("Failed to read " + file.getAbsolutePath(), e);
@@ -138,10 +141,38 @@ public final class FabricModJsonFactory {
 	}
 
 	public static boolean isModJar(Path input) {
-		return ZipUtils.contains(input, FABRIC_MOD_JSON);
+		return ZipUtils.contains(input, FabricModJsonHelpers.VANITY_MOD_JSON) || ZipUtils.contains(input, FabricModJsonHelpers.QUILT_MOD_JSON) || ZipUtils.contains(input, FabricModJsonHelpers.FABRIC_MOD_JSON);
 	}
 
 	public static boolean containsMod(FileSystemUtil.Delegate fs) {
-		return Files.exists(fs.getPath(FABRIC_MOD_JSON));
+		return Files.exists(fs.getPath(FabricModJsonHelpers.VANITY_MOD_JSON)) || Files.exists(fs.getPath(FabricModJsonHelpers.QUILT_MOD_JSON)) || Files.exists(fs.getPath(FabricModJsonHelpers.FABRIC_MOD_JSON));
+	}
+
+	public static boolean isQuiltMod(Path jar) {
+		try {
+			return ZipUtils.contains(jar, FabricModJsonHelpers.QUILT_MOD_JSON);
+		} catch (UncheckedIOException e) {
+			if (e.getCause() instanceof NoSuchFileException) {
+				return false;
+			} else {
+				throw e;
+			}
+		}
+	}
+
+	public static boolean isVanityMod(Path jar) {
+		try {
+			return ZipUtils.contains(jar, FabricModJsonHelpers.VANITY_MOD_JSON);
+		} catch (UncheckedIOException e) {
+			if (e.getCause() instanceof NoSuchFileException) {
+				return false;
+			} else {
+				throw e;
+			}
+		}
+	}
+
+	public static String getMetadataPath(Path jar) {
+		return isVanityMod(jar) ? FabricModJsonHelpers.VANITY_MOD_JSON : isQuiltMod(jar) ? FabricModJsonHelpers.QUILT_MOD_JSON : FabricModJsonHelpers.FABRIC_MOD_JSON;
 	}
 }

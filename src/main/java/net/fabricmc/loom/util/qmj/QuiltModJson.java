@@ -22,29 +22,38 @@
  * SOFTWARE.
  */
 
-package net.fabricmc.loom.api.processor;
+package net.fabricmc.loom.util.qmj;
 
-import java.util.List;
-import java.util.stream.Stream;
+import java.util.Objects;
+
+import com.google.gson.JsonObject;
 
 import net.fabricmc.loom.api.metadata.ModJson;
+import net.fabricmc.loom.util.fmj.FabricModJsonSource;
 
-public interface SpecContext {
-	List<ModJson> modDependencies();
+public abstract sealed class QuiltModJson implements ModJson permits QuiltModJsonV1 {
+	protected final JsonObject jsonObject;
+	protected final JsonObject loader;
+	private final FabricModJsonSource source;
 
-	List<ModJson> localMods();
+	protected QuiltModJson(JsonObject jsonObject, FabricModJsonSource source) {
+		this.jsonObject = Objects.requireNonNull(jsonObject);
+		this.source = Objects.requireNonNull(source);
+		this.loader = jsonObject.getAsJsonObject("quilt_loader");
+	}
 
-	/**
-	 * Return a set of mods that should be used for transforms, that target EITHER the common or client.
-	 */
-	List<ModJson> modDependenciesCompileRuntime();
+	@Override
+	public final FabricModJsonSource getSource() {
+		return source;
+	}
 
-	/**
-	 * Return a set of mods that should be used for transforms, that target ONLY the client.
-	 */
-	List<ModJson> modDependenciesCompileRuntimeClient();
+	@Override
+	public final String toString() {
+		return getClass().getName() + "[id=%s]".formatted(getId());
+	}
 
-	default List<ModJson> allMods() {
-		return Stream.concat(modDependencies().stream(), localMods().stream()).toList();
+	@Override
+	public final int hashCode() {
+		return Objects.hash(getId());
 	}
 }

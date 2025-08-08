@@ -22,29 +22,41 @@
  * SOFTWARE.
  */
 
-package net.fabricmc.loom.api.processor;
+package net.fabricmc.loom.api.metadata;
 
 import java.util.List;
-import java.util.stream.Stream;
+import java.util.Map;
 
-import net.fabricmc.loom.api.metadata.ModJson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Nullable;
 
-public interface SpecContext {
-	List<ModJson> modDependencies();
+import net.fabricmc.loom.util.fmj.ModEnvironment;
+import net.fabricmc.loom.util.fmj.FabricModJsonSource;
 
-	List<ModJson> localMods();
+@ApiStatus.Experimental
+public interface ModJson {
+	String getId();
 
-	/**
-	 * Return a set of mods that should be used for transforms, that target EITHER the common or client.
-	 */
-	List<ModJson> modDependenciesCompileRuntime();
+	String getModVersion();
 
-	/**
-	 * Return a set of mods that should be used for transforms, that target ONLY the client.
-	 */
-	List<ModJson> modDependenciesCompileRuntimeClient();
+	@Nullable
+	String getModName();
 
-	default List<ModJson> allMods() {
-		return Stream.concat(modDependencies().stream(), localMods().stream()).toList();
-	}
+	List<String> getMixinConfigurations();
+
+	Map<String, ModEnvironment> getClassTweakers();
+
+	@Nullable
+	JsonElement getInjectedInterfaces();
+
+	FabricModJsonSource getSource();
+
+	@Nullable
+	String getProvidedJavadocPath();
+
+	JsonObject stripNestedJars(JsonObject json);
+
+	JsonObject addNestedJars(JsonObject json, List<String> files);
 }

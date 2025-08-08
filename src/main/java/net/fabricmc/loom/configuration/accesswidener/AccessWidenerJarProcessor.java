@@ -35,6 +35,8 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import net.fabricmc.loom.api.metadata.ModJson;
+
 import org.gradle.api.file.RegularFileProperty;
 import org.jetbrains.annotations.Nullable;
 
@@ -84,8 +86,8 @@ public class AccessWidenerJarProcessor implements MinecraftJarProcessor<AccessWi
 		 */
 
 		if (includeTransitive) {
-			for (FabricModJson fabricModJson : context.modDependencies()) {
-				accessWideners.addAll(ModAccessWidenerEntry.readAll(fabricModJson, true));
+			for (ModJson modJson : context.modDependencies()) {
+				accessWideners.addAll(ModAccessWidenerEntry.readAll(modJson, true));
 			}
 		}
 

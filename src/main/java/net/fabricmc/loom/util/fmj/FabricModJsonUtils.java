@@ -31,6 +31,7 @@ import java.util.function.Predicate;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import org.jetbrains.annotations.Nullable;
 
 public final class FabricModJsonUtils {
 	private FabricModJsonUtils() {
@@ -41,6 +42,15 @@ public final class FabricModJsonUtils {
 		ensurePrimitive(element, JsonPrimitive::isString, key);
 
 		return element.getAsString();
+	}
+
+	@Nullable
+	public static String readStringOrNull(JsonObject jsonObject, String key) {
+		if (jsonObject != null && jsonObject.has(key)) {
+			return readString(jsonObject, key);
+		} else {
+			return null;
+		}
 	}
 
 	public static int readInt(JsonObject jsonObject, String key) {

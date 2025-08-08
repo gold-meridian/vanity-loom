@@ -36,30 +36,32 @@ import org.gradle.api.tasks.SourceSet;
 import net.fabricmc.loom.util.ZipUtils;
 import net.fabricmc.loom.util.gradle.SourceSetHelper;
 
+import org.jetbrains.annotations.NotNull;
+
 /**
  * A mod may be a zip, directory or Gradle {@link SourceSet}
  * This abstraction allows easily reading a contained file from the mod.
  */
 public interface FabricModJsonSource {
-	byte[] read(String path) throws IOException;
+	byte[] read(@NotNull String path) throws IOException;
 
 	record ZipSource(Path zipPath) implements FabricModJsonSource {
 		@Override
-		public byte[] read(String path) throws IOException {
+		public byte[] read(@NotNull String path) throws IOException {
 			return ZipUtils.unpack(zipPath, path);
 		}
 	}
 
 	record DirectorySource(Path directoryPath) implements FabricModJsonSource {
 		@Override
-		public byte[] read(String path) throws IOException {
+		public byte[] read(@NotNull String path) throws IOException {
 			return Files.readAllBytes(directoryPath.resolve(path));
 		}
 	}
 
 	record SourceSetSource(Project project, SourceSet... sourceSets) implements FabricModJsonSource {
 		@Override
-		public byte[] read(String path) throws IOException {
+		public byte[] read(@NotNull String path) throws IOException {
 			return Files.readAllBytes(findFile(path).toPath());
 		}
 

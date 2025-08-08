@@ -41,6 +41,9 @@ import javax.inject.Inject;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+
+import net.fabricmc.loom.api.metadata.ModJson;
+
 import org.jetbrains.annotations.Nullable;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassVisitor;
@@ -100,7 +103,7 @@ public abstract class InterfaceInjectionProcessor implements MinecraftJarProcess
 		}
 
 		Set<String> clientOnlyModIds = context.modDependenciesCompileRuntimeClient().stream()
-				.map(FabricModJson::getId)
+				.map(ModJson::getId)
 				.collect(Collectors.toSet());
 
 		return new Spec(injectedInterfaces, clientOnlyModIds);
@@ -225,9 +228,9 @@ public abstract class InterfaceInjectionProcessor implements MinecraftJarProcess
 	}
 
 	private record InjectedInterface(String modId, String className, String ifaceName, @Nullable String generics) {
-		public static List<InjectedInterface> fromMod(FabricModJson fabricModJson) {
-			final String modId = fabricModJson.getId();
-			final JsonElement jsonElement = fabricModJson.getCustom(Constants.CustomModJsonKeys.INJECTED_INTERFACE);
+		public static List<InjectedInterface> fromMod(ModJson modJson) {
+			final String modId = modJson.getId();
+			final JsonElement jsonElement = modJson.getInjectedInterfaces();
 
 			if (jsonElement == null) {
 				return Collections.emptyList();
@@ -263,8 +266,8 @@ public abstract class InterfaceInjectionProcessor implements MinecraftJarProcess
 			return result;
 		}
 
-		public static List<InjectedInterface> fromMods(List<FabricModJson> fabricModJsons) {
-			return fabricModJsons.stream()
+		public static List<InjectedInterface> fromMods(List<ModJson> modJsons) {
+			return modJsons.stream()
 					.map(InjectedInterface::fromMod)
 					.flatMap(List::stream)
 					.toList();

@@ -32,6 +32,10 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import com.google.gson.JsonObject;
+
+import net.fabricmc.loom.api.metadata.ModJson;
+import net.fabricmc.loom.util.metadata.ModJsonFactory;
+
 import org.gradle.api.Project;
 import org.gradle.api.provider.ListProperty;
 import org.gradle.api.provider.Property;
@@ -106,13 +110,13 @@ public class MixinRefmapService extends Service<MixinRefmapService.Options> {
 	}
 
 	public void applyToJar(Path path) throws IOException {
-		final FabricModJson fabricModJson = FabricModJsonFactory.createFromZipNullable(path);
+		final ModJson modJson = ModJsonFactory.createFromZipNullable(path);
 
-		if (fabricModJson == null) {
+		if (modJson == null) {
 			return;
 		}
 
-		final List<String> allMixinConfigs = fabricModJson.getMixinConfigurations();
+		final List<String> allMixinConfigs = modJson.getMixinConfigurations();
 		final List<String> mixinConfigs = getOptions().getMixinConfigs().get().stream()
 				.filter(allMixinConfigs::contains)
 				.toList();

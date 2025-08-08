@@ -25,9 +25,6 @@
 package net.fabricmc.loom.configuration;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.UncheckedIOException;
-import java.nio.charset.StandardCharsets;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -36,16 +33,17 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.google.common.collect.Iterables;
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
+
+import net.fabricmc.loom.api.metadata.ModJson;
+
+import net.fabricmc.loom.util.metadata.ModJsonFactory;
+
 import org.apache.commons.io.FilenameUtils;
 import org.gradle.api.InvalidUserDataException;
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.artifacts.Dependency;
 import org.gradle.api.artifacts.FileCollectionDependency;
-
-import net.fabricmc.loom.util.ZipUtils;
 
 public class FileDependencyInfo extends DependencyInfo {
 	protected final Map<String, File> classifierToFile = new HashMap<>();
@@ -101,7 +99,7 @@ public class FileDependencyInfo extends DependencyInfo {
 		} else {
 			group = "net.fabricmc.synthetic";
 			File root = classifierToFile.get(""); //We've built the classifierToFile map, now to try find a name and version for our dependency
-			byte[] modJson;
+			/*byte[] modJson;
 
 			try {
 				if ("jar".equals(FilenameUtils.getExtension(root.getName())) && (modJson = ZipUtils.unpackNullable(root.toPath(), "fabric.mod.json")) != null) {
@@ -126,6 +124,29 @@ public class FileDependencyInfo extends DependencyInfo {
 				}
 			} catch (IOException e) {
 				throw new UncheckedIOException("Failed to read input file: " + root, e);
+			}*/
+
+			ModJson metadata;
+
+			if ("jar".equals(FilenameUtils.getExtension(root.getName())) && (metadata = ModJsonFactory.createFromZipNullable(root.toPath())) != null) {
+				//It has metadata we can parse; try to extract as much as we can out of it
+				String name = metadata.getModName();
+
+				if (name == null) {
+					name = metadata.getId();
+				}
+
+				this.name = name;
+
+				version = metadata.getModVersion();
+
+				if (version == null) {
+					throw new IllegalArgumentException("Invalid mod jar (no version): " + root);
+				}
+			} else {
+				//Not a Fabric mod, just have to make something up
+				name = FilenameUtils.removeExtension(root.getName());
+				version = "1.0";
 			}
 		}
 	}

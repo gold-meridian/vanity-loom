@@ -27,15 +27,18 @@ package net.fabricmc.loom.build.nesting;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.google.common.base.Preconditions;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+
+import net.fabricmc.loom.util.metadata.ModJsonFactory;
+
 import org.gradle.api.UncheckedIOException;
 import org.slf4j.Logger;
 
@@ -50,7 +53,14 @@ public class JarNester {
 			return;
 		}
 
-		Preconditions.checkArgument(FabricModJsonFactory.isModJar(modJar), "Cannot nest jars into none mod jar " + modJar.getName());
+		Preconditions.checkArgument(FabricModJsonFactory.isModJar(modJar), "Cannot nest jars into non-mod jar " + modJar.getName());
+		List<String> files = new ArrayList<>();
+
+		for (File file : jars) {
+			String nestedJarPath = "META-INF/jars/" + file.getName();
+			Preconditions.checkArgument(FabricModJsonFactory.isModJar(file), "Cannot nest non-mod jar: " + file.getName());
+			files.add(nestedJarPath);
+		}
 
 		// Ensure deterministic ordering of entries in fabric.mod.json
 		Collection<File> sortedJars = jars.stream().sorted(Comparator.comparing(File::getName)).toList();
@@ -64,7 +74,7 @@ public class JarNester {
 				}
 			}).collect(Collectors.toList()));
 
-			int count = ZipUtils.transformJson(JsonObject.class, modJar.toPath(), Stream.of(new Pair<>("fabric.mod.json", json -> {
+			/*int count = ZipUtils.transformJson(JsonObject.class, modJar.toPath(), Stream.of(new Pair<>("fabric.mod.json", json -> {
 				JsonArray nestedJars = json.getAsJsonArray("jars");
 
 				if (nestedJars == null || !json.has("jars")) {
@@ -93,9 +103,10 @@ public class JarNester {
 				json.add("jars", nestedJars);
 
 				return json;
-			})));
+			})));*/
+			int count = ZipUtils.transformJson(JsonObject.class, modJar.toPath(), Stream.of(new Pair<>(FabricModJsonFactory.getMetadataPath(modJar.toPath()), json -> ModJsonFactory.createFromZip(modJar.toPath()).addNestedJars(json, files))));
 
-			Preconditions.checkState(count > 0, "Failed to transform fabric.mod.json");
+			Preconditions.checkState(count > 0, "Failed to transform mod metadata file");
 		} catch (IOException e) {
 			throw new java.io.UncheckedIOException("Failed to nest jars into " + modJar.getName(), e);
 		}
