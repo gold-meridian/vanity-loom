@@ -7,7 +7,6 @@ plugins {
 	id 'groovy'
 	id 'codenarc'
 	alias(libs.plugins.kotlin)
-	alias(libs.plugins.spotless)
 	alias(libs.plugins.retry)
 }
 
@@ -192,33 +191,6 @@ java {
 	withSourcesJar()
 	sourceCompatibility = JavaVersion.VERSION_21
 	targetCompatibility = JavaVersion.VERSION_21
-}
-
-spotless {
-	lineEndings = com.diffplug.spotless.LineEnding.UNIX
-
-	java {
-		licenseHeaderFile(rootProject.file("HEADER")).yearSeparator("-")
-		targetExclude("**/loom/util/DownloadUtil.java")
-	}
-
-	groovy {
-		importOrder('java', 'javax', '', 'net.fabricmc', '\\#')
-		licenseHeaderFile(rootProject.file("HEADER")).yearSeparator("-")
-		greclipse()
-	}
-
-	groovyGradle {
-		target 'src/**/*.gradle', '*.gradle'
-		greclipse()
-	}
-
-	kotlin {
-		licenseHeaderFile(rootProject.file("HEADER")).yearSeparator("-")
-		targetExclude("**/build.gradle.kts")
-		targetExclude("src/test/resources/projects/*/**")
-		ktlint()
-	}
 }
 
 codenarc {
