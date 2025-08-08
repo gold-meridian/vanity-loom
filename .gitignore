@@ -1,26 +1,11 @@
-# Ignore everything
-/*
+.vs/
+.vscode/
+.idea/
 
-# Folders
-!/gradle
-!/src
-!/.github
+.gradle/
+.kotlin/
+build/
+bin/
+obj/
 
-# Files
-!/.gitattributes
-!/.gitignore
-!/.editorconfig
-!/build.gradle
-!/gradle.properties
-!/gradlew
-!/gradlew.bat
-!/HEADER
-!/LICENSE
-!/README.md
-!/settings.gradle
-!/Jenkinsfile
-!/checkstyle.xml
-!/codenarc.groovy
-!/bootstrap
-
-/src/**/generated
+*.user
