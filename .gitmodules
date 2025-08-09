@@ -1,0 +1,6 @@
+[submodule "lorenz-tiny"]
+	path = lorenz-tiny
+	url = https://github.com/gold-meridian/lorenz-tiny
+[submodule "stitch"]
+	path = stitch
+	url = https://github.com/gold-meridian/stitch
