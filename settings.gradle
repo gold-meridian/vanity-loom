@@ -10,3 +10,20 @@ dependencyResolutionManagement {
 		}
 	}
 }
+
+// include ":lorenz-tiny"
+// include ":stitch"
+
+includeBuild("stitch") {
+	dependencySubstitution {
+		substitute(module("net.fabricmc:stitch"))
+				.using(project(":"))
+	}
+}
+
+includeBuild("lorenz-tiny") {
+	dependencySubstitution {
+		substitute(module("net.fabricmc:lorenz-tiny"))
+				.using(project(":"))
+	}
+}
