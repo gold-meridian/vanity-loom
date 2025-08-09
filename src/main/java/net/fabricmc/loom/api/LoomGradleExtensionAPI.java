@@ -27,6 +27,9 @@ package net.fabricmc.loom.api;
 import java.io.File;
 import java.util.List;
 
+import net.fabricmc.loom.configuration.providers.minecraft.MergedMinecraftProvider;
+import net.fabricmc.loom.configuration.providers.minecraft.MinecraftProvider;
+
 import org.gradle.api.Action;
 import org.gradle.api.NamedDomainObjectContainer;
 import org.gradle.api.NamedDomainObjectList;
@@ -240,6 +243,18 @@ public interface LoomGradleExtensionAPI {
 	void splitEnvironmentSourceSets();
 
 	boolean areEnvironmentSourceSetsSplit();
+
+	default void gluedMinecraftJar() {
+		getMinecraftJarConfiguration().set(MinecraftJarConfiguration.GLUED);
+	}
+
+	default void disableSignatureVerification() {
+		MinecraftProvider.skipVerification();
+	}
+
+	default void disableSyntheticParamsOffsetInMerged() {
+		MergedMinecraftProvider.disableSyntheticParamsOffset();
+	}
 
 	Property<Boolean> getRuntimeOnlyLog4j();
 

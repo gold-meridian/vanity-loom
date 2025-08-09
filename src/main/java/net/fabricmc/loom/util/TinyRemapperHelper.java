@@ -112,6 +112,10 @@ public final class TinyRemapperHelper {
 				String className = classDef.getName(fromId);
 
 				if (className == null) {
+					className = classDef.getSrcName();
+				}
+
+				if (className == null) {
 					continue;
 				}
 

@@ -37,15 +37,17 @@ import org.slf4j.LoggerFactory;
 import net.fabricmc.loom.api.mappings.layered.MappingsNamespace;
 import net.fabricmc.loom.configuration.ConfigContext;
 
-public final class MergedMinecraftProvider extends MinecraftProvider {
+public class MergedMinecraftProvider extends MinecraftProvider {
 	private static final Logger LOGGER = LoggerFactory.getLogger(MergedMinecraftProvider.class);
+
+	private static boolean syntheticParamsOffsetEnabled = true;
 
 	private Path minecraftMergedJar;
 
 	public MergedMinecraftProvider(MinecraftMetadataProvider metadataProvider, ConfigContext configContext) {
 		super(metadataProvider, configContext);
 
-		if (isLegacyVersion()) {
+		if (!(this instanceof GluedMinecraftProvider) && isLegacyVersion()) {
 			throw new RuntimeException("something has gone wrong - merged jar configuration selected but Minecraft " + metadataProvider.getMinecraftVersion() + " does not allow merging the obfuscated jars - the legacy-merged jar configuration should have been selected!");
 		}
 	}
@@ -76,7 +78,16 @@ public final class MergedMinecraftProvider extends MinecraftProvider {
 
 		if (!Files.exists(minecraftMergedJar) || getExtension().refreshDeps()) {
 			try {
-				mergeJars();
+				File serverJar = getMinecraftServerJar();
+
+				if (getServerBundleMetadata() != null) {
+					extractBundledServerJar();
+					serverJar = getMinecraftExtractedServerJar();
+				}
+
+				Objects.requireNonNull(serverJar, "Cannot merge null input jar?");
+
+				mergeJars(getMinecraftClientJar(), serverJar);
 			} catch (Throwable e) {
 				Files.deleteIfExists(getMinecraftClientJar().toPath());
 				Files.deleteIfExists(getMinecraftServerJar().toPath());
@@ -88,15 +99,8 @@ public final class MergedMinecraftProvider extends MinecraftProvider {
 		}
 	}
 
-	private void mergeJars() throws IOException {
-		File minecraftClientJar = getMinecraftClientJar();
-		File minecraftServerJar = getMinecraftServerJar();
-
-		if (getServerBundleMetadata() != null) {
-			minecraftServerJar = getMinecraftExtractedServerJar();
-		}
-
-		mergeJars(minecraftClientJar, minecraftServerJar, minecraftMergedJar.toFile());
+	protected void mergeJars(File clientJar, File serverJar) throws IOException {
+		mergeJars(clientJar, serverJar, minecraftMergedJar.toFile());
 	}
 
 	public static void mergeJars(File clientJar, File serverJar, File mergedJar) throws IOException {
@@ -106,12 +110,19 @@ public final class MergedMinecraftProvider extends MinecraftProvider {
 		Objects.requireNonNull(serverJar, "Cannot merge null server jar?");
 
 		try (var jarMerger = new MinecraftJarMerger(clientJar, serverJar, mergedJar)) {
-			jarMerger.enableSyntheticParamsOffset();
+			if (syntheticParamsOffsetEnabled) {
+				jarMerger.enableSyntheticParamsOffset();
+			}
+
 			jarMerger.merge();
 		}
 	}
 
 	public Path getMergedJar() {
 		return minecraftMergedJar;
+	}
+
+	public static void disableSyntheticParamsOffset() {
+		syntheticParamsOffsetEnabled = false;
 	}
 }

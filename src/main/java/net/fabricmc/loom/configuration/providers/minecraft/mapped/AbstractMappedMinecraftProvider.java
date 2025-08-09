@@ -246,6 +246,8 @@ public abstract class AbstractMappedMinecraftProvider<M extends MinecraftProvide
 		final MinecraftVersionMeta.JavaVersion javaVersion = minecraftProvider.getVersionInfo().javaVersion();
 		final boolean fixRecords = javaVersion != null && javaVersion.majorVersion() >= 16;
 
+		// TODO: Babric replaces fixRecords with remappedJars.sourceNamespace() == MappingsNamespace.INTERMEDIARY
+		// 		 since it was always true previously.  Do we need this?
 		TinyRemapper remapper = TinyRemapperHelper.getTinyRemapper(getProject(), configContext.serviceFactory(), fromM, toM, fixRecords, (builder) -> {
 			builder.extraPostApplyVisitor(new SignatureFixerApplyVisitor(remappedSignatures));
 			configureRemapper(remappedJars, builder);

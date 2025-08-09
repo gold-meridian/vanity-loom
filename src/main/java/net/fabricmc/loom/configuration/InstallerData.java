@@ -27,6 +27,14 @@ package net.fabricmc.loom.configuration;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+
+import com.google.gson.reflect.TypeToken;
+
+import net.fabricmc.loom.LoomGradlePlugin;
+import net.fabricmc.loom.configuration.providers.minecraft.MinecraftVersionMeta;
+
+import net.fabricmc.loom.util.Platform;
+
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.artifacts.ExternalModuleDependency;
@@ -39,6 +47,8 @@ import net.fabricmc.loom.LoomGradleExtension;
 import net.fabricmc.loom.LoomRepositoryPlugin;
 import net.fabricmc.loom.configuration.ide.idea.IdeaUtils;
 import net.fabricmc.loom.util.Constants;
+
+import java.util.List;
 
 public record InstallerData(String version, JsonObject installerJson, InstallerKind installerKind) {
 	private static final Logger LOGGER = LoggerFactory.getLogger(InstallerData.class);
@@ -74,6 +84,24 @@ public record InstallerData(String version, JsonObject installerJson, InstallerK
 		for (JsonElement jsonElement : jsonArray) {
 			final JsonObject jsonObject = jsonElement.getAsJsonObject();
 			final String name = jsonObject.get("name").getAsString();
+
+
+			if (jsonObject.has("rules")) {
+				TypeToken<List<MinecraftVersionMeta.Rule>> rulesTypeToken = new TypeToken<>() {};
+				List<MinecraftVersionMeta.Rule> rules = LoomGradlePlugin.GSON.fromJson(jsonObject.get("rules"), rulesTypeToken);
+
+				boolean valid = false;
+
+				for (MinecraftVersionMeta.Rule rule : rules) {
+					if (rule.appliesToOS(Platform.CURRENT)) {
+						valid = rule.isAllowed();
+					}
+				}
+
+				if (!valid) {
+					continue;
+				}
+			}
 
 			LOGGER.debug("Adding dependency ({}) from installer JSON", name);
 

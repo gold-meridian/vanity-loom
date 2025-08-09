@@ -97,7 +97,7 @@ dependencies {
 	implementation libs.bundles.asm
 
 	// game handling utils
-	implementation (libs.fabric.stitch) {
+	implementation (project(":stitch")) {
 		exclude module: 'enigma'
 	}
 
@@ -105,7 +105,7 @@ dependencies {
 	implementation libs.fabric.tiny.remapper
 	implementation libs.fabric.access.widener
 	implementation libs.fabric.mapping.io
-	implementation (libs.fabric.lorenz.tiny) {
+	implementation (project(":lorenz-tiny")) {
 		transitive = false
 	}
 

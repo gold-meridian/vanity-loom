@@ -164,7 +164,7 @@ public abstract class CompileConfiguration implements Runnable {
 		// Provide the vanilla mc jars
 		final MinecraftProvider minecraftProvider = jarConfiguration.createMinecraftProvider(metadataProvider, configContext);
 		extension.setMinecraftProvider(minecraftProvider);
-		minecraftProvider.provide();
+		minecraftProvider.init();
 
 		// Realise the dependencies without actually resolving them, this forces any lazy providers to be created, populating the layered mapping factories.
 		project.getConfigurations().getByName(Configurations.MAPPINGS).getDependencies().toArray();
@@ -177,6 +177,8 @@ public abstract class CompileConfiguration implements Runnable {
 		final MappingConfiguration mappingConfiguration = MappingConfiguration.create(getProject(), configContext.serviceFactory(), mappingsDep, minecraftProvider);
 		extension.setMappingConfiguration(mappingConfiguration);
 		mappingConfiguration.applyToProject(getProject(), mappingsDep);
+
+		minecraftProvider.provide();
 
 		// Provide the remapped mc jars
 		final IntermediaryMinecraftProvider<?> intermediaryMinecraftProvider = jarConfiguration.createIntermediaryMinecraftProvider(project);

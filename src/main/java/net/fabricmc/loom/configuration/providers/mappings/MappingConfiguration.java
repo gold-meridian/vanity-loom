@@ -39,6 +39,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import net.fabricmc.loom.configuration.providers.minecraft.GluedMinecraftProvider;
+
 import org.apache.tools.ant.util.StringUtils;
 import org.gradle.api.Project;
 import org.gradle.api.provider.Provider;
@@ -185,6 +187,8 @@ public class MappingConfiguration {
 			IntermediateMappingsService intermediateMappingsService = serviceFactory.get(IntermediateMappingsService.createOptions(project, minecraftProvider));
 
 			MappingsMerger.mergeAndSaveMappings(baseTinyMappings, tinyMappings, minecraftProvider, intermediateMappingsService);
+		} else if (minecraftProvider instanceof GluedMinecraftProvider) {
+			Files.move(baseTinyMappings, tinyMappings);
 		} else {
 			final List<Path> minecraftJars = minecraftProvider.getMinecraftJars();
 

@@ -61,7 +61,23 @@ public enum MappingsNamespace {
 	/**
 	 * Named mappings are the developer friendly names used to develop mods against.
 	 */
-	NAMED;
+	NAMED,
+
+
+	/**
+	 * Mappings used for merging two jars that were obfuscated differently.
+	 */
+	GLUE,
+
+	/**
+	 * Official mappings are the names that are used in the vanilla Minecraft server jars, these are usually obfuscated.
+	 */
+	SERVER,
+
+	/**
+	 * Official mappings are the names that are used in the vanilla Minecraft client jars, these are usually obfuscated.
+	 */
+	CLIENT;
 
 	/**
 	 * Gets a {@code MappingsNamespace} from a namespace string.
@@ -76,6 +92,9 @@ public enum MappingsNamespace {
 		case "serverOfficial" -> SERVER_OFFICIAL;
 		case "intermediary" -> INTERMEDIARY;
 		case "named" -> NAMED;
+		case "glue" -> GLUE;
+		case "server" -> SERVER;
+		case "client" -> CLIENT;
 		default -> null;
 		};
 	}

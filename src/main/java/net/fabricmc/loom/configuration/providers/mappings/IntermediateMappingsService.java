@@ -34,6 +34,9 @@ import java.util.Collections;
 import java.util.function.Supplier;
 
 import com.google.common.base.Suppliers;
+
+import net.fabricmc.mappingio.MappingReader;
+
 import org.gradle.api.Project;
 import org.gradle.api.file.RegularFileProperty;
 import org.gradle.api.provider.Property;
@@ -126,7 +129,7 @@ public final class IntermediateMappingsService extends Service<IntermediateMappi
 			MappingNsCompleter nsCompleter = new MappingNsCompleter(tree, Collections.singletonMap(MappingsNamespace.NAMED.toString(), MappingsNamespace.INTERMEDIARY.toString()), true);
 
 			try (BufferedReader reader = Files.newBufferedReader(mappingFile, StandardCharsets.UTF_8)) {
-				Tiny2FileReader.read(reader, nsCompleter);
+				MappingReader.read(reader, nsCompleter);
 			}
 		} catch (IOException e) {
 			throw new UncheckedIOException("Failed to read intermediary mappings", e);

@@ -32,6 +32,9 @@ import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.google.common.base.Preconditions;
+
+import net.fabricmc.loom.configuration.DependencyInfo;
+
 import org.gradle.api.JavaVersion;
 import org.gradle.api.Project;
 import org.jetbrains.annotations.Nullable;
@@ -53,6 +56,8 @@ import net.fabricmc.loom.util.gradle.ProgressGroup;
 public abstract class MinecraftProvider {
 	private static final Logger LOGGER = LoggerFactory.getLogger(MinecraftProvider.class);
 
+	private static boolean globalSkipVerification = false;
+
 	private final MinecraftMetadataProvider metadataProvider;
 
 	private File minecraftClientJar;
@@ -68,6 +73,10 @@ public abstract class MinecraftProvider {
 	public MinecraftProvider(MinecraftMetadataProvider metadataProvider, ConfigContext configContext) {
 		this.metadataProvider = metadataProvider;
 		this.configContext = configContext;
+	}
+
+	public void init() {
+		initFiles();
 	}
 
 	protected boolean provideClient() {
@@ -121,9 +130,23 @@ public abstract class MinecraftProvider {
 		}
 	}
 
+	protected boolean shouldVerifyJars() {
+		return true;
+	}
+
 	private void verifyJars() throws IOException, SignatureVerificationFailure {
+		if (!shouldVerifyJars()) {
+			LOGGER.info("Skipping Minecraft jar verification according to provider!");
+			return;
+		}
+
 		if (GradleUtils.getBooleanProperty(getProject(), Constants.Properties.DISABLE_MINECRAFT_VERIFICATION)) {
-			LOGGER.info("Skipping Minecraft jar verification!");
+			LOGGER.info("Skipping Minecraft jar verification according to gradle property: {}", Constants.Properties.DISABLE_MINECRAFT_VERIFICATION);
+			return;
+		}
+
+		if (globalSkipVerification) {
+			LOGGER.info("Skipping Minecraft jar verification according to disableSignatureVerification()!");
 			return;
 		}
 
@@ -188,7 +211,7 @@ public abstract class MinecraftProvider {
 		return false;
 	}
 
-	private void extractBundledServerJar() throws IOException {
+	protected void extractBundledServerJar() throws IOException {
 		Preconditions.checkArgument(provideServer(), "Not configured to provide server jar");
 		Objects.requireNonNull(getServerBundleMetadata(), "Cannot bundled mc jar from none bundled server jar");
 
@@ -278,5 +301,9 @@ public abstract class MinecraftProvider {
 		File workingDir = new File(extension.getFiles().getUserCache(), version);
 		workingDir.mkdirs();
 		return workingDir;
+	}
+
+	public static void skipVerification() {
+		globalSkipVerification = true;
 	}
 }
