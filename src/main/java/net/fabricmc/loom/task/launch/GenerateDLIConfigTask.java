@@ -142,9 +142,8 @@ public abstract class GenerateDLIConfigTask extends AbstractLoomTask {
 				.argument("client", assetsDirectory.getAbsolutePath())
 
 				// QUILT: add --version "Quilt Loom"
-				// TODO(vanity): Should we change this? Side effects?
 				.argument("client", "--version")
-				.argument("client", "Quilt Loom");
+				.argument("client", "Vanity Loom");
 
 		if (versionInfo.hasNativesToExtract()) {
 			String nativesPath = getNativesDirectoryPath().get();
