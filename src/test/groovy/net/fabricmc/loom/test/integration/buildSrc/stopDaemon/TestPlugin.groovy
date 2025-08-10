@@ -41,7 +41,6 @@ import org.gradle.invocation.DefaultGradle
 import org.gradle.jvm.toolchain.JavaLanguageVersion
 import org.gradle.launcher.daemon.configuration.DaemonPriority
 import org.gradle.launcher.daemon.context.DefaultDaemonContext
-import org.gradle.launcher.daemon.protocol.*
 import org.gradle.launcher.daemon.registry.DaemonInfo
 import org.gradle.launcher.daemon.registry.PersistentDaemonRegistry
 import org.gradle.launcher.daemon.server.DaemonTcpServerConnector

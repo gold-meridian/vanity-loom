@@ -31,7 +31,6 @@ import org.gradle.api.internal.MutationGuard
 import org.gradle.api.internal.MutationGuards
 import org.gradle.api.internal.collections.DefaultDomainObjectCollectionFactory
 import org.gradle.api.internal.collections.DomainObjectCollectionFactory
-import org.gradle.api.internal.file.*
 import org.gradle.api.internal.file.collections.DirectoryFileTreeFactory
 import org.gradle.api.internal.model.DefaultObjectFactory
 import org.gradle.api.internal.model.NamedObjectInstantiator
@@ -49,7 +48,6 @@ import org.gradle.cache.internal.DefaultCrossBuildInMemoryCacheFactory
 import org.gradle.internal.event.ListenerManager
 import org.gradle.internal.instantiation.InstantiatorFactory
 import org.gradle.internal.instantiation.generator.DefaultInstantiatorFactory
-import org.gradle.internal.nativeintegration.filesystem.FileSystem
 import org.gradle.internal.service.DefaultServiceRegistry
 import org.gradle.internal.service.Provides
 import org.gradle.internal.service.ServiceRegistrationProvider

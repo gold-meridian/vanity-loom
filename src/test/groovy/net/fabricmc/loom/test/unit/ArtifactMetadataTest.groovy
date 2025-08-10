@@ -219,13 +219,13 @@ class ArtifactMetadataTest extends Specification {
 		then:
 		knownBSMs == metadata.knownIdyBsms()
 		where:
-		knownBSMs               | entries
-		[]                      | ["fabric.mod.json": "{}"] // Default
-		["com/example/Class"]   | ["META-INF/MANIFEST.MF": manifest("Fabric-Loom-Known-Indy-BSMS", "com/example/Class")] // single bsm
+		knownBSMs             | entries
+		[]                    | ["fabric.mod.json": "{}"] // Default
+		["com/example/Class"] | ["META-INF/MANIFEST.MF": manifest("Fabric-Loom-Known-Indy-BSMS", "com/example/Class")] // single bsm
 		[
 				"com/example/Class",
 				"com/example/Another"
-		]                       | ["META-INF/MANIFEST.MF": manifest("Fabric-Loom-Known-Indy-BSMS", "com/example/Class,com/example/Another")] // two bsms
+		]                     | ["META-INF/MANIFEST.MF": manifest("Fabric-Loom-Known-Indy-BSMS", "com/example/Class,com/example/Another")] // two bsms
 	}
 
 	private static Path createModWithRemapType(String loomVersion, String remapType) {

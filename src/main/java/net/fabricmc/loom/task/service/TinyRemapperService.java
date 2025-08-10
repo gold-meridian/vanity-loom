@@ -75,6 +75,7 @@ public class TinyRemapperService extends Service<TinyRemapperService.Options> im
 	private KotlinRemapperClassloader kotlinRemapperClassloader;
 	// Set to true once remapping has started, once set no inputs can be read.
 	private boolean isRemapping = false;
+
 	public TinyRemapperService(Options options, ServiceFactory serviceFactory) {
 		super(options, serviceFactory);
 		tinyRemapper = createTinyRemapper();

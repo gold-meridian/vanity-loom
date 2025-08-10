@@ -36,7 +36,6 @@ import com.sun.jdi.Bootstrap
 import com.sun.jdi.event.BreakpointEvent
 import groovy.transform.CompileStatic
 import io.reactivex.Maybe
-import io.reactivex.Observable
 import io.reactivex.functions.Function
 import spock.lang.Specification
 import spock.lang.Timeout

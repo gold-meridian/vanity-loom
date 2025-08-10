@@ -32,8 +32,6 @@ import com.google.gson.JsonObject
 import org.gradle.api.tasks.bundling.ZipEntryCompression
 import spock.lang.Specification
 
-import net.fabricmc.loom.util.*
-
 class ZipUtilsTest extends Specification {
 	def "pack"() {
 		given:

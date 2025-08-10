@@ -34,7 +34,6 @@ import io.javalin.http.HttpStatus
 import spock.lang.IgnoreIf
 
 import net.fabricmc.loom.util.Checksum
-import net.fabricmc.loom.util.download.*
 
 class DownloadFileTest extends DownloadTest {
 	@IgnoreIf({ os.windows })

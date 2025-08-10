@@ -62,6 +62,7 @@ public class MinecraftJarMerger implements AutoCloseable {
 	private final Set<String> entriesAll;
 	private boolean removeSnowmen = false;
 	private boolean offsetSyntheticsParams = false;
+
 	public MinecraftJarMerger(File inputClient, File inputServer, File output) throws IOException {
 		if (output.exists()) {
 			if (!output.delete()) {

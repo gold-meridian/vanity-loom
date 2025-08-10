@@ -37,7 +37,6 @@ import net.fabricmc.loom.api.processor.ProcessorContext
 import net.fabricmc.loom.api.processor.SpecContext
 import net.fabricmc.loom.configuration.ifaceinject.InterfaceInjectionProcessor
 import net.fabricmc.loom.test.unit.processor.classes.*
-import net.fabricmc.loom.util.*
 import net.fabricmc.loom.util.fmj.FabricModJson
 import net.fabricmc.mappingio.MappingReader
 import net.fabricmc.mappingio.tree.MemoryMappingTree

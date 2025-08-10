@@ -42,6 +42,7 @@ public class SyntheticParameterClassVisitor extends ClassVisitor {
 	private int synthetic;
 	private String syntheticArgs;
 	private boolean backoff = false;
+
 	public SyntheticParameterClassVisitor(int api, ClassVisitor cv) {
 		super(api, cv);
 	}

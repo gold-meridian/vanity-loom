@@ -38,6 +38,7 @@ public abstract class FabricApiExtensionImpl implements FabricApiExtension {
 	private final FabricApiVersions versions;
 	private final FabricApiDataGeneration dataGeneration;
 	private final FabricApiTesting testing;
+
 	public FabricApiExtensionImpl() {
 		versions = getObjectFactory().newInstance(FabricApiVersions.class);
 		dataGeneration = getObjectFactory().newInstance(FabricApiDataGeneration.class);

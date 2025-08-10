@@ -74,6 +74,7 @@ public final class Download {
 	private final DownloadProgressListener progressListener;
 	private final HttpClient.Version httpVersion;
 	private final int downloadAttempt;
+
 	Download(URI url, String expectedHash, boolean useEtag, boolean forceDownload, boolean offline, Duration maxAge, DownloadProgressListener progressListener, HttpClient.Version httpVersion, int downloadAttempt) {
 		this.url = url;
 		this.expectedHash = expectedHash;
