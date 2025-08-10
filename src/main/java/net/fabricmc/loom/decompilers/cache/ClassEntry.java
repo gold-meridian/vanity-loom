@@ -62,7 +62,11 @@ public record ClassEntry(String name, List<String> innerClasses, List<String> su
 			}
 
 			if (!innerClass.startsWith(className)) {
-				throw new IllegalArgumentException("Inner class (" + innerClass + ") does not have the parent class name as a prefix: " + name);
+				if (innerClass.matches("^META-INF/versions/\\d+/.*$")) {
+					LOGGER.info("Got META-INF-versioned inner class: {}", innerClass);
+				} else {
+					throw new IllegalArgumentException("Inner class (" + innerClass + ") does not have the parent class name as a prefix: " + name);
+				}
 			}
 		}
 
@@ -86,7 +90,9 @@ public record ClassEntry(String name, List<String> innerClasses, List<String> su
 		copy(sourceRoot.resolve(name), targetPath);
 
 		for (String innerClass : innerClasses) {
-			copy(sourceRoot.resolve(innerClass), targetRoot.resolve(innerClass));
+			Path innerTarget = targetRoot.resolve(innerClass);
+			Files.createDirectories(innerTarget.getParent());
+			copy(sourceRoot.resolve(innerClass), innerTarget);
 		}
 	}
 

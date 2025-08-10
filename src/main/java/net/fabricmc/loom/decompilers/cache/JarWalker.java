@@ -95,7 +95,9 @@ public final class JarWalker {
 				if (outerClass == null) {
 					outerClasses.add(fileName);
 				} else {
-					innerClasses.computeIfAbsent(outerClass + ".class", k -> new ArrayList<>()).add(fileName);
+					if (!fileName.matches("^META-INF/versions/\\d+/.*$")) {
+						innerClasses.computeIfAbsent(outerClass + ".class", k -> new ArrayList<>()).add(fileName);
+					}
 				}
 			}
 		}
