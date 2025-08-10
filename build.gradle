@@ -5,7 +5,6 @@ plugins {
 	id 'idea'
 	id 'eclipse'
 	id 'groovy'
-	id 'codenarc'
 	alias(libs.plugins.kotlin)
 	alias(libs.plugins.retry)
 }
@@ -191,11 +190,6 @@ java {
 	withSourcesJar()
 	sourceCompatibility = JavaVersion.VERSION_21
 	targetCompatibility = JavaVersion.VERSION_21
-}
-
-codenarc {
-	toolVersion = libs.versions.codenarc.get()
-	configFile = file("codenarc.groovy")
 }
 
 gradlePlugin {
