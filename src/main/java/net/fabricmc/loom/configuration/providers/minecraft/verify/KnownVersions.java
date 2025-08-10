@@ -48,7 +48,7 @@ public record KnownVersions(
 
 	private static KnownVersions load() {
 		try (InputStream is = KnownVersions.class.getClassLoader().getResourceAsStream("certs/known_versions.json");
-				Reader reader = new InputStreamReader(Objects.requireNonNull(is))) {
+			 Reader reader = new InputStreamReader(Objects.requireNonNull(is))) {
 			return LoomGradlePlugin.GSON.fromJson(reader, KnownVersions.class);
 		} catch (IOException e) {
 			throw new UncheckedIOException("Failed to load known versions", e);

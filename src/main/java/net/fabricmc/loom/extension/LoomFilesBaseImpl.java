@@ -31,18 +31,22 @@ import org.gradle.api.Project;
 import net.fabricmc.loom.LoomGradleExtension;
 
 public abstract class LoomFilesBaseImpl implements LoomFiles {
-	protected abstract File getGradleUserHomeDir();
-	protected abstract File getRootDir();
-	protected abstract File getProjectDir();
-	protected abstract File getBuildDir();
-
-	public LoomFilesBaseImpl() { }
+	public LoomFilesBaseImpl() {
+	}
 
 	private static File createFile(File parent, String child) {
 		File file = new File(parent, child);
 		file.mkdirs();
 		return file;
 	}
+
+	protected abstract File getGradleUserHomeDir();
+
+	protected abstract File getRootDir();
+
+	protected abstract File getProjectDir();
+
+	protected abstract File getBuildDir();
 
 	@Override
 	public File getUserCache() {

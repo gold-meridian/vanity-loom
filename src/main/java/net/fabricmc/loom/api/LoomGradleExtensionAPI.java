@@ -27,9 +27,6 @@ package net.fabricmc.loom.api;
 import java.io.File;
 import java.util.List;
 
-import net.fabricmc.loom.configuration.providers.minecraft.MergedMinecraftProvider;
-import net.fabricmc.loom.configuration.providers.minecraft.MinecraftProvider;
-
 import org.gradle.api.Action;
 import org.gradle.api.NamedDomainObjectContainer;
 import org.gradle.api.NamedDomainObjectList;
@@ -56,7 +53,9 @@ import net.fabricmc.loom.configuration.ide.RunConfigSettings;
 import net.fabricmc.loom.configuration.processors.JarProcessor;
 import net.fabricmc.loom.configuration.providers.mappings.NoOpIntermediateMappingsProvider;
 import net.fabricmc.loom.configuration.providers.minecraft.ManifestLocations;
+import net.fabricmc.loom.configuration.providers.minecraft.MergedMinecraftProvider;
 import net.fabricmc.loom.configuration.providers.minecraft.MinecraftJarConfiguration;
+import net.fabricmc.loom.configuration.providers.minecraft.MinecraftProvider;
 import net.fabricmc.loom.task.GenerateSourcesTask;
 import net.fabricmc.loom.util.DeprecationHelper;
 
@@ -128,7 +127,7 @@ public interface LoomGradleExtensionAPI {
 	}
 
 	@ApiStatus.Experimental
-	// TODO: move this from LoomGradleExtensionAPI to LoomGradleExtension once getRefmapName & setRefmapName is removed.
+		// TODO: move this from LoomGradleExtensionAPI to LoomGradleExtension once getRefmapName & setRefmapName is removed.
 	MixinExtensionAPI getMixin();
 
 	default void interfaceInjection(Action<InterfaceInjectionExtensionAPI> action) {
@@ -204,7 +203,8 @@ public interface LoomGradleExtensionAPI {
 	 */
 	@ApiStatus.Experimental
 	default void noIntermediateMappings() {
-		setIntermediateMappingsProvider(NoOpIntermediateMappingsProvider.class, p -> { });
+		setIntermediateMappingsProvider(NoOpIntermediateMappingsProvider.class, p -> {
+		});
 	}
 
 	/**

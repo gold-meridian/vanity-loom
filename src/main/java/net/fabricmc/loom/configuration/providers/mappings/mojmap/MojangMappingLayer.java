@@ -46,7 +46,7 @@ import net.fabricmc.mappingio.format.proguard.ProGuardFileReader;
 import net.fabricmc.mappingio.tree.MemoryMappingTree;
 
 public record MojangMappingLayer(Path clientMappings, Path serverMappings, boolean nameSyntheticMembers, boolean dropNoneIntermediaryRoots,
-									@Nullable Supplier<MemoryMappingTree> intermediarySupplier, Logger logger) implements MappingLayer {
+								 @Nullable Supplier<MemoryMappingTree> intermediarySupplier, Logger logger) implements MappingLayer {
 	private static final Pattern SYNTHETIC_NAME_PATTERN = Pattern.compile("^(access|this|val\\$this|lambda\\$.*)\\$[0-9]+$");
 
 	@Override
@@ -89,7 +89,7 @@ public record MojangMappingLayer(Path clientMappings, Path serverMappings, boole
 
 		// Read both server and client mappings
 		try (BufferedReader clientBufferedReader = Files.newBufferedReader(clientMappings, StandardCharsets.UTF_8);
-				BufferedReader serverBufferedReader = Files.newBufferedReader(serverMappings, StandardCharsets.UTF_8)) {
+			 BufferedReader serverBufferedReader = Files.newBufferedReader(serverMappings, StandardCharsets.UTF_8)) {
 			ProGuardFileReader.read(clientBufferedReader, MappingsNamespace.NAMED.toString(), MappingsNamespace.OFFICIAL.toString(), nsSwitch);
 			ProGuardFileReader.read(serverBufferedReader, MappingsNamespace.NAMED.toString(), MappingsNamespace.OFFICIAL.toString(), nsSwitch);
 		}

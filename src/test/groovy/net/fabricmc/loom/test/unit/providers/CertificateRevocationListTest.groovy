@@ -73,9 +73,9 @@ class CertificateRevocationListTest extends Specification {
 		def x509crl = CertificateUtils.createCrl(keyPair, intermediate, [revokedLeaf])
 
 		def chain = CertificateChain.getRoot([
-			root,
-			intermediate,
-			revokedLeaf
+				root,
+				intermediate,
+				revokedLeaf
 		])
 
 		when:

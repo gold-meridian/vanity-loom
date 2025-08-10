@@ -38,21 +38,16 @@ import java.util.Objects;
 
 import javax.inject.Inject;
 
-import com.google.gson.JsonElement;
-
-import net.fabricmc.loom.api.metadata.ModJson;
-
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import net.fabricmc.loom.api.mappings.layered.MappingsNamespace;
+import net.fabricmc.loom.api.metadata.ModJson;
 import net.fabricmc.loom.api.processor.MinecraftJarProcessor;
 import net.fabricmc.loom.api.processor.ProcessorContext;
 import net.fabricmc.loom.api.processor.SpecContext;
 import net.fabricmc.loom.util.Checksum;
-import net.fabricmc.loom.util.Constants;
-import net.fabricmc.loom.util.fmj.FabricModJson;
 import net.fabricmc.mappingio.MappingReader;
 import net.fabricmc.mappingio.tree.MappingTree;
 import net.fabricmc.mappingio.tree.MemoryMappingTree;
@@ -92,9 +87,6 @@ public abstract class ModJavadocProcessor implements MinecraftJarProcessor<ModJa
 		return new Spec(Collections.unmodifiableList(javadocs));
 	}
 
-	public record Spec(List<ModJavadoc> javadocs) implements MinecraftJarProcessor.Spec {
-	}
-
 	@Override
 	public void processJar(Path jar, Spec spec, ProcessorContext context) {
 		// Nothing to do for the jar
@@ -109,6 +101,9 @@ public abstract class ModJavadocProcessor implements MinecraftJarProcessor<ModJa
 
 			return true;
 		};
+	}
+
+	public record Spec(List<ModJavadoc> javadocs) implements MinecraftJarProcessor.Spec {
 	}
 
 	public record ModJavadoc(String modId, MemoryMappingTree mappingTree, String mappingsHash) {

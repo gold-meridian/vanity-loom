@@ -1,10 +1,10 @@
 package net.fabricmc.example;
 
-import net.fabricmc.api.ModInitializer;
-
 import net.minecraft.block.Block;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import net.fabricmc.api.ModInitializer;
 
 public class ExampleMod implements ModInitializer {
 	public static final Logger LOGGER = LoggerFactory.getLogger("modid");

@@ -34,8 +34,8 @@ import org.gradle.api.tasks.SourceSet;
 import org.jetbrains.annotations.Nullable;
 
 import net.fabricmc.loom.api.metadata.ModJson;
-import net.fabricmc.loom.util.fmj.FabricModJsonHelpers;
 import net.fabricmc.loom.util.fmj.FabricModJsonFactory;
+import net.fabricmc.loom.util.fmj.FabricModJsonHelpers;
 import net.fabricmc.loom.util.gradle.SourceSetHelper;
 import net.fabricmc.loom.util.qmj.QuiltModJsonFactory;
 

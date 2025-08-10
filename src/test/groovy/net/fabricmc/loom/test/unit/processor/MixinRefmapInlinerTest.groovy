@@ -43,18 +43,18 @@ class MixinRefmapInlinerTest extends Specification {
 	def "MixinRefmapInlinerClassVisitor"() {
 		given:
 		def remapper = [
-			remapReference: { String mixinClassName, String reference ->
-				switch (reference) {
-					case "MixinRefmapInlinerClassVisitor":
-						return "RemappedClassName"
-					case "injectExample":
-						return "remappedInjectExample"
-					case "HEAD":
-						return "INJECT"
-					default:
-						return reference
+				remapReference: { String mixinClassName, String reference ->
+					switch (reference) {
+						case "MixinRefmapInlinerClassVisitor":
+							return "RemappedClassName"
+						case "injectExample":
+							return "remappedInjectExample"
+						case "HEAD":
+							return "INJECT"
+						default:
+							return reference
+					}
 				}
-			}
 		] as MixinReferenceRemapper
 
 		def remappedNode = new ClassNode()

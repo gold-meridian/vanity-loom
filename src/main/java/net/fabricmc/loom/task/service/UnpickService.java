@@ -76,6 +76,7 @@ import net.fabricmc.loom.util.service.ServiceFactory;
 import net.fabricmc.loom.util.service.ServiceType;
 
 public class UnpickService extends Service<UnpickService.Options> {
+	public static final ServiceType<Options, UnpickService> TYPE = new ServiceType<>(Options.class, UnpickService.class);
 	private static final Logger LOGGER = LoggerFactory.getLogger(UnpickService.class);
 	private static final java.util.logging.Logger JAVA_LOGGER = java.util.logging.Logger.getLogger("loom-unpick-service");
 
@@ -84,27 +85,8 @@ public class UnpickService extends Service<UnpickService.Options> {
 		JAVA_LOGGER.addHandler(new SLF4JAdapterHandler(LOGGER, true));
 	}
 
-	public static final ServiceType<Options, UnpickService> TYPE = new ServiceType<>(Options.class, UnpickService.class);
-
-	public interface Options extends Service.Options {
-		@InputFile
-		RegularFileProperty getUnpickDefinitions();
-
-		@Optional
-		@Nested
-		Property<UnpickRemapperService.Options> getUnpickRemapperService();
-
-		@InputFiles
-		ConfigurableFileCollection getUnpickConstantJar();
-
-		@InputFiles
-		ConfigurableFileCollection getUnpickClasspath();
-
-		@OutputFile
-		RegularFileProperty getUnpickOutputJar();
-
-		@Input
-		Property<Boolean> getLenient();
+	public UnpickService(Options options, ServiceFactory serviceFactory) {
+		super(options, serviceFactory);
 	}
 
 	public static Provider<Options> createOptions(GenerateSourcesTask task) {
@@ -140,22 +122,18 @@ public class UnpickService extends Service<UnpickService.Options> {
 		});
 	}
 
-	public UnpickService(Options options, ServiceFactory serviceFactory) {
-		super(options, serviceFactory);
-	}
-
 	public Path unpickJar(Path inputJar, @Nullable Path existingClasses) throws IOException {
 		final List<Path> classpath = Stream.of(
 				getOptions().getUnpickClasspath().getFiles().stream().map(File::toPath),
 				getOptions().getUnpickConstantJar().getFiles().stream().map(File::toPath),
 				Stream.of(inputJar),
 				Stream.ofNullable(existingClasses)
-			).flatMap(Function.identity()).toList();
+		).flatMap(Function.identity()).toList();
 		final Path outputJar = getOptions().getUnpickOutputJar().get().getAsFile().toPath();
 		Files.deleteIfExists(outputJar);
 
 		try (ZipFsClasspath zipFsClasspath = ZipFsClasspath.create(classpath);
-				InputStream unpickDefinitions = getUnpickDefinitionsInputStream()) {
+			 InputStream unpickDefinitions = getUnpickDefinitionsInputStream()) {
 			IClassResolver classResolver = zipFsClasspath.createClassResolver().chain(ClassResolvers.classpath());
 			ConstantUninliner uninliner = ConstantUninliner.builder()
 					.logger(JAVA_LOGGER)
@@ -200,6 +178,27 @@ public class UnpickService extends Service<UnpickService.Options> {
 								.flatMap(TinyRemapperService.Options::getFrom))
 						.getOrElse("named"))
 		)).sha256().hex();
+	}
+
+	public interface Options extends Service.Options {
+		@InputFile
+		RegularFileProperty getUnpickDefinitions();
+
+		@Optional
+		@Nested
+		Property<UnpickRemapperService.Options> getUnpickRemapperService();
+
+		@InputFiles
+		ConfigurableFileCollection getUnpickConstantJar();
+
+		@InputFiles
+		ConfigurableFileCollection getUnpickClasspath();
+
+		@OutputFile
+		RegularFileProperty getUnpickOutputJar();
+
+		@Input
+		Property<Boolean> getLenient();
 	}
 
 	private record UnpickZipProcessor(ConstantUninliner uninliner) implements AsyncZipProcessor {

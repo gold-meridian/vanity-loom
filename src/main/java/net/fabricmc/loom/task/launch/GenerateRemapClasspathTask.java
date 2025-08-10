@@ -45,12 +45,6 @@ import net.fabricmc.loom.task.AbstractLoomTask;
 import net.fabricmc.loom.util.Constants;
 
 public abstract class GenerateRemapClasspathTask extends AbstractLoomTask {
-	@InputFiles
-	public abstract ConfigurableFileCollection getRemapClasspath();
-
-	@OutputFile
-	public abstract RegularFileProperty getRemapClasspathFile();
-
 	public GenerateRemapClasspathTask() {
 		final ConfigurationContainer configurations = getProject().getConfigurations();
 
@@ -66,6 +60,12 @@ public abstract class GenerateRemapClasspathTask extends AbstractLoomTask {
 
 		getRemapClasspathFile().set(getExtension().getFiles().getRemapClasspathFile());
 	}
+
+	@InputFiles
+	public abstract ConfigurableFileCollection getRemapClasspath();
+
+	@OutputFile
+	public abstract RegularFileProperty getRemapClasspathFile();
 
 	@TaskAction
 	public void run() {

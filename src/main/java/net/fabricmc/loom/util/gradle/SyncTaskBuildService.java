@@ -41,9 +41,9 @@ public abstract class SyncTaskBuildService implements BuildService<SyncTaskBuild
 
 	public static void register(Project project) {
 		project.getGradle().getSharedServices().registerIfAbsent(
-					NAME,
-					SyncTaskBuildService.class,
-					spec -> spec.getMaxParallelUsages().set(1)
+				NAME,
+				SyncTaskBuildService.class,
+				spec -> spec.getMaxParallelUsages().set(1)
 		);
 	}
 

@@ -43,11 +43,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.google.gson.JsonObject;
-
-import net.fabricmc.loom.util.fmj.FabricModJsonFactory;
-
-import net.fabricmc.loom.util.metadata.ModJsonFactory;
-
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.attributes.Usage;
@@ -67,8 +62,10 @@ import net.fabricmc.loom.util.Pair;
 import net.fabricmc.loom.util.TinyRemapperHelper;
 import net.fabricmc.loom.util.TinyRemapperLoggerAdapter;
 import net.fabricmc.loom.util.ZipUtils;
+import net.fabricmc.loom.util.fmj.FabricModJsonFactory;
 import net.fabricmc.loom.util.kotlin.KotlinClasspathService;
 import net.fabricmc.loom.util.kotlin.KotlinRemapperClassloader;
+import net.fabricmc.loom.util.metadata.ModJsonFactory;
 import net.fabricmc.loom.util.service.ServiceFactory;
 import net.fabricmc.tinyremapper.InputTag;
 import net.fabricmc.tinyremapper.NonClassCopyMode;

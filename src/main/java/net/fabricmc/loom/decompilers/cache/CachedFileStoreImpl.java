@@ -128,7 +128,7 @@ public record CachedFileStoreImpl<T>(Path root, EntrySerializer<T> entrySerializ
 	 * The rules for the cache.
 	 *
 	 * @param maxFiles The maximum number of files in the cache
-	 * @param maxAge  The maximum age of a file in the cache
+	 * @param maxAge   The maximum age of a file in the cache
 	 */
 	public record CacheRules(long maxFiles, Duration maxAge) {
 	}

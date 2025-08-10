@@ -28,10 +28,6 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 
-import net.fabricmc.loom.api.metadata.ModJson;
-
-import net.fabricmc.loom.util.metadata.ModJsonFactory;
-
 import org.jetbrains.annotations.Nullable;
 import org.objectweb.asm.commons.Remapper;
 
@@ -39,8 +35,9 @@ import net.fabricmc.accesswidener.AccessWidenerReader;
 import net.fabricmc.accesswidener.AccessWidenerRemapper;
 import net.fabricmc.accesswidener.AccessWidenerWriter;
 import net.fabricmc.loom.api.mappings.layered.MappingsNamespace;
-import net.fabricmc.loom.util.fmj.FabricModJson;
+import net.fabricmc.loom.api.metadata.ModJson;
 import net.fabricmc.loom.util.fmj.FabricModJsonFactory;
+import net.fabricmc.loom.util.metadata.ModJsonFactory;
 
 public class AccessWidenerUtils {
 	/**

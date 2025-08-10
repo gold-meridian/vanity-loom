@@ -57,5 +57,6 @@ public interface ModProcessorExtension {
 	record Context(
 			String from,
 			String to,
-			List<ModDependency> mods) { }
+			List<ModDependency> mods) {
+	}
 }

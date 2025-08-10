@@ -79,9 +79,9 @@ public class ArmNativesLibraryProcessor extends LibraryProcessor {
 	@Override
 	public Predicate<Library> apply(Consumer<Library> dependencyConsumer) {
 		final String osName = switch (platform.getOperatingSystem()) {
-		case MAC_OS -> "macos";
-		case WINDOWS -> "windows";
-		case LINUX -> "linux";
+			case MAC_OS -> "macos";
+			case WINDOWS -> "windows";
+			case LINUX -> "linux";
 		};
 
 		return library -> {

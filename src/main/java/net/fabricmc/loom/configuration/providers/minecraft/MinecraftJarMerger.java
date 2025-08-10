@@ -55,18 +55,6 @@ import net.fabricmc.loom.util.SnowmanClassVisitor;
 import net.fabricmc.loom.util.SyntheticParameterClassVisitor;
 
 public class MinecraftJarMerger implements AutoCloseable {
-	public static class Entry {
-		public final Path path;
-		public final BasicFileAttributes metadata;
-		public final byte[] data;
-
-		public Entry(Path path, BasicFileAttributes metadata, byte[] data) {
-			this.path = path;
-			this.metadata = metadata;
-			this.data = data;
-		}
-	}
-
 	private static final MinecraftClassMerger CLASS_MERGER = new MinecraftClassMerger();
 	private final FileSystemUtil.Delegate inputClientFs, inputServerFs, outputFs;
 	private final Path inputClient, inputServer;
@@ -74,7 +62,6 @@ public class MinecraftJarMerger implements AutoCloseable {
 	private final Set<String> entriesAll;
 	private boolean removeSnowmen = false;
 	private boolean offsetSyntheticsParams = false;
-
 	public MinecraftJarMerger(File inputClient, File inputServer, File output) throws IOException {
 		if (output.exists()) {
 			if (!output.delete()) {
@@ -245,6 +232,18 @@ public class MinecraftJarMerger implements AutoCloseable {
 
 		for (Entry e : entries) {
 			add(e);
+		}
+	}
+
+	public static class Entry {
+		public final Path path;
+		public final BasicFileAttributes metadata;
+		public final byte[] data;
+
+		public Entry(Path path, BasicFileAttributes metadata, byte[] data) {
+			this.path = path;
+			this.metadata = metadata;
+			this.data = data;
 		}
 	}
 }

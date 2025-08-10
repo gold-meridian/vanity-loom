@@ -44,6 +44,12 @@ public class DependencyInfo {
 
 	private String resolvedVersion = null;
 
+	DependencyInfo(Project project, Dependency dependency, Configuration sourceConfiguration) {
+		this.project = project;
+		this.dependency = dependency;
+		this.sourceConfiguration = sourceConfiguration;
+	}
+
 	public static DependencyInfo create(Project project, String configuration) {
 		return create(project, project.getConfigurations().getByName(configuration));
 	}
@@ -68,12 +74,6 @@ public class DependencyInfo {
 		} else {
 			return new DependencyInfo(project, dependency, sourceConfiguration);
 		}
-	}
-
-	DependencyInfo(Project project, Dependency dependency, Configuration sourceConfiguration) {
-		this.project = project;
-		this.dependency = dependency;
-		this.sourceConfiguration = sourceConfiguration;
 	}
 
 	public Dependency getDependency() {

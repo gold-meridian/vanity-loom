@@ -35,7 +35,7 @@ public interface FabricApiExtension {
 	/**
 	 * Get a {@link Dependency} for a given Fabric API module.
 	 *
-	 * @param moduleName The name of the module.
+	 * @param moduleName       The name of the module.
 	 * @param fabricApiVersion The main Fabric API version.
 	 * @return A {@link Dependency} for the module.
 	 */
@@ -43,7 +43,8 @@ public interface FabricApiExtension {
 
 	/**
 	 * Get the version of a Fabric API module.
-	 * @param moduleName The name of the module.
+	 *
+	 * @param moduleName       The name of the module.
 	 * @param fabricApiVersion The main Fabric API version.
 	 * @return The version of the module.
 	 */
@@ -56,6 +57,7 @@ public interface FabricApiExtension {
 
 	/**
 	 * Configuration data generation using the specified settings.
+	 *
 	 * @param action An action to configure specific data generation settings. See {@link DataGenerationSettings} for more information.
 	 */
 	void configureDataGeneration(Action<DataGenerationSettings> action);
@@ -68,6 +70,7 @@ public interface FabricApiExtension {
 
 	/**
 	 * Configuration of game and/or client tests using the specified settings.
+	 *
 	 * @param action An action to configure specific game test settings. See {@link GameTestSettings} for more information.
 	 */
 	@ApiStatus.Experimental

@@ -36,7 +36,7 @@ import net.fabricmc.loom.configuration.providers.mappings.utils.MavenFileSpec
 import net.fabricmc.loom.util.ClosureAction
 
 class LayeredMappingSpecBuilderTest extends Specification {
-	def "simple mojmap" () {
+	def "simple mojmap"() {
 		when:
 		def spec = layered {
 			officialMojangMappings()
@@ -49,7 +49,7 @@ class LayeredMappingSpecBuilderTest extends Specification {
 		layers[1].class == MojangMappingsSpec
 	}
 
-	def "simple mojmap with parchment" () {
+	def "simple mojmap with parchment"() {
 		when:
 		def dep = "I like cake"
 		def spec = layered() {
@@ -68,7 +68,7 @@ class LayeredMappingSpecBuilderTest extends Specification {
 		parchment.removePrefix() == true
 	}
 
-	def "simple mojmap with parchment keep prefix" () {
+	def "simple mojmap with parchment keep prefix"() {
 		when:
 		def spec = layered() {
 			officialMojangMappings()
@@ -88,7 +88,7 @@ class LayeredMappingSpecBuilderTest extends Specification {
 		parchment.removePrefix() == false
 	}
 
-	def "simple mojmap with parchment keep prefix alternate hash" () {
+	def "simple mojmap with parchment keep prefix alternate hash"() {
 		when:
 		def spec = layered {
 			officialMojangMappings()

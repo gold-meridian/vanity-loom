@@ -41,9 +41,9 @@ class JarPackageIndexTest extends Specification {
 	def "Create JarPackageIndex from single JAR"() {
 		given:
 		def jar = zip([
-			"com/example/Foo.class",
-			"com/example/Bar.class",
-			"com/example/subpackage/Baz.class"
+				"com/example/Foo.class",
+				"com/example/Bar.class",
+				"com/example/subpackage/Baz.class"
 		])
 
 		when:
@@ -58,12 +58,12 @@ class JarPackageIndexTest extends Specification {
 	def "Create JarPackageIndex from multiple JARs"() {
 		given:
 		def jar1 = zip([
-			"com/example/Foo.class",
-			"com/example/Bar.class"
+				"com/example/Foo.class",
+				"com/example/Bar.class"
 		])
 		def jar2 = zip([
-			"com/example/subpackage/Baz.class",
-			"com/another/Example.class"
+				"com/example/subpackage/Baz.class",
+				"com/another/Example.class"
 		])
 
 		when:

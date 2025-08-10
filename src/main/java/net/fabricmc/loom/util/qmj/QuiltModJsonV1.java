@@ -36,13 +36,23 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import org.jetbrains.annotations.Nullable;
 
-import net.fabricmc.loom.util.fmj.ModEnvironment;
 import net.fabricmc.loom.util.fmj.FabricModJsonSource;
 import net.fabricmc.loom.util.fmj.FabricModJsonUtils;
+import net.fabricmc.loom.util.fmj.ModEnvironment;
 
 public final class QuiltModJsonV1 extends QuiltModJson {
 	QuiltModJsonV1(JsonObject jsonObject, FabricModJsonSource source) {
 		super(jsonObject, source);
+	}
+
+	private static String readMixinElement(JsonElement jsonElement) {
+		if (jsonElement instanceof JsonPrimitive str) {
+			return str.getAsString();
+		} else if (jsonElement instanceof JsonObject obj) {
+			return obj.get("config").getAsString();
+		} else {
+			throw new RuntimeException("Expected mixin element to be an object or string");
+		}
 	}
 
 	@Override
@@ -86,16 +96,6 @@ public final class QuiltModJsonV1 extends QuiltModJson {
 			return Collections.singletonList(mixins.getAsJsonPrimitive().getAsString());
 		} else {
 			throw new RuntimeException("Incorrect QMJ format; expected 'mixin' to be a string or array");
-		}
-	}
-
-	private static String readMixinElement(JsonElement jsonElement) {
-		if (jsonElement instanceof JsonPrimitive str) {
-			return str.getAsString();
-		} else if (jsonElement instanceof JsonObject obj) {
-			return obj.get("config").getAsString();
-		} else {
-			throw new RuntimeException("Expected mixin element to be an object or string");
 		}
 	}
 

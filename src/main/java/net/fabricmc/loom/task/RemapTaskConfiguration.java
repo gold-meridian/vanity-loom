@@ -114,7 +114,7 @@ public abstract class RemapTaskConfiguration implements Runnable {
 
 		GradleUtils.afterSuccessfulEvaluation(getProject(), () -> {
 			// Remove -dev jars from the default jar task
-			for (String configurationName : new String[] { JavaPlugin.API_ELEMENTS_CONFIGURATION_NAME, JavaPlugin.RUNTIME_ELEMENTS_CONFIGURATION_NAME }) {
+			for (String configurationName : new String[]{JavaPlugin.API_ELEMENTS_CONFIGURATION_NAME, JavaPlugin.RUNTIME_ELEMENTS_CONFIGURATION_NAME}) {
 				Configuration configuration = getConfigurations().getByName(configurationName);
 				final Jar jarTask = (Jar) getTasks().getByName(JavaPlugin.JAR_TASK_NAME);
 				configuration.getArtifacts().removeIf(artifact -> {

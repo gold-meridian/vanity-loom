@@ -43,67 +43,67 @@ public record MinecraftJarConfiguration<
 		M extends MinecraftProvider,
 		N extends NamedMinecraftProvider<M>,
 		Q extends MappedMinecraftProvider>(
-				MinecraftProviderFactory<M> minecraftProviderFactory,
-				IntermediaryMinecraftProviderFactory<M> intermediaryMinecraftProviderFactory,
-				NamedMinecraftProviderFactory<M> namedMinecraftProviderFactory,
-				ProcessedNamedMinecraftProviderFactory<M, N> processedNamedMinecraftProviderFactory,
-				DecompileConfigurationFactory<Q> decompileConfigurationFactory,
-				List<String> supportedEnvironments) {
+		MinecraftProviderFactory<M> minecraftProviderFactory,
+		IntermediaryMinecraftProviderFactory<M> intermediaryMinecraftProviderFactory,
+		NamedMinecraftProviderFactory<M> namedMinecraftProviderFactory,
+		ProcessedNamedMinecraftProviderFactory<M, N> processedNamedMinecraftProviderFactory,
+		DecompileConfigurationFactory<Q> decompileConfigurationFactory,
+		List<String> supportedEnvironments) {
 	public static final MinecraftJarConfiguration<
 			MergedMinecraftProvider,
 			NamedMinecraftProvider.MergedImpl,
 			MappedMinecraftProvider> MERGED = new MinecraftJarConfiguration<>(
-				MergedMinecraftProvider::new,
-				IntermediaryMinecraftProvider.MergedImpl::new,
-				NamedMinecraftProvider.MergedImpl::new,
-				ProcessedNamedMinecraftProvider.MergedImpl::new,
-				SingleJarDecompileConfiguration::new,
-				List.of("client", "server")
-			);
+			MergedMinecraftProvider::new,
+			IntermediaryMinecraftProvider.MergedImpl::new,
+			NamedMinecraftProvider.MergedImpl::new,
+			ProcessedNamedMinecraftProvider.MergedImpl::new,
+			SingleJarDecompileConfiguration::new,
+			List.of("client", "server")
+	);
 	public static final MinecraftJarConfiguration<
 			LegacyMergedMinecraftProvider,
 			NamedMinecraftProvider.LegacyMergedImpl,
 			MappedMinecraftProvider> LEGACY_MERGED = new MinecraftJarConfiguration<>(
-				LegacyMergedMinecraftProvider::new,
-				IntermediaryMinecraftProvider.LegacyMergedImpl::new,
-				NamedMinecraftProvider.LegacyMergedImpl::new,
-				ProcessedNamedMinecraftProvider.LegacyMergedImpl::new,
-				SingleJarDecompileConfiguration::new,
-				List.of("client", "server")
-			);
+			LegacyMergedMinecraftProvider::new,
+			IntermediaryMinecraftProvider.LegacyMergedImpl::new,
+			NamedMinecraftProvider.LegacyMergedImpl::new,
+			ProcessedNamedMinecraftProvider.LegacyMergedImpl::new,
+			SingleJarDecompileConfiguration::new,
+			List.of("client", "server")
+	);
 	public static final MinecraftJarConfiguration<
 			SingleJarMinecraftProvider,
 			NamedMinecraftProvider.SingleJarImpl,
 			MappedMinecraftProvider> SERVER_ONLY = new MinecraftJarConfiguration<>(
-				SingleJarMinecraftProvider::server,
-				IntermediaryMinecraftProvider.SingleJarImpl::server,
-				NamedMinecraftProvider.SingleJarImpl::server,
-				ProcessedNamedMinecraftProvider.SingleJarImpl::server,
-				SingleJarDecompileConfiguration::new,
-				List.of("server")
-			);
+			SingleJarMinecraftProvider::server,
+			IntermediaryMinecraftProvider.SingleJarImpl::server,
+			NamedMinecraftProvider.SingleJarImpl::server,
+			ProcessedNamedMinecraftProvider.SingleJarImpl::server,
+			SingleJarDecompileConfiguration::new,
+			List.of("server")
+	);
 	public static final MinecraftJarConfiguration<
 			SingleJarMinecraftProvider,
 			NamedMinecraftProvider.SingleJarImpl,
 			MappedMinecraftProvider> CLIENT_ONLY = new MinecraftJarConfiguration<>(
-				SingleJarMinecraftProvider::client,
-				IntermediaryMinecraftProvider.SingleJarImpl::client,
-				NamedMinecraftProvider.SingleJarImpl::client,
-				ProcessedNamedMinecraftProvider.SingleJarImpl::client,
-				SingleJarDecompileConfiguration::new,
-				List.of("client")
-			);
+			SingleJarMinecraftProvider::client,
+			IntermediaryMinecraftProvider.SingleJarImpl::client,
+			NamedMinecraftProvider.SingleJarImpl::client,
+			ProcessedNamedMinecraftProvider.SingleJarImpl::client,
+			SingleJarDecompileConfiguration::new,
+			List.of("client")
+	);
 	public static final MinecraftJarConfiguration<
 			SplitMinecraftProvider,
 			NamedMinecraftProvider.SplitImpl,
 			MappedMinecraftProvider.Split> SPLIT = new MinecraftJarConfiguration<>(
-				SplitMinecraftProvider::new,
-				IntermediaryMinecraftProvider.SplitImpl::new,
-				NamedMinecraftProvider.SplitImpl::new,
-				ProcessedNamedMinecraftProvider.SplitImpl::new,
-				SplitDecompileConfiguration::new,
-				List.of("client", "server")
-			);
+			SplitMinecraftProvider::new,
+			IntermediaryMinecraftProvider.SplitImpl::new,
+			NamedMinecraftProvider.SplitImpl::new,
+			ProcessedNamedMinecraftProvider.SplitImpl::new,
+			SplitDecompileConfiguration::new,
+			List.of("client", "server")
+	);
 	public static final MinecraftJarConfiguration<
 			GluedMinecraftProvider,
 			NamedMinecraftProvider.GluedImpl,

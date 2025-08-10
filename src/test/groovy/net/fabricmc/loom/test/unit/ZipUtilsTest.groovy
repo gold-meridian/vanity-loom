@@ -32,11 +32,7 @@ import com.google.gson.JsonObject
 import org.gradle.api.tasks.bundling.ZipEntryCompression
 import spock.lang.Specification
 
-import net.fabricmc.loom.util.Checksum
-import net.fabricmc.loom.util.FileSystemUtil
-import net.fabricmc.loom.util.Pair
-import net.fabricmc.loom.util.ZipReprocessorUtil
-import net.fabricmc.loom.util.ZipUtils
+import net.fabricmc.loom.util.*
 
 class ZipUtilsTest extends Specification {
 	def "pack"() {
@@ -52,7 +48,7 @@ class ZipUtilsTest extends Specification {
 		Files.exists(zip)
 		ZipUtils.contains(zip, "test.txt")
 		!ZipUtils.contains(zip, "nope.txt")
-		new String( ZipUtils.unpack(zip, "test.txt"), StandardCharsets.UTF_8) == "This is a test of packing"
+		new String(ZipUtils.unpack(zip, "test.txt"), StandardCharsets.UTF_8) == "This is a test of packing"
 	}
 
 	def "transform string"() {
@@ -64,18 +60,18 @@ class ZipUtilsTest extends Specification {
 		when:
 		ZipUtils.pack(dir.toPath(), zip)
 		def transformed = ZipUtils.transformString(zip, [
-			new Pair<String, ZipUtils.UnsafeUnaryOperator<String>>("test.txt", new ZipUtils.UnsafeUnaryOperator<String>() {
-				@Override
-				String apply(String arg) throws IOException {
-					return arg.toUpperCase()
-				}
-			})
+				new Pair<String, ZipUtils.UnsafeUnaryOperator<String>>("test.txt", new ZipUtils.UnsafeUnaryOperator<String>() {
+					@Override
+					String apply(String arg) throws IOException {
+						return arg.toUpperCase()
+					}
+				})
 		])
 
 		then:
 		transformed == 1
 		ZipUtils.contains(zip, "test.txt")
-		new String( ZipUtils.unpack(zip, "test.txt"), StandardCharsets.UTF_8) == "THIS IS A TEST OF TRANSFORMING"
+		new String(ZipUtils.unpack(zip, "test.txt"), StandardCharsets.UTF_8) == "THIS IS A TEST OF TRANSFORMING"
 	}
 
 	def "replace string"() {
@@ -183,13 +179,13 @@ class ZipUtilsTest extends Specification {
 		Checksum.of(zip).sha1().hex() == "1b06cc0aaa65ab2b0d423fe33431ff5bd14bf9c8"
 
 		where:
-		timezone 			| _
-		"UTC" 				| _
-		"US/Central" 		| _
-		"Europe/London" 	| _
-		"Australia/Sydney" 	| _
-		"Etc/GMT-6" 		| _
-		"Etc/GMT+9" 		| _
+		timezone           | _
+		"UTC"              | _
+		"US/Central"       | _
+		"Europe/London"    | _
+		"Australia/Sydney" | _
+		"Etc/GMT-6"        | _
+		"Etc/GMT+9"        | _
 	}
 
 	def "transform json"() {

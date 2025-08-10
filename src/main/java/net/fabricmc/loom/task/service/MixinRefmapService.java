@@ -32,10 +32,6 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import com.google.gson.JsonObject;
-
-import net.fabricmc.loom.api.metadata.ModJson;
-import net.fabricmc.loom.util.metadata.ModJsonFactory;
-
 import org.gradle.api.Project;
 import org.gradle.api.provider.ListProperty;
 import org.gradle.api.provider.Property;
@@ -44,11 +40,11 @@ import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.SourceSet;
 
 import net.fabricmc.loom.LoomGradleExtension;
+import net.fabricmc.loom.api.metadata.ModJson;
 import net.fabricmc.loom.extension.MixinExtension;
 import net.fabricmc.loom.task.RemapJarTask;
 import net.fabricmc.loom.util.ZipUtils;
-import net.fabricmc.loom.util.fmj.FabricModJson;
-import net.fabricmc.loom.util.fmj.FabricModJsonFactory;
+import net.fabricmc.loom.util.metadata.ModJsonFactory;
 import net.fabricmc.loom.util.service.Service;
 import net.fabricmc.loom.util.service.ServiceFactory;
 import net.fabricmc.loom.util.service.ServiceType;
@@ -56,11 +52,8 @@ import net.fabricmc.loom.util.service.ServiceType;
 public class MixinRefmapService extends Service<MixinRefmapService.Options> {
 	public static final ServiceType<Options, MixinRefmapService> TYPE = new ServiceType<>(Options.class, MixinRefmapService.class);
 
-	public interface Options extends Service.Options {
-		@Input
-		ListProperty<String> getMixinConfigs();
-		@Input
-		Property<String> getRefmapName();
+	public MixinRefmapService(Options options, ServiceFactory serviceFactory) {
+		super(options, serviceFactory);
 	}
 
 	public static Provider<List<Options>> createOptions(RemapJarTask task) {
@@ -105,10 +98,6 @@ public class MixinRefmapService extends Service<MixinRefmapService.Options> {
 		});
 	}
 
-	public MixinRefmapService(Options options, ServiceFactory serviceFactory) {
-		super(options, serviceFactory);
-	}
-
 	public void applyToJar(Path path) throws IOException {
 		final ModJson modJson = ModJsonFactory.createFromZipNullable(path);
 
@@ -131,5 +120,13 @@ public class MixinRefmapService extends Service<MixinRefmapService.Options> {
 				return json;
 			})));
 		}
+	}
+
+	public interface Options extends Service.Options {
+		@Input
+		ListProperty<String> getMixinConfigs();
+
+		@Input
+		Property<String> getRefmapName();
 	}
 }

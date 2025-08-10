@@ -58,6 +58,16 @@ public class DownloadBuilder {
 		return new DownloadBuilder(new URI(url));
 	}
 
+	// See comment on org.gradle.util.internal.GUtil.isSecureUrl
+	private static boolean isSecureUrl(URI url) {
+		if ("127.0.0.1".equals(url.getHost())) {
+			return true;
+		}
+
+		final String scheme = url.getScheme();
+		return !"http".equalsIgnoreCase(scheme);
+	}
+
 	public DownloadBuilder sha1(String sha1) {
 		this.expectedHash = "sha1:" + sha1;
 		return this;
@@ -168,16 +178,6 @@ public class DownloadBuilder {
 		}
 
 		throw new IllegalStateException();
-	}
-
-	// See comment on org.gradle.util.internal.GUtil.isSecureUrl
-	private static boolean isSecureUrl(URI url) {
-		if ("127.0.0.1".equals(url.getHost())) {
-			return true;
-		}
-
-		final String scheme = url.getScheme();
-		return !"http".equalsIgnoreCase(scheme);
 	}
 
 	@FunctionalInterface

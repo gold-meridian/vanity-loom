@@ -34,8 +34,8 @@ class FabricApiExtensionTest extends Specification {
 	def "get module version"() {
 		when:
 		def fabricApi = new FabricApiVersions() {
-					Project project = GradleTestUtil.mockProject()
-				}
+			Project project = GradleTestUtil.mockProject()
+		}
 		def version = fabricApi.moduleVersion(moduleName, apiVersion)
 
 		then:
@@ -52,8 +52,8 @@ class FabricApiExtensionTest extends Specification {
 	def "unknown module"() {
 		when:
 		def fabricApi = new FabricApiVersions() {
-					Project project = GradleTestUtil.mockProject()
-				}
+			Project project = GradleTestUtil.mockProject()
+		}
 		fabricApi.moduleVersion("fabric-api-unknown", apiVersion)
 
 		then:

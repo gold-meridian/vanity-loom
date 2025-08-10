@@ -60,9 +60,9 @@ class MigrateMappingsTest extends Specification implements GradleProjectTestTrai
 
 		when:
 		def result = gradle.run(tasks: [
-			"migrateMappings",
-			"--mappings",
-			"24w36a+build.6"
+				"migrateMappings",
+				"--mappings",
+				"24w36a+build.6"
 		])
 		def remapped = new File(gradle.projectDir, "remappedSrc/example/Test.java").text
 
@@ -102,9 +102,9 @@ class MigrateMappingsTest extends Specification implements GradleProjectTestTrai
 
 		when:
 		def result = gradle.run(tasks: [
-			"migrateMappings",
-			"--mappings",
-			"net.fabricmc:yarn:24w36a+build.6:v2"
+				"migrateMappings",
+				"--mappings",
+				"net.fabricmc:yarn:24w36a+build.6:v2"
 		])
 		def remapped = new File(gradle.projectDir, "remappedSrc/example/Test.java").text
 
@@ -144,9 +144,9 @@ class MigrateMappingsTest extends Specification implements GradleProjectTestTrai
 
 		when:
 		def result = gradle.run(tasks: [
-			"migrateMappings",
-			"--mappings",
-			"net.minecraft:mappings:24w36a"
+				"migrateMappings",
+				"--mappings",
+				"net.minecraft:mappings:24w36a"
 		])
 		def remapped = new File(gradle.projectDir, "remappedSrc/example/Test.java").text
 

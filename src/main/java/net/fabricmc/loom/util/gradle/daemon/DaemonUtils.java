@@ -124,15 +124,6 @@ public final class DaemonUtils {
 	}
 
 	public abstract static class Context {
-		@Input
-		protected abstract Property<String> getRegistryBin();
-
-		@Inject
-		protected abstract FileLockManager getFileLockManager();
-
-		@Inject
-		protected abstract Chmod getChmod();
-
 		@SuppressWarnings("unused")
 		@Inject
 		public Context(Project project) {
@@ -150,5 +141,14 @@ public final class DaemonUtils {
 					.resolve("registry.bin")
 					.toAbsolutePath().toString();
 		}
+
+		@Input
+		protected abstract Property<String> getRegistryBin();
+
+		@Inject
+		protected abstract FileLockManager getFileLockManager();
+
+		@Inject
+		protected abstract Chmod getChmod();
 	}
 }

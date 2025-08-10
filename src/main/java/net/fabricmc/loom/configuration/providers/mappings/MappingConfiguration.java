@@ -39,8 +39,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import net.fabricmc.loom.configuration.providers.minecraft.GluedMinecraftProvider;
-
 import org.apache.tools.ant.util.StringUtils;
 import org.gradle.api.Project;
 import org.gradle.api.provider.Provider;
@@ -53,6 +51,7 @@ import net.fabricmc.loom.configuration.DependencyInfo;
 import net.fabricmc.loom.configuration.providers.mappings.tiny.MappingsMerger;
 import net.fabricmc.loom.configuration.providers.mappings.tiny.TinyJarInfo;
 import net.fabricmc.loom.configuration.providers.mappings.unpick.UnpickMetadata;
+import net.fabricmc.loom.configuration.providers.minecraft.GluedMinecraftProvider;
 import net.fabricmc.loom.configuration.providers.minecraft.MinecraftProvider;
 import net.fabricmc.loom.util.Constants;
 import net.fabricmc.loom.util.DeletingFileVisitor;
@@ -68,13 +67,12 @@ public class MappingConfiguration {
 	private static final Logger LOGGER = LoggerFactory.getLogger(MappingConfiguration.class);
 
 	public final String mappingsIdentifier;
-
-	private final Path mappingsWorkingDir;
-	// The mappings that gradle gives us
-	private final Path baseTinyMappings;
 	// The mappings we use in practice
 	public final Path tinyMappings;
 	public final Path tinyMappingsJar;
+	private final Path mappingsWorkingDir;
+	// The mappings that gradle gives us
+	private final Path baseTinyMappings;
 	private final Path unpickDefinitions;
 
 	@Nullable
@@ -118,6 +116,50 @@ public class MappingConfiguration {
 		return mappingProvider;
 	}
 
+	private static String getMappingsClassifier(DependencyInfo dependency, boolean isV2) {
+		String[] depStringSplit = dependency.getDepString().split(":");
+
+		if (depStringSplit.length >= 4) {
+			return "-" + depStringSplit[3] + (isV2 ? "-v2" : "");
+		}
+
+		return isV2 ? "-v2" : "";
+	}
+
+	private static boolean areMappingsV2(Path path) throws IOException {
+		try (BufferedReader reader = Files.newBufferedReader(path)) {
+			return MappingReader.detectFormat(reader) == MappingFormat.TINY_2_FILE;
+		}
+	}
+
+	public static void extractMappings(Path jar, Path extractTo) throws IOException {
+		try (FileSystemUtil.Delegate delegate = FileSystemUtil.getJarFileSystem(jar)) {
+			extractMappings(delegate.fs(), extractTo);
+		}
+	}
+
+	public static void extractMappings(FileSystem jar, Path extractTo) throws IOException {
+		Files.copy(jar.getPath("mappings/mappings.tiny"), extractTo, StandardCopyOption.REPLACE_EXISTING);
+	}
+
+	private static void cleanWorkingDirectory(Path mappingsWorkingDir) {
+		try {
+			if (Files.exists(mappingsWorkingDir)) {
+				Files.walkFileTree(mappingsWorkingDir, new DeletingFileVisitor());
+			}
+
+			Files.createDirectories(mappingsWorkingDir);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private static String createMappingsIdentifier(String mappingsName, String version, String classifier, String minecraftVersion) {
+		//          mappingsName      . mcVersion . version        classifier
+		// Example: net.fabricmc.yarn . 1_16_5    . 1.16.5+build.5 -v2
+		return mappingsName + "." + minecraftVersion.replace(' ', '_').replace('.', '_').replace('-', '_') + "." + version + classifier;
+	}
+
 	public Provider<TinyMappingsService.Options> getMappingsServiceOptions(Project project) {
 		return TinyMappingsService.createOptions(project, Objects.requireNonNull(tinyMappings));
 	}
@@ -149,12 +191,12 @@ public class MappingConfiguration {
 		if (unpickMetadata != null) {
 			if (unpickMetadata.hasConstants()) {
 				String notation = switch (unpickMetadata) {
-				case UnpickMetadata.V1 v1 -> String.format("%s:%s:%s:constants",
-						dependency.getDependency().getGroup(),
-						dependency.getDependency().getName(),
-						dependency.getDependency().getVersion()
-				);
-				case UnpickMetadata.V2 v2 -> Objects.requireNonNull(v2.constants());
+					case UnpickMetadata.V1 v1 -> String.format("%s:%s:%s:constants",
+							dependency.getDependency().getGroup(),
+							dependency.getDependency().getName(),
+							dependency.getDependency().getVersion()
+					);
+					case UnpickMetadata.V2 v2 -> Objects.requireNonNull(v2.constants());
 				};
 
 				project.getDependencies().add(Constants.Configurations.MAPPING_CONSTANTS, notation);
@@ -162,16 +204,6 @@ public class MappingConfiguration {
 		}
 
 		project.getDependencies().add(Constants.Configurations.MAPPINGS_FINAL, project.files(tinyMappingsJar.toFile()));
-	}
-
-	private static String getMappingsClassifier(DependencyInfo dependency, boolean isV2) {
-		String[] depStringSplit = dependency.getDepString().split(":");
-
-		if (depStringSplit.length >= 4) {
-			return "-" + depStringSplit[3] + (isV2 ? "-v2" : "");
-		}
-
-		return isV2 ? "-v2" : "";
 	}
 
 	private void storeMappings(Project project, ServiceFactory serviceFactory, MinecraftProvider minecraftProvider, Path inputJar) throws IOException {
@@ -201,22 +233,6 @@ public class MappingConfiguration {
 			LOGGER.info(":populating field names");
 			suggestFieldNames(minecraftJars.get(0), baseTinyMappings, tinyMappings);
 		}
-	}
-
-	private static boolean areMappingsV2(Path path) throws IOException {
-		try (BufferedReader reader = Files.newBufferedReader(path)) {
-			return MappingReader.detectFormat(reader) == MappingFormat.TINY_2_FILE;
-		}
-	}
-
-	public static void extractMappings(Path jar, Path extractTo) throws IOException {
-		try (FileSystemUtil.Delegate delegate = FileSystemUtil.getJarFileSystem(jar)) {
-			extractMappings(delegate.fs(), extractTo);
-		}
-	}
-
-	public static void extractMappings(FileSystem jar, Path extractTo) throws IOException {
-		Files.copy(jar.getPath("mappings/mappings.tiny"), extractTo, StandardCopyOption.REPLACE_EXISTING);
 	}
 
 	private void extractExtras(FileSystem jar) throws IOException {
@@ -253,8 +269,8 @@ public class MappingConfiguration {
 	private void suggestFieldNames(Path inputJar, Path oldMappings, Path newMappings) {
 		Command command = new CommandProposeFieldNames();
 		runCommand(command, inputJar.toFile().getAbsolutePath(),
-						oldMappings.toAbsolutePath().toString(),
-						newMappings.toAbsolutePath().toString());
+				oldMappings.toAbsolutePath().toString(),
+				newMappings.toAbsolutePath().toString());
 	}
 
 	private void runCommand(Command command, String... args) {
@@ -265,26 +281,8 @@ public class MappingConfiguration {
 		}
 	}
 
-	private static void cleanWorkingDirectory(Path mappingsWorkingDir) {
-		try {
-			if (Files.exists(mappingsWorkingDir)) {
-				Files.walkFileTree(mappingsWorkingDir, new DeletingFileVisitor());
-			}
-
-			Files.createDirectories(mappingsWorkingDir);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
 	public Path mappingsWorkingDir() {
 		return mappingsWorkingDir;
-	}
-
-	private static String createMappingsIdentifier(String mappingsName, String version, String classifier, String minecraftVersion) {
-		//          mappingsName      . mcVersion . version        classifier
-		// Example: net.fabricmc.yarn . 1_16_5    . 1.16.5+build.5 -v2
-		return mappingsName + "." + minecraftVersion.replace(' ', '_').replace('.', '_').replace('-', '_') + "." + version + classifier;
 	}
 
 	public String mappingsIdentifier() {

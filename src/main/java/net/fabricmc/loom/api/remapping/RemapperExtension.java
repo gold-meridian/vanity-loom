@@ -44,9 +44,9 @@ public interface RemapperExtension<T extends RemapperParameters> {
 	/**
 	 * Return a {@link ClassVisitor} that will be used when remapping the given class.
 	 *
-	 * @param className The name of the class being remapped
+	 * @param className       The name of the class being remapped
 	 * @param remapperContext The remapper context
-	 * @param classVisitor The parent class visitor
+	 * @param classVisitor    The parent class visitor
 	 * @return A {@link ClassVisitor} that will be used when remapping the given class, or the given {@code classVisitor} if no extra processing is required for this class.
 	 */
 	ClassVisitor insertVisitor(String className, RemapperContext remapperContext, ClassVisitor classVisitor);

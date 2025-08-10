@@ -38,13 +38,13 @@ import org.gradle.api.tasks.TaskAction;
 import net.fabricmc.loom.task.AbstractLoomTask;
 
 public abstract class GenerateLog4jConfigTask extends AbstractLoomTask {
-	@OutputFile
-	public abstract RegularFileProperty getOutputFile();
-
 	@Inject
 	public GenerateLog4jConfigTask() {
 		getOutputFile().set(getExtension().getFiles().getDefaultLog4jConfigFile());
 	}
+
+	@OutputFile
+	public abstract RegularFileProperty getOutputFile();
 
 	@TaskAction
 	public void run() {

@@ -32,8 +32,8 @@ class RunConfigUnitTest extends Specification {
 	def "escape arguments"() {
 		when:
 		def args = RunConfig.joinArguments([
-			"-Dfabric.test=123",
-			"-Dfabric.test=abc 123"
+				"-Dfabric.test=123",
+				"-Dfabric.test=abc 123"
 		])
 
 		then:

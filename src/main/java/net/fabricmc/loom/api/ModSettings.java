@@ -42,16 +42,16 @@ import net.fabricmc.loom.util.gradle.SourceSetReference;
  * A {@link Named} object for setting mod-related values. The {@linkplain Named#getName() name} should match the mod id.
  */
 public abstract class ModSettings implements Named {
-	/**
-	 * List of classpath directories, or jar files used to populate the `fabric.classPathGroups` Fabric Loader system property.
-	 */
-	public abstract ConfigurableFileCollection getModFiles();
-
 	@Inject
 	public ModSettings() {
 		getModSourceSets().finalizeValueOnRead();
 		getModFiles().finalizeValueOnRead();
 	}
+
+	/**
+	 * List of classpath directories, or jar files used to populate the `fabric.classPathGroups` Fabric Loader system property.
+	 */
+	public abstract ConfigurableFileCollection getModFiles();
 
 	/**
 	 * Add {@link SourceSet}'s output directories from the current project to be grouped with the named mod.

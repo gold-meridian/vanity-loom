@@ -52,9 +52,9 @@ import static org.gradle.testkit.runner.TaskOutcome.SUCCESS
 class DebugLineNumbersTest extends Specification implements GradleProjectTestTrait {
 	static final String MAPPINGS = "1.20.1-net.fabricmc.yarn.1_20_1.1.20.1+build.1-v2"
 	static final Map<String, Integer> BREAKPOINTS = [
-		"net.minecraft.server.dedicated.ServerPropertiesLoader": 12,
-		"net.minecraft.server.dedicated.MinecraftDedicatedServer": 105,
-		"net.minecraft.registry.RegistryOps": 44
+			"net.minecraft.server.dedicated.ServerPropertiesLoader"  : 12,
+			"net.minecraft.server.dedicated.MinecraftDedicatedServer": 105,
+			"net.minecraft.registry.RegistryOps"                     : 44
 	]
 
 	def "Debug test"() {
@@ -161,7 +161,7 @@ class DebugLineNumbersTest extends Specification implements GradleProjectTestTra
 						"127.0.0.1",
 						8050,
 						timeout
-						)
+				)
 			} catch (ConnectException e) {
 				Thread.sleep(timeout * 1000)
 				if (i == maxTimeout) {
@@ -173,14 +173,15 @@ class DebugLineNumbersTest extends Specification implements GradleProjectTestTra
 		throw new IllegalStateException()
 	}
 
-	@CompileStatic // Makes RxJava somewhat usable in Groovy
+	@CompileStatic
+	// Makes RxJava somewhat usable in Groovy
 	class Debugger implements AutoCloseable {
 		final IDebugSession debugSession
 
 		Debugger(IDebugSession debugSession) {
 			this.debugSession = debugSession
 
-			debugSession.eventHub.events().subscribe({ }) {
+			debugSession.eventHub.events().subscribe({}) {
 				// Manually bail out, as it seems this can be called after close()
 				it.printStackTrace()
 				System.exit(-1)
@@ -194,7 +195,7 @@ class DebugLineNumbersTest extends Specification implements GradleProjectTestTra
 					0,
 					null,
 					null
-					)
+			)
 
 			// Wait for the breakpoint to be installed
 			return breakpoint.install().thenCompose {

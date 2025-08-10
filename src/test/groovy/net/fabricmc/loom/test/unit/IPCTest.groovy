@@ -55,7 +55,8 @@ class IPCTest extends Specification {
 		}
 
 		// Allow ipcServer to finish reading, before closing.
-		while (received.size() != 2) { }
+		while (received.size() != 2) {
+		}
 		ipcServer.close()
 
 		then:

@@ -35,8 +35,8 @@ public interface ServiceFactory {
 	 * Gets or creates a service instance with the given options.
 	 *
 	 * @param options The options to use.
-	 * @param <O> The options type.
-	 * @param <S> The service type.
+	 * @param <O>     The options type.
+	 * @param <S>     The service type.
 	 * @return The service instance.
 	 */
 	default <O extends Service.Options, S extends Service<O>> S get(Provider<O> options) {
@@ -45,9 +45,10 @@ public interface ServiceFactory {
 
 	/**
 	 * Gets or creates a service instance with the given options, or returns null if the options are not present.
+	 *
 	 * @param options The options to use.
-	 * @param <O> The options type.
-	 * @param <S> The service type.
+	 * @param <O>     The options type.
+	 * @param <S>     The service type.
 	 * @return The service instance, or null if the options are not present.
 	 */
 	@Nullable
@@ -63,8 +64,8 @@ public interface ServiceFactory {
 	 * Gets or creates a service instance with the given options.
 	 *
 	 * @param options The options to use.
-	 * @param <O> The options type.
-	 * @param <S> The service type.
+	 * @param <O>     The options type.
+	 * @param <S>     The service type.
 	 * @return The service instance.
 	 */
 	<O extends Service.Options, S extends Service<O>> S get(O options);

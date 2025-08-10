@@ -102,9 +102,9 @@ class FabricModJsonV2Test extends Specification {
 		def fmj = FabricModJsonFactory.create(JSON_OBJECT, mockSource)
 		then:
 		new ArrayList<>(fmj.mixinConfigurations).sort() == [
-			"test.client.mixins.json",
-			"test.server.mixins.json",
-			"test.mixins.json"
+				"test.client.mixins.json",
+				"test.server.mixins.json",
+				"test.mixins.json"
 		].sort()
 	}
 
@@ -126,9 +126,9 @@ class FabricModJsonV2Test extends Specification {
 		def fmj = FabricModJsonFactory.create(JSON_OBJECT, mockSource)
 		then:
 		fmj.getClassTweakers() == [
-			"client.ct": ModEnvironment.CLIENT,
-			"server.ct": ModEnvironment.SERVER,
-			"universal.ct": ModEnvironment.UNIVERSAL
+				"client.ct"   : ModEnvironment.CLIENT,
+				"server.ct"   : ModEnvironment.SERVER,
+				"universal.ct": ModEnvironment.UNIVERSAL
 		]
 	}
 

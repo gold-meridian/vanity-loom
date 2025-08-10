@@ -101,7 +101,7 @@ public record LocalMavenHelper(String group, String name, String version, @Nulla
 		}
 
 		final String fileName = classifier == null ? String.format("%s-%s.jar", name, version)
-													: String.format("%s-%s-%s.jar", name, version, classifier);
+				: String.format("%s-%s-%s.jar", name, version, classifier);
 		return getDirectory().resolve(fileName);
 	}
 

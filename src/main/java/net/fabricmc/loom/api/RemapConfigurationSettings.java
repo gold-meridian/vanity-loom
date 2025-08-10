@@ -104,23 +104,6 @@ public abstract class RemapConfigurationSettings implements Named {
 	 */
 	public abstract Property<Boolean> getApplyDependencyTransforms();
 
-	public enum PublishingMode {
-		NONE,
-		COMPILE_ONLY(JavaPlugin.API_ELEMENTS_CONFIGURATION_NAME),
-		RUNTIME_ONLY(JavaPlugin.RUNTIME_ELEMENTS_CONFIGURATION_NAME),
-		COMPILE_AND_RUNTIME(JavaPlugin.API_ELEMENTS_CONFIGURATION_NAME, JavaPlugin.RUNTIME_ELEMENTS_CONFIGURATION_NAME);
-
-		private final Set<String> outgoingConfigurations;
-
-		PublishingMode(String... outgoingConfigurations) {
-			this.outgoingConfigurations = Set.of(outgoingConfigurations);
-		}
-
-		public Set<String> outgoingConfigurations() {
-			return outgoingConfigurations;
-		}
-	}
-
 	@Inject
 	protected abstract Project getProject();
 
@@ -148,5 +131,22 @@ public abstract class RemapConfigurationSettings implements Named {
 	@Override
 	public String toString() {
 		return "RemapConfigurationSettings '" + getName() + "'";
+	}
+
+	public enum PublishingMode {
+		NONE,
+		COMPILE_ONLY(JavaPlugin.API_ELEMENTS_CONFIGURATION_NAME),
+		RUNTIME_ONLY(JavaPlugin.RUNTIME_ELEMENTS_CONFIGURATION_NAME),
+		COMPILE_AND_RUNTIME(JavaPlugin.API_ELEMENTS_CONFIGURATION_NAME, JavaPlugin.RUNTIME_ELEMENTS_CONFIGURATION_NAME);
+
+		private final Set<String> outgoingConfigurations;
+
+		PublishingMode(String... outgoingConfigurations) {
+			this.outgoingConfigurations = Set.of(outgoingConfigurations);
+		}
+
+		public Set<String> outgoingConfigurations() {
+			return outgoingConfigurations;
+		}
 	}
 }

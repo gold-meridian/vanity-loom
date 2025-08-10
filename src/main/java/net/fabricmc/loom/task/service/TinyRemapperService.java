@@ -68,27 +68,17 @@ import net.fabricmc.tinyremapper.extension.mixin.MixinExtension;
 
 public class TinyRemapperService extends Service<TinyRemapperService.Options> implements TinyRemapperServiceInterface, Closeable {
 	public static final ServiceType<Options, TinyRemapperService> TYPE = new ServiceType<>(Options.class, TinyRemapperService.class);
-
-	public interface Options extends Service.Options {
-		@Input
-		Property<String> getFrom();
-		@Input
-		Property<String> getTo();
-		@Nested
-		ListProperty<MappingsService.Options> getMappings();
-		@Input
-		Property<Boolean> getUselegacyMixinAP();
-		@Nested
-		ListProperty<MixinAPMappingService.Options> getMixinApMappings();
-		@Nested
-		@Optional
-		Property<KotlinClasspathService.Options> getKotlinClasspathService();
-		@InputFiles
-		ConfigurableFileCollection getClasspath();
-		@Input
-		ListProperty<String> getKnownIndyBsms();
-		@Input
-		ListProperty<RemapperExtensionHolder> getRemapperExtensions();
+	private final Map<String, InputTag> inputTagMap = new HashMap<>();
+	private final HashSet<Path> classpath = new HashSet<>();
+	private TinyRemapper tinyRemapper;
+	@Nullable
+	private KotlinRemapperClassloader kotlinRemapperClassloader;
+	// Set to true once remapping has started, once set no inputs can be read.
+	private boolean isRemapping = false;
+	public TinyRemapperService(Options options, ServiceFactory serviceFactory) {
+		super(options, serviceFactory);
+		tinyRemapper = createTinyRemapper();
+		readClasspath();
 	}
 
 	public static Provider<Options> createOptions(AbstractRemapJarTask remapJarTask) {
@@ -133,20 +123,6 @@ public class TinyRemapperService extends Service<TinyRemapperService.Options> im
 			options.getKnownIndyBsms().set(extension.getKnownIndyBsms().get().stream().sorted().toList());
 			options.getRemapperExtensions().set(extension.getRemapperExtensions());
 		});
-	}
-
-	private TinyRemapper tinyRemapper;
-	@Nullable
-	private KotlinRemapperClassloader kotlinRemapperClassloader;
-	private final Map<String, InputTag> inputTagMap = new HashMap<>();
-	private final HashSet<Path> classpath = new HashSet<>();
-	// Set to true once remapping has started, once set no inputs can be read.
-	private boolean isRemapping = false;
-
-	public TinyRemapperService(Options options, ServiceFactory serviceFactory) {
-		super(options, serviceFactory);
-		tinyRemapper = createTinyRemapper();
-		readClasspath();
 	}
 
 	private TinyRemapper createTinyRemapper() {
@@ -243,5 +219,35 @@ public class TinyRemapperService extends Service<TinyRemapperService.Options> im
 		if (kotlinRemapperClassloader != null) {
 			kotlinRemapperClassloader.close();
 		}
+	}
+
+	public interface Options extends Service.Options {
+		@Input
+		Property<String> getFrom();
+
+		@Input
+		Property<String> getTo();
+
+		@Nested
+		ListProperty<MappingsService.Options> getMappings();
+
+		@Input
+		Property<Boolean> getUselegacyMixinAP();
+
+		@Nested
+		ListProperty<MixinAPMappingService.Options> getMixinApMappings();
+
+		@Nested
+		@Optional
+		Property<KotlinClasspathService.Options> getKotlinClasspathService();
+
+		@InputFiles
+		ConfigurableFileCollection getClasspath();
+
+		@Input
+		ListProperty<String> getKnownIndyBsms();
+
+		@Input
+		ListProperty<RemapperExtensionHolder> getRemapperExtensions();
 	}
 }

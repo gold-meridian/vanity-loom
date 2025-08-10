@@ -38,10 +38,49 @@ public sealed interface UnpickMetadata permits UnpickMetadata.V1, UnpickMetadata
 	String UNPICK_METADATA_PATH = "extras/unpick.json";
 	String UNPICK_DEFINITIONS_PATH = "extras/definitions.unpick";
 
+	static UnpickMetadata parse(Path path) throws IOException {
+		JsonObject jsonObject = LoomGradlePlugin.GSON.fromJson(Files.readString(path, StandardCharsets.UTF_8), JsonObject.class);
+
+		if (!jsonObject.has("version")) {
+			throw new UnsupportedOperationException("Missing unpick metadata version");
+		}
+
+		int version = jsonObject.get("version").getAsInt();
+
+		switch (version) {
+			case 1 -> {
+				return new V1(
+						getString(jsonObject, "unpickGroup"),
+						getString(jsonObject, "unpickVersion")
+				);
+			}
+			case 2 -> {
+				return new V2(
+						getString(jsonObject, "namespace"),
+						getOptionalString(jsonObject, "constants")
+				);
+			}
+			default -> throw new UnsupportedOperationException("Unsupported unpick metadata version: %s. Please update loom.".formatted(version));
+		}
+	}
+
+	private static String getString(JsonObject jsonObject, String key) {
+		if (!jsonObject.has(key)) {
+			throw new UnsupportedOperationException("Missing unpick metadata %s".formatted(key));
+		}
+
+		return jsonObject.get(key).getAsString();
+	}
+
+	@Nullable
+	private static String getOptionalString(JsonObject jsonObject, String key) {
+		return jsonObject.has(key) ? jsonObject.get(key).getAsString() : null;
+	}
+
 	boolean hasConstants();
 
 	/**
-	 * @param unpickGroup Deprecated, always uses the version of unpick loom depends on.
+	 * @param unpickGroup   Deprecated, always uses the version of unpick loom depends on.
 	 * @param unpickVersion Deprecated, always uses the version of unpick loom depends on.
 	 */
 	record V1(@Deprecated String unpickGroup, @Deprecated String unpickVersion) implements UnpickMetadata {
@@ -62,44 +101,5 @@ public sealed interface UnpickMetadata permits UnpickMetadata.V1, UnpickMetadata
 		public boolean hasConstants() {
 			return constants != null;
 		}
-	}
-
-	static UnpickMetadata parse(Path path) throws IOException {
-		JsonObject jsonObject = LoomGradlePlugin.GSON.fromJson(Files.readString(path, StandardCharsets.UTF_8), JsonObject.class);
-
-		if (!jsonObject.has("version")) {
-			throw new UnsupportedOperationException("Missing unpick metadata version");
-		}
-
-		int version = jsonObject.get("version").getAsInt();
-
-		switch (version) {
-		case 1 -> {
-			return new V1(
-				getString(jsonObject, "unpickGroup"),
-				getString(jsonObject, "unpickVersion")
-			);
-		}
-		case 2 -> {
-			return new V2(
-				getString(jsonObject, "namespace"),
-				getOptionalString(jsonObject, "constants")
-			);
-		}
-		default -> throw new UnsupportedOperationException("Unsupported unpick metadata version: %s. Please update loom.".formatted(version));
-		}
-	}
-
-	private static String getString(JsonObject jsonObject, String key) {
-		if (!jsonObject.has(key)) {
-			throw new UnsupportedOperationException("Missing unpick metadata %s".formatted(key));
-		}
-
-		return jsonObject.get(key).getAsString();
-	}
-
-	@Nullable
-	private static String getOptionalString(JsonObject jsonObject, String key) {
-		return jsonObject.has(key) ? jsonObject.get(key).getAsString() : null;
 	}
 }

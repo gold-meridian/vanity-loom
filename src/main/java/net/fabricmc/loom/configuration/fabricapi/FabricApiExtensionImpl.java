@@ -35,18 +35,17 @@ import net.fabricmc.loom.api.fabricapi.FabricApiExtension;
 import net.fabricmc.loom.api.fabricapi.GameTestSettings;
 
 public abstract class FabricApiExtensionImpl implements FabricApiExtension {
-	@Inject
-	protected abstract ObjectFactory getObjectFactory();
-
 	private final FabricApiVersions versions;
 	private final FabricApiDataGeneration dataGeneration;
 	private final FabricApiTesting testing;
-
 	public FabricApiExtensionImpl() {
 		versions = getObjectFactory().newInstance(FabricApiVersions.class);
 		dataGeneration = getObjectFactory().newInstance(FabricApiDataGeneration.class);
 		testing = getObjectFactory().newInstance(FabricApiTesting.class);
 	}
+
+	@Inject
+	protected abstract ObjectFactory getObjectFactory();
 
 	@Override
 	public Dependency module(String moduleName, String fabricApiVersion) {
@@ -60,7 +59,8 @@ public abstract class FabricApiExtensionImpl implements FabricApiExtension {
 
 	@Override
 	public void configureDataGeneration() {
-		configureDataGeneration(dataGenerationSettings -> { });
+		configureDataGeneration(dataGenerationSettings -> {
+		});
 	}
 
 	@Override
@@ -70,7 +70,8 @@ public abstract class FabricApiExtensionImpl implements FabricApiExtension {
 
 	@Override
 	public void configureTests() {
-		configureTests(gameTestSettings -> { });
+		configureTests(gameTestSettings -> {
+		});
 	}
 
 	@Override

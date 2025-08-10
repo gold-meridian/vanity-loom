@@ -58,12 +58,38 @@ public abstract class RunConfigSettings implements Named {
 	 * Arguments for the program's main class.
 	 */
 	private final List<String> programArgs = new ArrayList<>();
-
+	/**
+	 * Whether to append the project path to the {@link #configName} when {@code project} isn't the root project.
+	 *
+	 * <p>Warning: could produce ambiguous run config names if disabled, unless used carefully in conjunction with
+	 * {@link #configName}.
+	 */
+	private final Property<Boolean> appendProjectPathToConfigName;
+	/**
+	 * The main class of the run configuration.
+	 *
+	 * <p>If unset, {@link #defaultMainClass} is used as the fallback, including the overwritten main class
+	 * from installer files.
+	 */
+	private final Property<String> mainClass;
+	/**
+	 * The true entrypoint, this is usually dev launch injector.
+	 * This should not be changed unless you know what you are doing.
+	 */
+	@ApiStatus.Internal
+	@ApiStatus.Experimental
+	private final Property<String> devLaunchMainClass;
+	/**
+	 * The base name of the run configuration, which is the name it is created with, i.e. 'client'
+	 */
+	private final String name;
+	private final Map<String, Object> environmentVariables = new HashMap<>();
+	private final Project project;
+	private final LoomGradleExtension extension;
 	/**
 	 * The environment (or side) to run, usually client or server.
 	 */
 	private String environment;
-
 	/**
 	 * The full name of the run configuration, i.e. 'Minecraft Client'.
 	 *
@@ -73,15 +99,6 @@ public abstract class RunConfigSettings implements Named {
 	 * the project path will be appended automatically, e.g. 'Minecraft Client (:some:project)'.
 	 */
 	private String configName;
-
-	/**
-	 * Whether to append the project path to the {@link #configName} when {@code project} isn't the root project.
-	 *
-	 * <p>Warning: could produce ambiguous run config names if disabled, unless used carefully in conjunction with
-	 * {@link #configName}.
-	 */
-	private final Property<Boolean> appendProjectPathToConfigName;
-
 	/**
 	 * The default main class of the run configuration.
 	 *
@@ -89,49 +106,20 @@ public abstract class RunConfigSettings implements Named {
 	 * priority over the main class specified in the Fabric installer configuration.
 	 */
 	private String defaultMainClass;
-
-	/**
-	 * The main class of the run configuration.
-	 *
-	 * <p>If unset, {@link #defaultMainClass} is used as the fallback, including the overwritten main class
-	 * from installer files.
-	 */
-	private final Property<String> mainClass;
-
-	/**
-	 * The true entrypoint, this is usually dev launch injector.
-	 * This should not be changed unless you know what you are doing.
-	 */
-	@ApiStatus.Internal
-	@ApiStatus.Experimental
-	private final Property<String> devLaunchMainClass;
-
 	/**
 	 * The source set getter, which obtains the source set from the given project.
 	 */
 	private Function<Project, SourceSet> source;
-
 	/**
 	 * The run directory for this configuration, relative to the root project directory.
 	 */
 	private String runDir;
-
-	/**
-	 * The base name of the run configuration, which is the name it is created with, i.e. 'client'
-	 */
-	private final String name;
-
 	/**
 	 * When true a run configuration file will be generated for IDE's.
 	 *
 	 * <p>By default only run configs on the root project will be generated.
 	 */
 	private boolean ideConfigGenerated;
-
-	private final Map<String, Object> environmentVariables = new HashMap<>();
-
-	private final Project project;
-	private final LoomGradleExtension extension;
 
 	@Inject
 	public RunConfigSettings(Project project, String name) {

@@ -43,38 +43,6 @@ public class ScopedServiceFactory implements ServiceFactory, Closeable {
 	private final Map<Service.Options, Service<?>> servicesIdentityMap = new IdentityHashMap<>();
 	private final Map<String, Service<?>> servicesJsonMap = new HashMap<>();
 
-	@Override
-	public <O extends Service.Options, S extends Service<O>> S get(O options) {
-		// First check if the service is already created, using the identity map saving the need to serialize the options
-		//noinspection unchecked
-		S service = (S) servicesIdentityMap.get(options);
-
-		if (service != null) {
-			return service;
-		}
-
-		// If the service is not already created, serialize the options and check the json map as it may be an equivalent service
-		String key = getOptionsCacheKey(options);
-		//noinspection unchecked
-		service = (S) servicesJsonMap.get(key);
-
-		if (service != null) {
-			return service;
-		}
-
-		service = createService(options, getEffectiveServiceFactory());
-
-		servicesIdentityMap.put(options, service);
-		servicesJsonMap.put(key, service);
-
-		return service;
-	}
-
-	@VisibleForTesting
-	protected ServiceFactory getEffectiveServiceFactory() {
-		return this;
-	}
-
 	private static <O extends Service.Options, S extends Service<O>> S createService(O options, ServiceFactory serviceFactory) {
 		// We need to create the service from the provided options
 		final Class<? extends S> serviceClass;
@@ -105,6 +73,38 @@ public class ScopedServiceFactory implements ServiceFactory, Closeable {
 		} catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
 			throw new RuntimeException("Failed to create service instance", e);
 		}
+	}
+
+	@Override
+	public <O extends Service.Options, S extends Service<O>> S get(O options) {
+		// First check if the service is already created, using the identity map saving the need to serialize the options
+		//noinspection unchecked
+		S service = (S) servicesIdentityMap.get(options);
+
+		if (service != null) {
+			return service;
+		}
+
+		// If the service is not already created, serialize the options and check the json map as it may be an equivalent service
+		String key = getOptionsCacheKey(options);
+		//noinspection unchecked
+		service = (S) servicesJsonMap.get(key);
+
+		if (service != null) {
+			return service;
+		}
+
+		service = createService(options, getEffectiveServiceFactory());
+
+		servicesIdentityMap.put(options, service);
+		servicesJsonMap.put(key, service);
+
+		return service;
+	}
+
+	@VisibleForTesting
+	protected ServiceFactory getEffectiveServiceFactory() {
+		return this;
 	}
 
 	private String getOptionsCacheKey(Service.Options options) {

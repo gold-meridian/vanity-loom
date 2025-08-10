@@ -50,9 +50,9 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 public class MixinExtensionImpl extends MixinExtensionApiImpl implements MixinExtension {
-	private boolean isDefault;
 	private final Property<String> defaultRefmapName;
 	private final Property<Boolean> inlineDependencyRefmaps;
+	private boolean isDefault;
 
 	@Inject
 	public MixinExtensionImpl(Project project) {
@@ -140,7 +140,8 @@ public class MixinExtensionImpl extends MixinExtensionApiImpl implements MixinEx
 			if (sourceSet.getName().equals("main")) {
 				add(sourceSet);
 			} else {
-				add(sourceSet, getDefaultRefmapName().map(defaultRefmapName -> "%s-%s".formatted(sourceSet.getName(), defaultRefmapName)), x -> { });
+				add(sourceSet, getDefaultRefmapName().map(defaultRefmapName -> "%s-%s".formatted(sourceSet.getName(), defaultRefmapName)), x -> {
+				});
 			}
 		});
 	}

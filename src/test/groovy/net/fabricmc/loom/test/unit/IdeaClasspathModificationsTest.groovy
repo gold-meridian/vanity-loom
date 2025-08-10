@@ -48,8 +48,8 @@ class IdeaClasspathModificationsTest extends Specification {
 		def input = fromDummy()
 		def output = IdeaSyncTask.setClasspathModificationsInXml(input, ["/path/to/file.jar"])
 		output = IdeaSyncTask.setClasspathModificationsInXml(output, [
-			"/path/to/file.jar",
-			"/path/to/another.jar"
+				"/path/to/file.jar",
+				"/path/to/another.jar"
 		])
 
 		then:

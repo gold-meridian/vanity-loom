@@ -68,14 +68,74 @@ import net.fabricmc.loom.util.Constants;
 public abstract class IdeaSyncTask extends AbstractLoomTask {
 	private static final Logger LOGGER = LoggerFactory.getLogger(IdeaSyncTask.class);
 
-	@Nested
-	protected abstract ListProperty<IntelijRunConfig> getIdeaRunConfigs();
-
 	@Inject
 	public IdeaSyncTask() {
 		setGroup(Constants.TaskGroup.IDE);
 		getIdeaRunConfigs().set(getProject().provider(this::getRunConfigs));
 	}
+
+	private static void setClasspathModifications(Path runConfig, List<String> exclusions) throws IOException {
+		final String inputXml = Files.readString(runConfig, StandardCharsets.UTF_8);
+		final String outputXml;
+
+		try {
+			outputXml = setClasspathModificationsInXml(inputXml, exclusions);
+		} catch (Exception e) {
+			LOGGER.error("Failed to modify idea xml", e);
+
+			return;
+		}
+
+		if (!inputXml.equals(outputXml)) {
+			Files.writeString(runConfig, outputXml, StandardCharsets.UTF_8);
+		}
+	}
+
+	@VisibleForTesting
+	public static String setClasspathModificationsInXml(String input, List<String> exclusions) throws Exception {
+		final DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+		final DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
+		final Document document = documentBuilder.parse(new InputSource(new StringReader(input)));
+		final Element root = document.getDocumentElement();
+
+		final NodeList nodeList = root.getElementsByTagName("configuration");
+		assert nodeList.getLength() == 1;
+
+		final Element configuration = (Element) nodeList.item(0);
+		final NodeList classpathModificationsList = configuration.getElementsByTagName("classpathModifications");
+
+		// Remove all the existing exclusions
+		for (int i = 0; i < classpathModificationsList.getLength(); i++) {
+			configuration.removeChild(classpathModificationsList.item(i));
+		}
+
+		final Element classpathModifications = document.createElement("classpathModifications");
+
+		for (String exclusionPath : exclusions) {
+			final Element exclusion = document.createElement("entry");
+
+			exclusion.setAttribute("exclude", "true");
+			exclusion.setAttribute("path", exclusionPath);
+
+			classpathModifications.appendChild(exclusion);
+		}
+
+		configuration.appendChild(classpathModifications);
+
+		final TransformerFactory transformerFactory = TransformerFactory.newInstance();
+		final Transformer transformer = transformerFactory.newTransformer();
+		transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+
+		final DOMSource source = new DOMSource(document);
+
+		final StringWriter writer = new StringWriter();
+		transformer.transform(source, new StreamResult(writer));
+
+		return writer.toString().replace("\r", "");
+	}
+
+	@Nested
+	protected abstract ListProperty<IntelijRunConfig> getIdeaRunConfigs();
 
 	@TaskAction
 	public void runTask() throws IOException {
@@ -141,65 +201,5 @@ public abstract class IdeaSyncTask extends AbstractLoomTask {
 				LOGGER.error("Failed to modify run configuration xml", e);
 			}
 		}
-	}
-
-	private static void setClasspathModifications(Path runConfig, List<String> exclusions) throws IOException {
-		final String inputXml = Files.readString(runConfig, StandardCharsets.UTF_8);
-		final String outputXml;
-
-		try {
-			outputXml = setClasspathModificationsInXml(inputXml, exclusions);
-		} catch (Exception e) {
-			LOGGER.error("Failed to modify idea xml", e);
-
-			return;
-		}
-
-		if (!inputXml.equals(outputXml)) {
-			Files.writeString(runConfig, outputXml, StandardCharsets.UTF_8);
-		}
-	}
-
-	@VisibleForTesting
-	public static String setClasspathModificationsInXml(String input, List<String> exclusions) throws Exception {
-		final DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
-		final DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
-		final Document document = documentBuilder.parse(new InputSource(new StringReader(input)));
-		final Element root = document.getDocumentElement();
-
-		final NodeList nodeList = root.getElementsByTagName("configuration");
-		assert nodeList.getLength() == 1;
-
-		final Element configuration = (Element) nodeList.item(0);
-		final NodeList classpathModificationsList = configuration.getElementsByTagName("classpathModifications");
-
-		// Remove all the existing exclusions
-		for (int i = 0; i < classpathModificationsList.getLength(); i++) {
-			configuration.removeChild(classpathModificationsList.item(i));
-		}
-
-		final Element classpathModifications = document.createElement("classpathModifications");
-
-		for (String exclusionPath : exclusions) {
-			final Element exclusion = document.createElement("entry");
-
-			exclusion.setAttribute("exclude", "true");
-			exclusion.setAttribute("path", exclusionPath);
-
-			classpathModifications.appendChild(exclusion);
-		}
-
-		configuration.appendChild(classpathModifications);
-
-		final TransformerFactory transformerFactory = TransformerFactory.newInstance();
-		final Transformer transformer = transformerFactory.newTransformer();
-		transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
-
-		final DOMSource source = new DOMSource(document);
-
-		final StringWriter writer = new StringWriter();
-		transformer.transform(source, new StreamResult(writer));
-
-		return writer.toString().replace("\r", "");
 	}
 }

@@ -41,11 +41,7 @@ import org.gradle.invocation.DefaultGradle
 import org.gradle.jvm.toolchain.JavaLanguageVersion
 import org.gradle.launcher.daemon.configuration.DaemonPriority
 import org.gradle.launcher.daemon.context.DefaultDaemonContext
-import org.gradle.launcher.daemon.protocol.DaemonMessageSerializer
-import org.gradle.launcher.daemon.protocol.Finished
-import org.gradle.launcher.daemon.protocol.Message
-import org.gradle.launcher.daemon.protocol.StopWhenIdle
-import org.gradle.launcher.daemon.protocol.Success
+import org.gradle.launcher.daemon.protocol.*
 import org.gradle.launcher.daemon.registry.DaemonInfo
 import org.gradle.launcher.daemon.registry.PersistentDaemonRegistry
 import org.gradle.launcher.daemon.server.DaemonTcpServerConnector
@@ -112,7 +108,7 @@ class TestPlugin implements Plugin<Project> {
 				false,
 				NativeServices.NativeServicesMode.NOT_SET,
 				DaemonPriority.NORMAL
-				)
+		)
 	}
 
 	class TestIncomingConnectionHandler implements IncomingConnectionHandler, Runnable, AutoCloseable {

@@ -39,15 +39,26 @@ public interface LoomFiles {
 	}
 
 	File getUserCache();
+
 	File getRootProjectPersistentCache();
+
 	File getProjectPersistentCache();
+
 	File getProjectBuildCache();
+
 	File getRemappedModCache();
+
 	File getNativesDirectory(Project project);
+
 	File getDefaultLog4jConfigFile();
+
 	File getDevLauncherConfig();
+
 	File getRemapClasspathFile();
+
 	File getGlobalMinecraftRepo();
+
 	File getLocalMinecraftRepo();
+
 	File getDecompileCache(String version);
 }

@@ -66,20 +66,6 @@ public interface TinyRemapperExtension {
 		return getPostApplyVisitor();
 	}
 
-	interface Context {
-		/**
-		 * @return The source namespace.
-		 */
-		String sourceNamespace();
-
-		/**
-		 * @return The target namespace.
-		 */
-		String targetNamespace();
-	}
-
-	// Deprecated, for removal in Loom 1.6:
-
 	/**
 	 * @deprecated Use {@link #getAnalyzeVisitorProvider(Context)} instead.
 	 */
@@ -88,6 +74,8 @@ public interface TinyRemapperExtension {
 	default TinyRemapper.AnalyzeVisitorProvider getAnalyzeVisitorProvider() {
 		return null;
 	}
+
+	// Deprecated, for removal in Loom 1.6:
 
 	/**
 	 * @deprecated Use {@link #getPreApplyVisitor(Context)} instead.
@@ -105,5 +93,17 @@ public interface TinyRemapperExtension {
 	@Nullable
 	default TinyRemapper.ApplyVisitorProvider getPostApplyVisitor() {
 		return null;
+	}
+
+	interface Context {
+		/**
+		 * @return The source namespace.
+		 */
+		String sourceNamespace();
+
+		/**
+		 * @return The target namespace.
+		 */
+		String targetNamespace();
 	}
 }

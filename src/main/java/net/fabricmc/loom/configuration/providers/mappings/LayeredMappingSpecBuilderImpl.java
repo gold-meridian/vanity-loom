@@ -45,6 +45,12 @@ import net.fabricmc.loom.configuration.providers.mappings.parchment.ParchmentMap
 public class LayeredMappingSpecBuilderImpl implements LayeredMappingSpecBuilder {
 	private final List<MappingsSpec<?>> layers = new LinkedList<>();
 
+	public static LayeredMappingSpec buildOfficialMojangMappings() {
+		var builder = new LayeredMappingSpecBuilderImpl();
+		builder.officialMojangMappings();
+		return builder.build();
+	}
+
 	@Override
 	public LayeredMappingSpecBuilder addLayer(MappingsSpec<?> mappingSpec) {
 		layers.add(mappingSpec);
@@ -84,11 +90,5 @@ public class LayeredMappingSpecBuilderImpl implements LayeredMappingSpecBuilder 
 		builtLayers.addAll(layers);
 
 		return new LayeredMappingSpec(Collections.unmodifiableList(builtLayers));
-	}
-
-	public static LayeredMappingSpec buildOfficialMojangMappings() {
-		var builder = new LayeredMappingSpecBuilderImpl();
-		builder.officialMojangMappings();
-		return builder.build();
 	}
 }

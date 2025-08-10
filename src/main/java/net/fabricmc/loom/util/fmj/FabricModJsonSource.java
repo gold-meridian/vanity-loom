@@ -32,11 +32,10 @@ import java.nio.file.Path;
 
 import org.gradle.api.Project;
 import org.gradle.api.tasks.SourceSet;
+import org.jetbrains.annotations.NotNull;
 
 import net.fabricmc.loom.util.ZipUtils;
 import net.fabricmc.loom.util.gradle.SourceSetHelper;
-
-import org.jetbrains.annotations.NotNull;
 
 /**
  * A mod may be a zip, directory or Gradle {@link SourceSet}

@@ -45,9 +45,9 @@ public final class LibraryContext {
 	 */
 	public boolean supportsArm64(Platform.OperatingSystem operatingSystem) {
 		final String osName = switch (operatingSystem) {
-		case MAC_OS -> "macos";
-		case WINDOWS -> "windows";
-		case LINUX -> "linux";
+			case MAC_OS -> "macos";
+			case WINDOWS -> "windows";
+			case LINUX -> "linux";
 		};
 
 		return versionMeta.libraries().stream()

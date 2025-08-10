@@ -31,18 +31,8 @@ import java.security.cert.X509Certificate
 
 import org.bouncycastle.asn1.DERIA5String
 import org.bouncycastle.asn1.x500.X500Name
-import org.bouncycastle.asn1.x509.CRLDistPoint
-import org.bouncycastle.asn1.x509.CRLNumber
-import org.bouncycastle.asn1.x509.CRLReason
-import org.bouncycastle.asn1.x509.DistributionPointName
-import org.bouncycastle.asn1.x509.Extension
-import org.bouncycastle.asn1.x509.GeneralName
-import org.bouncycastle.asn1.x509.GeneralNames
-import org.bouncycastle.cert.jcajce.JcaX509CRLConverter
-import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter
-import org.bouncycastle.cert.jcajce.JcaX509ExtensionUtils
-import org.bouncycastle.cert.jcajce.JcaX509v2CRLBuilder
-import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder
+import org.bouncycastle.asn1.x509.*
+import org.bouncycastle.cert.jcajce.*
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder
 
 import net.fabricmc.loom.configuration.providers.minecraft.verify.CertificateChain
@@ -75,7 +65,7 @@ class CertificateUtils {
 				notAfter,
 				subjectName,
 				keyPair.getPublic()
-				)
+		)
 
 		def contentSigner = SIGNER_BUILDER.build(keyPair.getPrivate())
 		return CERT_CONVERTER.getCertificate(builder.build(contentSigner))

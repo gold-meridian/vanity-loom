@@ -39,7 +39,7 @@ class UnpickLayerTest extends LayeredMappingsSpecification {
 		def unpickData = getUnpickData(
 				new IntermediaryMappingsSpec(),
 				builder.build()
-				)
+		)
 		def metadata = unpickData.metadata()
 		then:
 		metadata instanceof UnpickMetadata.V1

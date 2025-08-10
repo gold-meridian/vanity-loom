@@ -58,8 +58,8 @@ class KotlinClassMetadataRemappingAnnotationVisitor(
         if (headerVersion != currentMinorVersion) {
             logger.info(
                 "Kotlin metadata for class ($className) as it was built using a different major Kotlin " +
-                    "version (${header.metadataVersion[0]}.${header.metadataVersion[1]}.x) while the remapper " +
-                    "is using (${KotlinVersion.CURRENT}).",
+                        "version (${header.metadataVersion[0]}.${header.metadataVersion[1]}.x) while the remapper " +
+                        "is using (${KotlinVersion.CURRENT}).",
             )
         }
         val metadata = KotlinClassMetadata.readLenient(header)
@@ -77,6 +77,7 @@ class KotlinClassMetadataRemappingAnnotationVisitor(
                 writeClassHeader(remapped)
                 validateKotlinClassHeader(remapped, header)
             }
+
             is KotlinClassMetadata.SyntheticClass -> {
                 var klambda = metadata.kmLambda
 
@@ -89,6 +90,7 @@ class KotlinClassMetadataRemappingAnnotationVisitor(
                     accept(next)
                 }
             }
+
             is KotlinClassMetadata.FileFacade -> {
                 var kpackage = metadata.kmPackage
                 kpackage = KotlinClassRemapper(remapper).remap(kpackage)
@@ -96,6 +98,7 @@ class KotlinClassMetadataRemappingAnnotationVisitor(
                 writeClassHeader(remapped)
                 validateKotlinClassHeader(remapped, header)
             }
+
             is KotlinClassMetadata.MultiFileClassPart -> {
                 var kpackage = metadata.kmPackage
                 kpackage = KotlinClassRemapper(remapper).remap(kpackage)
@@ -109,6 +112,7 @@ class KotlinClassMetadataRemappingAnnotationVisitor(
                 writeClassHeader(remapped)
                 validateKotlinClassHeader(remapped, header)
             }
+
             is KotlinClassMetadata.MultiFileClassFacade, is KotlinClassMetadata.Unknown -> {
                 // do nothing
                 accept(next)
@@ -175,7 +179,7 @@ class KotlinClassMetadataRemappingAnnotationVisitor(
         if (remapped.data2.size != original.data2.size) {
             logger.info(
                 "Kotlin class metadata size mismatch: data2 size does not match original in class $className. " +
-                    "New: ${remapped.data2.size} Old: ${original.data2.size}",
+                        "New: ${remapped.data2.size} Old: ${original.data2.size}",
             )
         }
     }

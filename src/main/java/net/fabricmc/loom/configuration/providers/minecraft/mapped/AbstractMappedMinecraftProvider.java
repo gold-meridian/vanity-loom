@@ -61,13 +61,30 @@ public abstract class AbstractMappedMinecraftProvider<M extends MinecraftProvide
 	private static final Logger LOGGER = LoggerFactory.getLogger(AbstractMappedMinecraftProvider.class);
 
 	protected final M minecraftProvider;
-	private final Project project;
 	protected final LoomGradleExtension extension;
+	private final Project project;
 
 	public AbstractMappedMinecraftProvider(Project project, M minecraftProvider) {
 		this.minecraftProvider = minecraftProvider;
 		this.project = project;
 		this.extension = LoomGradleExtension.get(project);
+	}
+
+	// Create two copies of the remapped jar, the backup jar is used as the input of genSources
+	public static Path getBackupJarPath(MinecraftJar minecraftJar) {
+		final Path outputJarPath = minecraftJar.getPath();
+		return outputJarPath.resolveSibling(outputJarPath.getFileName() + ".backup");
+	}
+
+	// Configure the remapper to add the client @Environment annotation to all classes in the client jar.
+	public static void configureSplitRemapper(RemappedJars remappedJars, TinyRemapper.Builder tinyRemapperBuilder) {
+		final MinecraftJar outputJar = remappedJars.outputJar();
+		assert !outputJar.isMerged();
+
+		if (outputJar.includesClient()) {
+			assert !outputJar.includesServer();
+			tinyRemapperBuilder.extraPostApplyVisitor(SidedClassVisitor.CLIENT);
+		}
 	}
 
 	public abstract MappingsNamespace getTargetNamespace();
@@ -124,44 +141,15 @@ public abstract class AbstractMappedMinecraftProvider<M extends MinecraftProvide
 		return minecraftJars;
 	}
 
-	// Create two copies of the remapped jar, the backup jar is used as the input of genSources
-	public static Path getBackupJarPath(MinecraftJar minecraftJar) {
-		final Path outputJarPath = minecraftJar.getPath();
-		return outputJarPath.resolveSibling(outputJarPath.getFileName() + ".backup");
-	}
-
 	protected void createBackupJars(List<MinecraftJar> minecraftJars) throws IOException {
 		for (MinecraftJar minecraftJar : minecraftJars) {
 			Files.copy(minecraftJar.getPath(), getBackupJarPath(minecraftJar), StandardCopyOption.REPLACE_EXISTING);
 		}
 	}
 
-	public record ProvideContext(boolean applyDependencies, boolean refreshOutputs, ConfigContext configContext) {
-		ProvideContext withApplyDependencies(boolean applyDependencies) {
-			return new ProvideContext(applyDependencies, refreshOutputs(), configContext());
-		}
-	}
-
 	@Override
 	public Path getJar(MinecraftJar.Type type) {
 		return getMavenHelper(type).getOutputFile(null);
-	}
-
-	public enum MavenScope {
-		// Output files will be stored per project
-		LOCAL(LoomFiles::getLocalMinecraftRepo),
-		// Output files will be stored globally
-		GLOBAL(LoomFiles::getGlobalMinecraftRepo);
-
-		private final Function<LoomFiles, File> fileFunction;
-
-		MavenScope(Function<LoomFiles, File> fileFunction) {
-			this.fileFunction = fileFunction;
-		}
-
-		public Path getRoot(LoomGradleExtension extension) {
-			return fileFunction.apply(extension.getFiles()).toPath();
-		}
 	}
 
 	public abstract MavenScope getMavenScope();
@@ -274,17 +262,6 @@ public abstract class AbstractMappedMinecraftProvider<M extends MinecraftProvide
 	protected void configureRemapper(RemappedJars remappedJars, TinyRemapper.Builder tinyRemapperBuilder) {
 	}
 
-	// Configure the remapper to add the client @Environment annotation to all classes in the client jar.
-	public static void configureSplitRemapper(RemappedJars remappedJars, TinyRemapper.Builder tinyRemapperBuilder) {
-		final MinecraftJar outputJar = remappedJars.outputJar();
-		assert !outputJar.isMerged();
-
-		if (outputJar.includesClient()) {
-			assert !outputJar.includesServer();
-			tinyRemapperBuilder.extraPostApplyVisitor(SidedClassVisitor.CLIENT);
-		}
-	}
-
 	private void cleanOutputs(List<RemappedJars> remappedJars) throws IOException {
 		for (RemappedJars remappedJar : remappedJars) {
 			Files.deleteIfExists(remappedJar.outputJarPath());
@@ -300,11 +277,34 @@ public abstract class AbstractMappedMinecraftProvider<M extends MinecraftProvide
 		return minecraftProvider;
 	}
 
+	public enum MavenScope {
+		// Output files will be stored per project
+		LOCAL(LoomFiles::getLocalMinecraftRepo),
+		// Output files will be stored globally
+		GLOBAL(LoomFiles::getGlobalMinecraftRepo);
+
+		private final Function<LoomFiles, File> fileFunction;
+
+		MavenScope(Function<LoomFiles, File> fileFunction) {
+			this.fileFunction = fileFunction;
+		}
+
+		public Path getRoot(LoomGradleExtension extension) {
+			return fileFunction.apply(extension.getFiles()).toPath();
+		}
+	}
+
 	public sealed interface OutputJar permits RemappedJars, SimpleOutputJar {
 		MinecraftJar outputJar();
 
 		default MinecraftJar.Type type() {
 			return outputJar().getType();
+		}
+	}
+
+	public record ProvideContext(boolean applyDependencies, boolean refreshOutputs, ConfigContext configContext) {
+		ProvideContext withApplyDependencies(boolean applyDependencies) {
+			return new ProvideContext(applyDependencies, refreshOutputs(), configContext());
 		}
 	}
 

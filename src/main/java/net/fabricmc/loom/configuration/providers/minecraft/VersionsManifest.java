@@ -30,15 +30,15 @@ import java.util.Map;
 import org.jetbrains.annotations.Nullable;
 
 public record VersionsManifest(List<Version> versions, Map<String, String> latest) {
-	public static class Version {
-		public String id, url, sha1;
-	}
-
 	@Nullable
 	public Version getVersion(String id) {
 		return versions.stream()
 				.filter(versions -> versions.id.equalsIgnoreCase(id))
 				.findFirst()
 				.orElse(null);
+	}
+
+	public static class Version {
+		public String id, url, sha1;
 	}
 }

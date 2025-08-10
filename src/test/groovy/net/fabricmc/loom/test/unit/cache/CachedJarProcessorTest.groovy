@@ -43,10 +43,10 @@ import net.fabricmc.loom.util.ZipUtils
 
 class CachedJarProcessorTest extends Specification {
 	static Map<String, byte[]> jarEntries = [
-		"net/fabricmc/Example.class": newClass("net/fabricmc/Example"),
-		"net/fabricmc/other/Test.class": newClass("net/fabricmc/other/Test"),
-		"net/fabricmc/other/Test\$Inner.class": newInnerClass("net/fabricmc/other/Test\$Inner", "net/fabricmc/other/Test", "Inner"),
-		"net/fabricmc/other/Test\$1.class": newInnerClass("net/fabricmc/other/Test\$1", "net/fabricmc/other/Test"),
+			"net/fabricmc/Example.class"          : newClass("net/fabricmc/Example"),
+			"net/fabricmc/other/Test.class"       : newClass("net/fabricmc/other/Test"),
+			"net/fabricmc/other/Test\$Inner.class": newInnerClass("net/fabricmc/other/Test\$Inner", "net/fabricmc/other/Test", "Inner"),
+			"net/fabricmc/other/Test\$1.class"    : newInnerClass("net/fabricmc/other/Test\$1", "net/fabricmc/other/Test"),
 	]
 
 	static String ExampleHash = "abc123/db5c3a2d04e0c6ea03aef0d217517aa0233f9b8198753d3c96574fe5825a13c4"
@@ -151,8 +151,8 @@ class CachedJarProcessorTest extends Specification {
 		Files.delete(outputJar)
 
 		ClassLineNumbers lineNumbers = lineNumbers([
-			"net/fabricmc/Example",
-			"net/fabricmc/other/Test"
+				"net/fabricmc/Example",
+				"net/fabricmc/other/Test"
 		])
 		processor.completeJob(outputJar, workJob, lineNumbers)
 
@@ -190,8 +190,8 @@ class CachedJarProcessorTest extends Specification {
 		Files.delete(outputJar)
 
 		ClassLineNumbers lineNumbers = lineNumbers([
-			"net/fabricmc/Example",
-			"net/fabricmc/other/Test"
+				"net/fabricmc/Example",
+				"net/fabricmc/other/Test"
 		])
 		processor.completeJob(outputJar, workJob, lineNumbers)
 
@@ -225,8 +225,8 @@ class CachedJarProcessorTest extends Specification {
 		Files.delete(outputJar)
 
 		ClassLineNumbers lineNumbers = lineNumbers([
-			"net/fabricmc/Example",
-			"net/fabricmc/other/Test"
+				"net/fabricmc/Example",
+				"net/fabricmc/other/Test"
 		])
 		processor.completeJob(outputJar, workJob, lineNumbers)
 
@@ -245,21 +245,21 @@ class CachedJarProcessorTest extends Specification {
 		given:
 		def jar1 = ZipTestUtils.createZipFromBytes(
 				[
-					"net/fabricmc/Example.class": newClass("net/fabricmc/Example"),
-					"net/fabricmc/other/Test.class": newClass("net/fabricmc/other/Test", ),
-					"net/fabricmc/other/Test\$Inner.class": newInnerClass("net/fabricmc/other/Test\$Inner", "net/fabricmc/other/Test", "Inner", ["net/fabricmc/Example"] as String[]),
-					"net/fabricmc/other/Test\$1.class": newInnerClass("net/fabricmc/other/Test\$1", "net/fabricmc/other/Test"),
+						"net/fabricmc/Example.class"          : newClass("net/fabricmc/Example"),
+						"net/fabricmc/other/Test.class"       : newClass("net/fabricmc/other/Test",),
+						"net/fabricmc/other/Test\$Inner.class": newInnerClass("net/fabricmc/other/Test\$Inner", "net/fabricmc/other/Test", "Inner", ["net/fabricmc/Example"] as String[]),
+						"net/fabricmc/other/Test\$1.class"    : newInnerClass("net/fabricmc/other/Test\$1", "net/fabricmc/other/Test"),
 				]
-				)
+		)
 		// The second jar changes Example, so we would expect Test to be invalidated, thus causing a full decompile in this case
 		def jar2 = ZipTestUtils.createZipFromBytes(
 				[
-					"net/fabricmc/Example.class": newClass("net/fabricmc/Example", ["java/lang/Runnable"] as String[]),
-					"net/fabricmc/other/Test.class": newClass("net/fabricmc/other/Test", ),
-					"net/fabricmc/other/Test\$Inner.class": newInnerClass("net/fabricmc/other/Test\$Inner", "net/fabricmc/other/Test", "Inner", ["net/fabricmc/Example"] as String[]),
-					"net/fabricmc/other/Test\$1.class": newInnerClass("net/fabricmc/other/Test\$1", "net/fabricmc/other/Test"),
+						"net/fabricmc/Example.class"          : newClass("net/fabricmc/Example", ["java/lang/Runnable"] as String[]),
+						"net/fabricmc/other/Test.class"       : newClass("net/fabricmc/other/Test",),
+						"net/fabricmc/other/Test\$Inner.class": newInnerClass("net/fabricmc/other/Test\$Inner", "net/fabricmc/other/Test", "Inner", ["net/fabricmc/Example"] as String[]),
+						"net/fabricmc/other/Test\$1.class"    : newInnerClass("net/fabricmc/other/Test\$1", "net/fabricmc/other/Test"),
 				]
-				)
+		)
 
 		def cache = new CachedFileStoreImpl<>(testPath.resolve("cache"), CachedData.SERIALIZER, new CachedFileStoreImpl.CacheRules(50_000, Duration.ofDays(90)))
 		def processor = new CachedJarProcessor(cache, "abc123")
@@ -278,8 +278,8 @@ class CachedJarProcessorTest extends Specification {
 		Files.delete(outputJar)
 
 		ClassLineNumbers lineNumbers = lineNumbers([
-			"net/fabricmc/Example",
-			"net/fabricmc/other/Test"
+				"net/fabricmc/Example",
+				"net/fabricmc/other/Test"
 		])
 		processor.completeJob(outputJar, workJob, lineNumbers)
 

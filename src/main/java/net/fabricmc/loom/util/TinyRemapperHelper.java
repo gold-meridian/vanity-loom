@@ -46,10 +46,10 @@ import net.fabricmc.tinyremapper.TinyRemapper;
  */
 public final class TinyRemapperHelper {
 	private static final Map<String, String> JSR_TO_JETBRAINS = Map.of(
-				"javax/annotation/Nullable", "org/jetbrains/annotations/Nullable",
-				"javax/annotation/Nonnull", "org/jetbrains/annotations/NotNull",
-				"javax/annotation/concurrent/Immutable", "org/jetbrains/annotations/Unmodifiable"
-			);
+			"javax/annotation/Nullable", "org/jetbrains/annotations/Nullable",
+			"javax/annotation/Nonnull", "org/jetbrains/annotations/NotNull",
+			"javax/annotation/concurrent/Immutable", "org/jetbrains/annotations/Unmodifiable"
+	);
 
 	/**
 	 * Matches the new local variable naming format introduced in 21w37a.
@@ -60,7 +60,8 @@ public final class TinyRemapperHelper {
 	}
 
 	public static TinyRemapper getTinyRemapper(Project project, ServiceFactory serviceFactory, String fromM, String toM) throws IOException {
-		return getTinyRemapper(project, serviceFactory, fromM, toM, false, (builder) -> { });
+		return getTinyRemapper(project, serviceFactory, fromM, toM, false, (builder) -> {
+		});
 	}
 
 	public static TinyRemapper getTinyRemapper(Project project, ServiceFactory serviceFactory, String fromM, String toM, boolean fixRecords, Consumer<TinyRemapper.Builder> builderConsumer) throws IOException {

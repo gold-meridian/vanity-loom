@@ -51,7 +51,7 @@ class FileMappingLayerTest extends LayeredMappingsSpecification {
 		def mappings = getLayeredMappings(
 				new IntermediaryMappingsSpec(),
 				builder.build()
-				)
+		)
 		then:
 		mappings.srcNamespace == "named"
 		mappings.dstNamespaces == ["intermediary", "official"]
@@ -81,10 +81,10 @@ class FileMappingLayerTest extends LayeredMappingsSpecification {
 		def mappings = getLayeredMappings(
 				new IntermediaryMappingsSpec(),
 				FileMappingsSpecBuilderImpl.builder(FileSpec.create(mappingsFile))
-				.fallbackNamespaces('named', 'official')
-				.mergeNamespace(MappingsNamespace.OFFICIAL)
-				.build()
-				)
+						.fallbackNamespaces('named', 'official')
+						.mergeNamespace(MappingsNamespace.OFFICIAL)
+						.build()
+		)
 		def tiny = getTiny(mappings)
 		then:
 		mappings.srcNamespace == "named"
@@ -97,13 +97,13 @@ class FileMappingLayerTest extends LayeredMappingsSpecification {
 	}
 
 	enum YarnSetupType {
-		TINY_JAR('tiny jar', { downloadFile(YARN_1_17_URL, "yarn.jar") }, { }),
+		TINY_JAR('tiny jar', { downloadFile(YARN_1_17_URL, "yarn.jar") }, {}),
 		BARE_TINY('bare tiny file', {
 			def yarnJar = downloadFile(YARN_1_17_URL, "yarn.jar")
 			def yarnTiny = new File(tempDir, "yarn.tiny")
 			yarnTiny.bytes = ZipUtils.unpack(yarnJar.toPath(), "mappings/mappings.tiny")
 			yarnTiny
-		}, { }),
+		}, {}),
 		ENIGMA_ZIP('enigma zip', {
 			// Recent Yarn data is not published as Enigma zips, so this zip is just a copy
 			// of Yarn's repo at a60a3189
@@ -113,7 +113,7 @@ class FileMappingLayerTest extends LayeredMappingsSpecification {
 		}),
 		YARN_V2_URL('yarn url', {
 			YARN_1_17_URL
-		}, { })
+		}, {})
 		;
 
 		final String displayName

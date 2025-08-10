@@ -44,11 +44,19 @@ import net.fabricmc.loom.util.gradle.SourceSetHelper;
 
 public abstract class FabricApiDataGeneration extends FabricApiAbstractSourceSet {
 	@Inject
-	protected abstract Project getProject();
-
-	@Inject
 	public FabricApiDataGeneration() {
 	}
+
+	private static void extendsFrom(Project project, String name, String extendsFrom) {
+		final ConfigurationContainer configurations = project.getConfigurations();
+
+		configurations.named(name, configuration -> {
+			configuration.extendsFrom(configurations.getByName(extendsFrom));
+		});
+	}
+
+	@Inject
+	protected abstract Project getProject();
 
 	@Override
 	protected String getSourceSetName() {
@@ -118,14 +126,6 @@ public abstract class FabricApiDataGeneration extends FabricApiAbstractSourceSet
 				task.getOutputs().dir(outputDirectory);
 			});
 		}
-	}
-
-	private static void extendsFrom(Project project, String name, String extendsFrom) {
-		final ConfigurationContainer configurations = project.getConfigurations();
-
-		configurations.named(name, configuration -> {
-			configuration.extendsFrom(configurations.getByName(extendsFrom));
-		});
 	}
 
 	private void dependsOn(SourceSet sourceSet, SourceSet other) {

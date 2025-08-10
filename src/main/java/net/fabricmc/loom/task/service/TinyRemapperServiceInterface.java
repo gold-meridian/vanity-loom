@@ -31,5 +31,6 @@ import net.fabricmc.tinyremapper.TinyRemapper;
 @VisibleForTesting
 public interface TinyRemapperServiceInterface {
 	TinyRemapper getTinyRemapperForRemapping();
+
 	TinyRemapper getTinyRemapperForInputs();
 }

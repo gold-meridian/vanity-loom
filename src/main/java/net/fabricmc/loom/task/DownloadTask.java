@@ -51,6 +51,11 @@ import net.fabricmc.loom.util.download.DownloadException;
  * A general purpose task for downloading files from a URL, using the loom {@link Download} utility.
  */
 public abstract class DownloadTask extends DefaultTask {
+	@Inject
+	public DownloadTask() {
+		getIsOffline().set(getProject().getGradle().getStartParameter().isOffline());
+	}
+
 	/**
 	 * The URL to download the file from.
 	 */
@@ -71,13 +76,13 @@ public abstract class DownloadTask extends DefaultTask {
 	@Input
 	public abstract Property<Duration> getMaxAge();
 
+	// Internal stuff:
+
 	/**
 	 * The file to download to.
 	 */
 	@OutputFile
 	public abstract RegularFileProperty getOutput();
-
-	// Internal stuff:
 
 	@ApiStatus.Internal
 	@Input
@@ -85,11 +90,6 @@ public abstract class DownloadTask extends DefaultTask {
 
 	@Inject
 	protected abstract WorkerExecutor getWorkerExecutor();
-
-	@Inject
-	public DownloadTask() {
-		getIsOffline().set(getProject().getGradle().getStartParameter().isOffline());
-	}
 
 	@TaskAction
 	public void run() {
@@ -106,9 +106,13 @@ public abstract class DownloadTask extends DefaultTask {
 
 	public interface DownloadWorkParameters extends WorkParameters {
 		Property<String> getUrl();
+
 		Property<String> getSha1();
+
 		Property<Duration> getMaxAge();
+
 		RegularFileProperty getOutputFile();
+
 		Property<Boolean> getIsOffline();
 	}
 

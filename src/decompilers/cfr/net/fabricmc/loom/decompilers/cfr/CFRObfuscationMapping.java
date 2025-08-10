@@ -57,11 +57,6 @@ public class CFRObfuscationMapping extends NullMapping {
 		mappingTree = readMappings(mappings);
 	}
 
-	@Override
-	public Dumper wrap(Dumper d) {
-		return new JavadocProvidingDumper(d);
-	}
-
 	private static MappingTree readMappings(Path input) {
 		try (BufferedReader reader = Files.newBufferedReader(input)) {
 			MemoryMappingTree mappingTree = new MemoryMappingTree();
@@ -72,6 +67,11 @@ public class CFRObfuscationMapping extends NullMapping {
 		} catch (IOException e) {
 			throw new RuntimeException("Failed to read mappings", e);
 		}
+	}
+
+	@Override
+	public Dumper wrap(Dumper d) {
+		return new JavadocProvidingDumper(d);
 	}
 
 	private class JavadocProvidingDumper extends DelegatingDumper {

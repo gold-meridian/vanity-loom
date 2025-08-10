@@ -40,8 +40,8 @@ import java.util.concurrent.Executors;
 public interface AsyncZipProcessor {
 	static void processEntries(Path inputZip, Path outputZip, AsyncZipProcessor processor) throws IOException {
 		try (FileSystemUtil.Delegate inFs = FileSystemUtil.getJarFileSystem(inputZip, false);
-				FileSystemUtil.Delegate outFs = FileSystemUtil.getJarFileSystem(outputZip, true);
-				ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors())) {
+			 FileSystemUtil.Delegate outFs = FileSystemUtil.getJarFileSystem(outputZip, true);
+			 ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors())) {
 			final Path inRoot = inFs.get().getPath("/");
 			final Path outRoot = outFs.get().getPath("/");
 

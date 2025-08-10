@@ -58,9 +58,8 @@ public class SourceMappingsService extends Service<SourceMappingsService.Options
 	public static final ServiceType<Options, SourceMappingsService> TYPE = new ServiceType<>(Options.class, SourceMappingsService.class);
 	private static final Logger LOGGER = LoggerFactory.getLogger(SourceMappingsService.class);
 
-	public interface Options extends Service.Options {
-		@InputFiles
-		ConfigurableFileCollection getMappings(); // Only a single file
+	public SourceMappingsService(Options options, ServiceFactory serviceFactory) {
+		super(options, serviceFactory);
 	}
 
 	public static Provider<Options> create(Project project) {
@@ -131,11 +130,12 @@ public class SourceMappingsService extends Service<SourceMappingsService.Options
 		}
 	}
 
-	public SourceMappingsService(Options options, ServiceFactory serviceFactory) {
-		super(options, serviceFactory);
-	}
-
 	public Path getMappingsFile() {
 		return getOptions().getMappings().getSingleFile().toPath();
+	}
+
+	public interface Options extends Service.Options {
+		@InputFiles
+		ConfigurableFileCollection getMappings(); // Only a single file
 	}
 }

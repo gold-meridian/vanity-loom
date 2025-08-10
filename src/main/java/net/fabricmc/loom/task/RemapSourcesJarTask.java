@@ -44,9 +44,6 @@ import net.fabricmc.loom.task.service.SourceRemapperService;
 import net.fabricmc.loom.util.service.ScopedServiceFactory;
 
 public abstract class RemapSourcesJarTask extends AbstractRemapJarTask {
-	@Nested
-	abstract Property<SourceRemapperService.Options> getSourcesRemapperServiceOptions();
-
 	@Inject
 	public RemapSourcesJarTask() {
 		super();
@@ -55,6 +52,9 @@ public abstract class RemapSourcesJarTask extends AbstractRemapJarTask {
 
 		getSourcesRemapperServiceOptions().set(SourceRemapperService.createOptions(this));
 	}
+
+	@Nested
+	abstract Property<SourceRemapperService.Options> getSourcesRemapperServiceOptions();
 
 	@TaskAction
 	public void run() {

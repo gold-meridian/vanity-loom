@@ -41,9 +41,6 @@ import javax.inject.Inject;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-
-import net.fabricmc.loom.api.metadata.ModJson;
-
 import org.jetbrains.annotations.Nullable;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassVisitor;
@@ -56,6 +53,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import net.fabricmc.loom.api.mappings.layered.MappingsNamespace;
+import net.fabricmc.loom.api.metadata.ModJson;
 import net.fabricmc.loom.api.processor.MinecraftJarProcessor;
 import net.fabricmc.loom.api.processor.ProcessorContext;
 import net.fabricmc.loom.api.processor.SpecContext;
@@ -63,7 +61,6 @@ import net.fabricmc.loom.util.Constants;
 import net.fabricmc.loom.util.LazyCloseable;
 import net.fabricmc.loom.util.Pair;
 import net.fabricmc.loom.util.ZipUtils;
-import net.fabricmc.loom.util.fmj.FabricModJson;
 import net.fabricmc.mappingio.tree.MappingTree;
 import net.fabricmc.mappingio.tree.MemoryMappingTree;
 import net.fabricmc.tinyremapper.TinyRemapper;
@@ -79,6 +76,28 @@ public abstract class InterfaceInjectionProcessor implements MinecraftJarProcess
 	public InterfaceInjectionProcessor(String name, boolean fromDependencies) {
 		this.name = name;
 		this.fromDependencies = fromDependencies;
+	}
+
+	private static String appendComment(String comment, List<InjectedInterface> injectedInterfaces) {
+		if (injectedInterfaces.isEmpty()) {
+			return comment;
+		}
+
+		var commentBuilder = comment == null ? new StringBuilder() : new StringBuilder(comment);
+
+		for (InjectedInterface injectedInterface : injectedInterfaces) {
+			String iiComment = "<p>Interface {@link %s} injected by mod %s</p>".formatted(injectedInterface.ifaceName().replace('/', '.').replace('$', '.'), injectedInterface.modId());
+
+			if (commentBuilder.indexOf(iiComment) == -1) {
+				if (commentBuilder.isEmpty()) {
+					commentBuilder.append(iiComment);
+				} else {
+					commentBuilder.append('\n').append(iiComment);
+				}
+			}
+		}
+
+		return comment;
 	}
 
 	@Override
@@ -107,9 +126,6 @@ public abstract class InterfaceInjectionProcessor implements MinecraftJarProcess
 				.collect(Collectors.toSet());
 
 		return new Spec(injectedInterfaces, clientOnlyModIds);
-	}
-
-	public record Spec(List<InjectedInterface> injectedInterfaces, Set<String> clientOnlyModIds) implements MinecraftJarProcessor.Spec {
 	}
 
 	@Override
@@ -205,26 +221,7 @@ public abstract class InterfaceInjectionProcessor implements MinecraftJarProcess
 		};
 	}
 
-	private static String appendComment(String comment, List<InjectedInterface> injectedInterfaces) {
-		if (injectedInterfaces.isEmpty()) {
-			return comment;
-		}
-
-		var commentBuilder = comment == null ? new StringBuilder() : new StringBuilder(comment);
-
-		for (InjectedInterface injectedInterface : injectedInterfaces) {
-			String iiComment = "<p>Interface {@link %s} injected by mod %s</p>".formatted(injectedInterface.ifaceName().replace('/', '.').replace('$', '.'), injectedInterface.modId());
-
-			if (commentBuilder.indexOf(iiComment) == -1) {
-				if (commentBuilder.isEmpty()) {
-					commentBuilder.append(iiComment);
-				} else {
-					commentBuilder.append('\n').append(iiComment);
-				}
-			}
-		}
-
-		return comment;
+	public record Spec(List<InjectedInterface> injectedInterfaces, Set<String> clientOnlyModIds) implements MinecraftJarProcessor.Spec {
 	}
 
 	private record InjectedInterface(String modId, String className, String ifaceName, @Nullable String generics) {
@@ -449,12 +446,12 @@ public abstract class InterfaceInjectionProcessor implements MinecraftJarProcess
 				if (!this.acceptedTypeVariables.contains(name)) {
 					throw new IllegalStateException(
 							"Interface "
-							+ this.interfaceName
-							+ " attempted to use a type variable named "
-							+ name
-							+ " which is not present in the "
-							+ this.className
-							+ " class"
+									+ this.interfaceName
+									+ " attempted to use a type variable named "
+									+ name
+									+ " which is not present in the "
+									+ this.className
+									+ " class"
 					);
 				}
 

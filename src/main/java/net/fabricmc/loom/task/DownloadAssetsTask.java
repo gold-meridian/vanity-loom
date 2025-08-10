@@ -49,33 +49,6 @@ import net.fabricmc.loom.util.download.GradleDownloadProgressListener;
 import net.fabricmc.loom.util.gradle.ProgressGroup;
 
 public abstract class DownloadAssetsTask extends AbstractLoomTask {
-	@Input
-	public abstract Property<String> getAssetsHash();
-
-	@Input
-	public abstract Property<Integer> getDownloadThreads();
-
-	@Input
-	public abstract Property<String> getMinecraftVersion();
-
-	@Input
-	public abstract Property<String> getResourcesBaseUrl();
-
-	@Input
-	protected abstract Property<String> getAssetsIndexJson();
-
-	@OutputDirectory
-	public abstract RegularFileProperty getAssetsDirectory();
-
-	@OutputDirectory
-	public abstract RegularFileProperty getLegacyResourcesDirectory();
-
-	@Inject
-	protected abstract ProgressLoggerFactory getProgressLoggerFactory();
-
-	@Nested
-	protected abstract DownloadFactory getDownloadFactory();
-
 	@Inject
 	public DownloadAssetsTask() {
 		final MinecraftVersionMeta versionInfo = getExtension().getMinecraftProvider().getVersionInfo();
@@ -106,12 +79,39 @@ public abstract class DownloadAssetsTask extends AbstractLoomTask {
 		getLegacyResourcesDirectory().finalizeValueOnRead();
 	}
 
+	@Input
+	public abstract Property<String> getAssetsHash();
+
+	@Input
+	public abstract Property<Integer> getDownloadThreads();
+
+	@Input
+	public abstract Property<String> getMinecraftVersion();
+
+	@Input
+	public abstract Property<String> getResourcesBaseUrl();
+
+	@Input
+	protected abstract Property<String> getAssetsIndexJson();
+
+	@OutputDirectory
+	public abstract RegularFileProperty getAssetsDirectory();
+
+	@OutputDirectory
+	public abstract RegularFileProperty getLegacyResourcesDirectory();
+
+	@Inject
+	protected abstract ProgressLoggerFactory getProgressLoggerFactory();
+
+	@Nested
+	protected abstract DownloadFactory getDownloadFactory();
+
 	@TaskAction
 	public void downloadAssets() throws IOException {
 		final AssetIndex assetIndex = getAssetIndex();
 
 		try (ProgressGroup progressGroup = new ProgressGroup("Download Assets", getProgressLoggerFactory());
-				DownloadExecutor executor = new DownloadExecutor(getDownloadThreads().get())) {
+			 DownloadExecutor executor = new DownloadExecutor(getDownloadThreads().get())) {
 			for (AssetIndex.Object object : assetIndex.getObjects()) {
 				final String sha1 = object.hash();
 				final String url = getResourcesBaseUrl().get() + sha1.substring(0, 2) + "/" + sha1;

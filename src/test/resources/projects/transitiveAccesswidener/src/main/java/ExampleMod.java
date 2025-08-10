@@ -1,6 +1,6 @@
-import net.minecraft.world.biome.BiomeKeys;
-import net.minecraft.world.biome.Biome;
 import net.minecraft.util.registry.RegistryKey;
+import net.minecraft.world.biome.Biome;
+import net.minecraft.world.biome.BiomeKeys;
 
 import net.fabricmc.api.ModInitializer;
 

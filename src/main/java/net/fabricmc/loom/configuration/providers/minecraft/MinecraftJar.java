@@ -71,6 +71,30 @@ public abstract sealed class MinecraftJar permits MinecraftJar.Client, Minecraft
 
 	public abstract MinecraftJar forPath(Path path);
 
+	public enum Type {
+		// Merged jar
+		MERGED("merged"),
+
+		// Regular jars, not merged or split
+		SERVER("server"),
+		CLIENT("client"),
+
+		// Split jars
+		COMMON("common"),
+		CLIENT_ONLY("clientOnly");
+
+		private final String name;
+
+		Type(String name) {
+			this.name = name;
+		}
+
+		@Override
+		public String toString() {
+			return name;
+		}
+	}
+
 	public static final class Merged extends MinecraftJar {
 		public Merged(Path path) {
 			super(path, true, true, true, Type.MERGED);
@@ -125,30 +149,6 @@ public abstract sealed class MinecraftJar permits MinecraftJar.Client, Minecraft
 		@Override
 		public MinecraftJar forPath(Path path) {
 			return new ClientOnly(path);
-		}
-	}
-
-	public enum Type {
-		// Merged jar
-		MERGED("merged"),
-
-		// Regular jars, not merged or split
-		SERVER("server"),
-		CLIENT("client"),
-
-		// Split jars
-		COMMON("common"),
-		CLIENT_ONLY("clientOnly");
-
-		private final String name;
-
-		Type(String name) {
-			this.name = name;
-		}
-
-		@Override
-		public String toString() {
-			return name;
 		}
 	}
 }

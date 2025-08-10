@@ -71,7 +71,6 @@ public record AccessWidenerFile(
 				content
 		);
 	}*/
-
 	@Override
 	public int hashCode() {
 		int result = Objects.hash(path, modId);

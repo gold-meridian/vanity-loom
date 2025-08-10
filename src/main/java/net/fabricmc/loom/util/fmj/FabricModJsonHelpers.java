@@ -30,15 +30,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import net.fabricmc.loom.api.metadata.ModJson;
-
-import net.fabricmc.loom.util.metadata.ModJsonFactory;
-
 import org.gradle.api.Project;
 import org.gradle.api.tasks.SourceSet;
 
 import net.fabricmc.loom.LoomGradleExtension;
+import net.fabricmc.loom.api.metadata.ModJson;
 import net.fabricmc.loom.util.gradle.SourceSetHelper;
+import net.fabricmc.loom.util.metadata.ModJsonFactory;
 
 public class FabricModJsonHelpers {
 	public static final String FABRIC_MOD_JSON = "fabric.mod.json";

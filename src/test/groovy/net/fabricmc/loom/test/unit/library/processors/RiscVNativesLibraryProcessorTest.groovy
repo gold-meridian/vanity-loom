@@ -39,7 +39,7 @@ class RiscVNativesLibraryProcessorTest extends LibraryProcessorTest {
 
 		where:
 		id       || result
-		"1.21" || LibraryProcessor.ApplicationResult.MUST_APPLY
+		"1.21"   || LibraryProcessor.ApplicationResult.MUST_APPLY
 		"1.20.1" || LibraryProcessor.ApplicationResult.MUST_APPLY
 		"1.14.4" || LibraryProcessor.ApplicationResult.DONT_APPLY // Not using classpath natives
 		"1.12.2" || LibraryProcessor.ApplicationResult.DONT_APPLY // Not LWJGL 3
@@ -54,8 +54,8 @@ class RiscVNativesLibraryProcessorTest extends LibraryProcessorTest {
 
 		where:
 		id       | platform
-		"1.21" | PlatformTestUtils.LINUX_ARM64
-		"1.21" | PlatformTestUtils.LINUX_X64
+		"1.21"   | PlatformTestUtils.LINUX_ARM64
+		"1.21"   | PlatformTestUtils.LINUX_X64
 		"1.19.4" | PlatformTestUtils.MAC_OS_X64
 		"1.18.2" | PlatformTestUtils.WINDOWS_X64
 		"1.17.1" | PlatformTestUtils.MAC_OS_X64

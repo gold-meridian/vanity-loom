@@ -42,6 +42,7 @@ public interface MappingLayer {
 
 	/**
 	 * Provides a list of layer classes that this mapping layer depends on. If such a layer is not present an Exception will be thrown when trying to resolve the layer.
+	 *
 	 * @return A list of MappingLayer classes to depend on.
 	 */
 	default List<Class<? extends MappingLayer>> dependsOn() {

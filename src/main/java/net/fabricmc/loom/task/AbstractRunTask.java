@@ -60,24 +60,6 @@ public abstract class AbstractRunTask extends JavaExec {
 	private static final CharsetEncoder ASCII_ENCODER = StandardCharsets.US_ASCII.newEncoder();
 	private static final Logger LOGGER = LoggerFactory.getLogger(AbstractRunTask.class);
 
-	@Input
-	protected abstract Property<String> getInternalRunDir();
-	@Input
-	protected abstract MapProperty<String, Object> getInternalEnvironmentVars();
-	@Input
-	protected abstract ListProperty<String> getInternalJvmArgs();
-	@Input
-	protected abstract Property<Boolean> getUseArgFile();
-	@Input
-	protected abstract Property<String> getProjectDir();
-	@Input
-	// We use a string here, as it's technically an output, but we don't want to cache runs of this task by default.
-	protected abstract Property<String> getArgFilePath();
-
-	// We control the classpath, as we use a ArgFile to pass it over the command line: https://docs.oracle.com/javase/7/docs/technotes/tools/windows/javac.html#commandlineargfile
-	@InputFiles
-	protected abstract ConfigurableFileCollection getInternalClasspath();
-
 	public AbstractRunTask(Function<Project, RunConfig> configProvider) {
 		super();
 		setGroup(Constants.TaskGroup.FABRIC);
@@ -104,6 +86,73 @@ public abstract class AbstractRunTask extends JavaExec {
 		File argFile = new File(buildCache, "argFiles/" + getName());
 		getArgFilePath().set(argFile.getAbsolutePath());
 	}
+
+	// Based off https://github.com/JetBrains/intellij-community/blob/295dd68385a458bdfde638152e36d19bed18b666/platform/util/src/com/intellij/execution/CommandLineWrapperUtil.java#L87
+	private static String quoteArg(String arg) {
+		final String specials = " #'\"\n\r\t\f";
+
+		if (!containsAnyChar(arg, specials)) {
+			return arg;
+		}
+
+		final StringBuilder sb = new StringBuilder(arg.length() * 2);
+
+		for (int i = 0; i < arg.length(); i++) {
+			char c = arg.charAt(i);
+
+			switch (c) {
+				case ' ', '#', '\'' -> sb.append('"').append(c).append('"');
+				case '"' -> sb.append("\"\\\"\"");
+				case '\n' -> sb.append("\"\\n\"");
+				case '\r' -> sb.append("\"\\r\"");
+				case '\t' -> sb.append("\"\\t\"");
+				case '\f' -> sb.append("\"\\f\"");
+				default -> sb.append(c);
+			}
+		}
+
+		return sb.toString();
+	}
+
+	// https://github.com/JetBrains/intellij-community/blob/295dd68385a458bdfde638152e36d19bed18b666/platform/util/base/src/com/intellij/openapi/util/text/Strings.java#L100-L118
+	public static boolean containsAnyChar(final @NotNull String value, final @NotNull String chars) {
+		return chars.length() > value.length()
+				? containsAnyChar(value, chars, 0, value.length())
+				: containsAnyChar(chars, value, 0, chars.length());
+	}
+
+	public static boolean containsAnyChar(final @NotNull String value, final @NotNull String chars, final int start, final int end) {
+		for (int i = start; i < end; i++) {
+			if (chars.indexOf(value.charAt(i)) >= 0) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	@Input
+	protected abstract Property<String> getInternalRunDir();
+
+	@Input
+	protected abstract MapProperty<String, Object> getInternalEnvironmentVars();
+
+	@Input
+	protected abstract ListProperty<String> getInternalJvmArgs();
+
+	@Input
+	protected abstract Property<Boolean> getUseArgFile();
+
+	@Input
+	protected abstract Property<String> getProjectDir();
+
+	@Input
+	// We use a string here, as it's technically an output, but we don't want to cache runs of this task by default.
+	protected abstract Property<String> getArgFilePath();
+
+	// We control the classpath, as we use a ArgFile to pass it over the command line: https://docs.oracle.com/javase/7/docs/technotes/tools/windows/javac.html#commandlineargfile
+	@InputFiles
+	protected abstract ConfigurableFileCollection getInternalClasspath();
 
 	private boolean canUseArgFile() {
 		if (!canPathBeASCIIEncoded()) {
@@ -170,50 +219,6 @@ public abstract class AbstractRunTask extends JavaExec {
 		return args;
 	}
 
-	// Based off https://github.com/JetBrains/intellij-community/blob/295dd68385a458bdfde638152e36d19bed18b666/platform/util/src/com/intellij/execution/CommandLineWrapperUtil.java#L87
-	private static String quoteArg(String arg) {
-		final String specials = " #'\"\n\r\t\f";
-
-		if (!containsAnyChar(arg, specials)) {
-			return arg;
-		}
-
-		final StringBuilder sb = new StringBuilder(arg.length() * 2);
-
-		for (int i = 0; i < arg.length(); i++) {
-			char c = arg.charAt(i);
-
-			switch (c) {
-			case ' ', '#', '\'' -> sb.append('"').append(c).append('"');
-			case '"' -> sb.append("\"\\\"\"");
-			case '\n' -> sb.append("\"\\n\"");
-			case '\r' -> sb.append("\"\\r\"");
-			case '\t' -> sb.append("\"\\t\"");
-			case '\f' -> sb.append("\"\\f\"");
-			default -> sb.append(c);
-			}
-		}
-
-		return sb.toString();
-	}
-
-	// https://github.com/JetBrains/intellij-community/blob/295dd68385a458bdfde638152e36d19bed18b666/platform/util/base/src/com/intellij/openapi/util/text/Strings.java#L100-L118
-	public static boolean containsAnyChar(final @NotNull String value, final @NotNull String chars) {
-		return chars.length() > value.length()
-				? containsAnyChar(value, chars, 0, value.length())
-				: containsAnyChar(chars, value, 0, chars.length());
-	}
-
-	public static boolean containsAnyChar(final @NotNull String value, final @NotNull String chars, final int start, final int end) {
-		for (int i = start; i < end; i++) {
-			if (chars.indexOf(value.charAt(i)) >= 0) {
-				return true;
-			}
-		}
-
-		return false;
-	}
-
 	@Override
 	public @NotNull JavaExec setClasspath(@NotNull FileCollection classpath) {
 		this.getInternalClasspath().setFrom(classpath);
@@ -221,7 +226,7 @@ public abstract class AbstractRunTask extends JavaExec {
 	}
 
 	@Override
-	public @NotNull JavaExec classpath(Object @NotNull... paths) {
+	public @NotNull JavaExec classpath(Object @NotNull ... paths) {
 		this.getInternalClasspath().from(paths);
 		return this;
 	}

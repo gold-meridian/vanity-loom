@@ -89,7 +89,7 @@ loom {
 jar {
 	def archivesName = base.archivesName.get()
 	from("LICENSE") {
-		rename { "${it}_${archivesName}"}
+		rename { "${it}_${archivesName}" }
 	}
 }
 

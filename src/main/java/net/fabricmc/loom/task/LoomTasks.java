@@ -51,6 +51,43 @@ import net.fabricmc.loom.util.Platform;
 import net.fabricmc.loom.util.gradle.GradleUtils;
 
 public abstract class LoomTasks implements Runnable {
+	public static String getRunConfigTaskName(RunConfigSettings config) {
+		String configName = config.getName();
+		return "run" + configName.substring(0, 1).toUpperCase() + configName.substring(1);
+	}
+
+	private static void registerClientSetupTasks(TaskContainer tasks, boolean extractNatives) {
+		tasks.register("downloadAssets", DownloadAssetsTask.class, t -> {
+			t.setDescription("Downloads required game assets for Minecraft.");
+		});
+
+		if (extractNatives) {
+			tasks.register("extractNatives", ExtractNativesTask.class, t -> {
+				t.setDescription("Extracts the Minecraft platform specific natives.");
+			});
+		}
+
+		tasks.register("configureClientLaunch", task -> {
+			task.dependsOn(tasks.named("downloadAssets"));
+			task.dependsOn(tasks.named("configureLaunch"));
+
+			if (extractNatives) {
+				task.dependsOn(tasks.named("extractNatives"));
+			}
+
+			task.setDescription("Setup the required files to launch the Minecraft client");
+			task.setGroup(Constants.TaskGroup.FABRIC);
+		});
+	}
+
+	public static Provider<Task> getIDELaunchConfigureTaskName(Project project) {
+		return project.provider(() -> {
+			final MinecraftJarConfiguration jarConfiguration = LoomGradleExtension.get(project).getMinecraftJarConfiguration().get();
+			final String name = jarConfiguration == MinecraftJarConfiguration.SERVER_ONLY ? "configureLaunch" : "configureClientLaunch";
+			return project.getTasks().getByName(name);
+		});
+	}
+
 	@Inject
 	protected abstract Project getProject();
 
@@ -130,11 +167,6 @@ public abstract class LoomTasks implements Runnable {
 			t.dependsOn(getIDELaunchConfigureTaskName(getProject()));
 			t.setGroup(Constants.TaskGroup.IDE);
 		});
-	}
-
-	public static String getRunConfigTaskName(RunConfigSettings config) {
-		String configName = config.getName();
-		return "run" + configName.substring(0, 1).toUpperCase() + configName.substring(1);
 	}
 
 	private void registerRunTasks() {
@@ -240,38 +272,6 @@ public abstract class LoomTasks implements Runnable {
 
 		getTasks().withType(RenderDocRunTask.class).configureEach(task -> {
 			task.getRenderDocExecutable().fileProvider(renderDocCMD);
-		});
-	}
-
-	private static void registerClientSetupTasks(TaskContainer tasks, boolean extractNatives) {
-		tasks.register("downloadAssets", DownloadAssetsTask.class, t -> {
-			t.setDescription("Downloads required game assets for Minecraft.");
-		});
-
-		if (extractNatives) {
-			tasks.register("extractNatives", ExtractNativesTask.class, t -> {
-				t.setDescription("Extracts the Minecraft platform specific natives.");
-			});
-		}
-
-		tasks.register("configureClientLaunch", task -> {
-			task.dependsOn(tasks.named("downloadAssets"));
-			task.dependsOn(tasks.named("configureLaunch"));
-
-			if (extractNatives) {
-				task.dependsOn(tasks.named("extractNatives"));
-			}
-
-			task.setDescription("Setup the required files to launch the Minecraft client");
-			task.setGroup(Constants.TaskGroup.FABRIC);
-		});
-	}
-
-	public static Provider<Task> getIDELaunchConfigureTaskName(Project project) {
-		return project.provider(() -> {
-			final MinecraftJarConfiguration jarConfiguration = LoomGradleExtension.get(project).getMinecraftJarConfiguration().get();
-			final String name = jarConfiguration == MinecraftJarConfiguration.SERVER_ONLY ? "configureLaunch" : "configureClientLaunch";
-			return project.getTasks().getByName(name);
 		});
 	}
 }

@@ -41,6 +41,35 @@ import java.util.function.Supplier;
 import net.fabricmc.tinyremapper.FileSystemReference;
 
 public final class FileSystemUtil {
+	private FileSystemUtil() {
+	}
+
+	public static Delegate getJarFileSystem(File file, boolean create) throws IOException {
+		return new Delegate(FileSystemReference.openJar(file.toPath(), create), toJarUri(file.toPath()));
+	}
+
+	public static Delegate getJarFileSystem(Path path, boolean create) throws IOException {
+		return new Delegate(FileSystemReference.openJar(path, create), toJarUri(path));
+	}
+
+	public static Delegate getJarFileSystem(Path path) throws IOException {
+		return new Delegate(FileSystemReference.openJar(path), toJarUri(path));
+	}
+
+	public static Delegate getJarFileSystem(URI uri, boolean create) throws IOException {
+		return new Delegate(FileSystemReference.open(uri, create), uri);
+	}
+
+	private static URI toJarUri(Path path) {
+		URI uri = path.toUri();
+
+		try {
+			return new URI("jar:" + uri.getScheme(), uri.getHost(), uri.getPath(), uri.getFragment());
+		} catch (URISyntaxException e) {
+			throw new RuntimeException("can't convert path " + path + " to uri", e);
+		}
+	}
+
 	public record Delegate(FileSystemReference reference, URI uri) implements AutoCloseable, Supplier<FileSystem> {
 		public Path getPath(String path, String... more) {
 			return get().getPath(path, more);
@@ -107,35 +136,6 @@ public final class FileSystemUtil {
 		// TODO cleanup
 		public FileSystem fs() {
 			return get();
-		}
-	}
-
-	private FileSystemUtil() {
-	}
-
-	public static Delegate getJarFileSystem(File file, boolean create) throws IOException {
-		return new Delegate(FileSystemReference.openJar(file.toPath(), create), toJarUri(file.toPath()));
-	}
-
-	public static Delegate getJarFileSystem(Path path, boolean create) throws IOException {
-		return new Delegate(FileSystemReference.openJar(path, create), toJarUri(path));
-	}
-
-	public static Delegate getJarFileSystem(Path path) throws IOException {
-		return new Delegate(FileSystemReference.openJar(path), toJarUri(path));
-	}
-
-	public static Delegate getJarFileSystem(URI uri, boolean create) throws IOException {
-		return new Delegate(FileSystemReference.open(uri, create), uri);
-	}
-
-	private static URI toJarUri(Path path) {
-		URI uri = path.toUri();
-
-		try {
-			return new URI("jar:" + uri.getScheme(), uri.getHost(), uri.getPath(), uri.getFragment());
-		} catch (URISyntaxException e) {
-			throw new RuntimeException("can't convert path "+path+" to uri", e);
 		}
 	}
 

@@ -49,17 +49,22 @@ import net.fabricmc.mappingio.tree.MemoryMappingTree;
 
 public final class TinyMappingsService extends Service<TinyMappingsService.Options> {
 	public static final ServiceType<Options, TinyMappingsService> TYPE = new ServiceType<>(Options.class, TinyMappingsService.class);
+	private final Supplier<MemoryMappingTree> mappingTree = Suppliers.memoize(() -> {
+		Path mappings = getOptions().getMappings().getSingleFile().toPath();
 
-	public interface Options extends Service.Options {
-		@InputFiles
-		ConfigurableFileCollection getMappings(); // Only a single file
+		if (getOptions().getZipEntryPath().isPresent()) {
+			try (FileSystemUtil.Delegate delegate = FileSystemUtil.getJarFileSystem(mappings)) {
+				return readMappings(delegate.fs().getPath(getOptions().getZipEntryPath().get()));
+			} catch (IOException e) {
+				throw new UncheckedIOException("Failed to read mappings from zip", e);
+			}
+		}
 
-		/**
-		 * When present, the mappings will be read from the specified zip entry path.
-		 */
-		@Optional
-		@Input
-		Property<String> getZipEntryPath();
+		return readMappings(mappings);
+	});
+
+	public TinyMappingsService(Options options, ServiceFactory serviceFactory) {
+		super(options, serviceFactory);
 	}
 
 	public static Provider<Options> createOptions(Project project, Path mappings) {
@@ -76,24 +81,6 @@ public final class TinyMappingsService extends Service<TinyMappingsService.Optio
 		});
 	}
 
-	public TinyMappingsService(Options options, ServiceFactory serviceFactory) {
-		super(options, serviceFactory);
-	}
-
-	private final Supplier<MemoryMappingTree> mappingTree = Suppliers.memoize(() -> {
-		Path mappings = getOptions().getMappings().getSingleFile().toPath();
-
-		if (getOptions().getZipEntryPath().isPresent()) {
-			try (FileSystemUtil.Delegate delegate = FileSystemUtil.getJarFileSystem(mappings)) {
-				return readMappings(delegate.fs().getPath(getOptions().getZipEntryPath().get()));
-			} catch (IOException e) {
-				throw new UncheckedIOException("Failed to read mappings from zip", e);
-			}
-		}
-
-		return readMappings(mappings);
-	});
-
 	private MemoryMappingTree readMappings(Path mappings) {
 		try {
 			MemoryMappingTree mappingTree = new MemoryMappingTree();
@@ -106,5 +93,17 @@ public final class TinyMappingsService extends Service<TinyMappingsService.Optio
 
 	public MemoryMappingTree getMappingTree() {
 		return mappingTree.get();
+	}
+
+	public interface Options extends Service.Options {
+		@InputFiles
+		ConfigurableFileCollection getMappings(); // Only a single file
+
+		/**
+		 * When present, the mappings will be read from the specified zip entry path.
+		 */
+		@Optional
+		@Input
+		Property<String> getZipEntryPath();
 	}
 }

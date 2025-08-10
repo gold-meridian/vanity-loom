@@ -32,7 +32,8 @@ import groovy.util.Node;
 import groovy.xml.QName;
 
 public final class GroovyXmlUtil {
-	private GroovyXmlUtil() { }
+	private GroovyXmlUtil() {
+	}
 
 	public static Node getOrCreateNode(Node parent, String name) {
 		for (Object object : parent.children()) {

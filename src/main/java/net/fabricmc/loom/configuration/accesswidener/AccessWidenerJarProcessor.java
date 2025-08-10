@@ -35,18 +35,16 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import net.fabricmc.loom.api.metadata.ModJson;
-
 import org.gradle.api.file.RegularFileProperty;
 import org.jetbrains.annotations.Nullable;
 
 import net.fabricmc.accesswidener.AccessWidener;
 import net.fabricmc.loom.api.mappings.layered.MappingsNamespace;
+import net.fabricmc.loom.api.metadata.ModJson;
 import net.fabricmc.loom.api.processor.MinecraftJarProcessor;
 import net.fabricmc.loom.api.processor.ProcessorContext;
 import net.fabricmc.loom.api.processor.SpecContext;
 import net.fabricmc.loom.util.LazyCloseable;
-import net.fabricmc.loom.util.fmj.FabricModJson;
 import net.fabricmc.loom.util.fmj.ModEnvironment;
 import net.fabricmc.tinyremapper.TinyRemapper;
 
@@ -103,32 +101,6 @@ public class AccessWidenerJarProcessor implements MinecraftJarProcessor<AccessWi
 		return name;
 	}
 
-	public record Spec(List<AccessWidenerEntry> accessWideners) implements MinecraftJarProcessor.Spec {
-		List<AccessWidenerEntry> accessWidenersForContext(ProcessorContext context) {
-			return accessWideners.stream()
-					.filter(entry -> isSupported(entry.environment(), context))
-					.toList();
-		}
-
-		private static boolean isSupported(ModEnvironment modEnvironment, ProcessorContext context) {
-			if (context.isMerged()) {
-				// All envs are supported wth a merged jar
-				return true;
-			}
-
-			if (context.includesClient() && modEnvironment.isClient()) {
-				return true;
-			}
-
-			if (context.includesServer() && modEnvironment.isServer()) {
-				return true;
-			}
-
-			// Universal supports all jars
-			return modEnvironment == ModEnvironment.UNIVERSAL;
-		}
-	}
-
 	@Override
 	public void processJar(Path jar, AccessWidenerJarProcessor.Spec spec, ProcessorContext context) throws IOException {
 		final List<AccessWidenerEntry> accessWideners = spec.accessWidenersForContext(context);
@@ -148,5 +120,31 @@ public class AccessWidenerJarProcessor implements MinecraftJarProcessor<AccessWi
 	@Override
 	public @Nullable MappingsProcessor<Spec> processMappings() {
 		return TransitiveAccessWidenerMappingsProcessor.INSTANCE;
+	}
+
+	public record Spec(List<AccessWidenerEntry> accessWideners) implements MinecraftJarProcessor.Spec {
+		private static boolean isSupported(ModEnvironment modEnvironment, ProcessorContext context) {
+			if (context.isMerged()) {
+				// All envs are supported wth a merged jar
+				return true;
+			}
+
+			if (context.includesClient() && modEnvironment.isClient()) {
+				return true;
+			}
+
+			if (context.includesServer() && modEnvironment.isServer()) {
+				return true;
+			}
+
+			// Universal supports all jars
+			return modEnvironment == ModEnvironment.UNIVERSAL;
+		}
+
+		List<AccessWidenerEntry> accessWidenersForContext(ProcessorContext context) {
+			return accessWideners.stream()
+					.filter(entry -> isSupported(entry.environment(), context))
+					.toList();
+		}
 	}
 }

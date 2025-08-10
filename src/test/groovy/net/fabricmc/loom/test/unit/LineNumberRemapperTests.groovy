@@ -46,9 +46,9 @@ class LineNumberRemapperTests extends Specification {
 
 		// + 10 to each line number
 		def entry = new ClassLineNumbers.Entry(className, 30, 40, [
-			27: 37,
-			29: 39,
-			30: 40
+				27: 37,
+				29: 39,
+				30: 40
 		])
 		def lineNumbers = new ClassLineNumbers([(className): entry])
 
@@ -72,8 +72,8 @@ class LineNumberRemapperTests extends Specification {
 
 		// + 10 to each line number
 		def entry = new ClassLineNumbers.Entry(className, 30, 40, [
-			27: 37,
-			30: 40
+				27: 37,
+				30: 40
 		])
 		def lineNumbers = new ClassLineNumbers([(className): entry])
 

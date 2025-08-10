@@ -49,15 +49,6 @@ public class KotlinRemapperClassloader extends URLClassLoader {
 		super(urls, null);
 	}
 
-	@Override
-	protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
-		if (PARENT_PACKAGES.stream().anyMatch(name::startsWith)) {
-			return LoomGradlePlugin.class.getClassLoader().loadClass(name);
-		}
-
-		return super.loadClass(name, resolve);
-	}
-
 	public static KotlinRemapperClassloader create(KotlinClasspath classpathProvider) {
 		// Include the libraries that are not on the kotlin classpath.
 		final Stream<URL> loomUrls = getClassUrls(
@@ -74,6 +65,15 @@ public class KotlinRemapperClassloader extends URLClassLoader {
 
 	private static Stream<URL> getClassUrls(Class<?>... classes) {
 		return Arrays.stream(classes).map(klass -> klass.getProtectionDomain().getCodeSource().getLocation());
+	}
+
+	@Override
+	protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
+		if (PARENT_PACKAGES.stream().anyMatch(name::startsWith)) {
+			return LoomGradlePlugin.class.getClassLoader().loadClass(name);
+		}
+
+		return super.loadClass(name, resolve);
 	}
 
 	/**

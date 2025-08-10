@@ -31,7 +31,7 @@ import spock.lang.Specification
 import net.fabricmc.loom.test.util.GradleProjectTestTrait
 import net.fabricmc.loom.util.ZipUtils
 
-import static net.fabricmc.loom.test.LoomTestConstants.*
+import static net.fabricmc.loom.test.LoomTestConstants.STANDARD_TEST_VERSIONS
 import static org.gradle.testkit.runner.TaskOutcome.SUCCESS
 
 class UnpickTest extends Specification implements GradleProjectTestTrait {
@@ -43,12 +43,12 @@ class UnpickTest extends Specification implements GradleProjectTestTrait {
 
 		when:
 		def result = gradle.run(tasks: useCache ? [
-			"genSourcesWithVineflower",
-			"--info"
+				"genSourcesWithVineflower",
+				"--info"
 		] : [
-			"genSourcesWithVineflower",
-			"--no-use-cache",
-			"--info"
+				"genSourcesWithVineflower",
+				"--no-use-cache",
+				"--info"
 		])
 		then:
 		result.task(":genSourcesWithVineflower").outcome == SUCCESS
@@ -57,8 +57,8 @@ class UnpickTest extends Specification implements GradleProjectTestTrait {
 
 		where:
 		[version, useCache] << [
-			STANDARD_TEST_VERSIONS,
-			[true, false]
+				STANDARD_TEST_VERSIONS,
+				[true, false]
 		].combinations()
 	}
 

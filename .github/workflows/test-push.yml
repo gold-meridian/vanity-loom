@@ -59,8 +59,7 @@ jobs:
           distribution: 'temurin'
       - uses: actions/checkout@v4
       - run: ./gradlew writeActionsTestMatrix --stacktrace --warning-mode fail
-      -
-        id: set-matrix
+      - id: set-matrix
         run: echo "matrix=$(cat build/test_matrix.json)" >> $GITHUB_OUTPUT
 
     outputs:

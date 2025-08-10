@@ -80,6 +80,15 @@ import net.fabricmc.loom.util.service.ScopedServiceFactory;
 import net.fabricmc.loom.util.service.ServiceFactory;
 
 public abstract class CompileConfiguration implements Runnable {
+	private static Duration getDefaultTimeout() {
+		if (System.getenv("CI") != null) {
+			// Set a small timeout on CI, as it's unlikely going to unlock.
+			return Duration.ofMinutes(1);
+		}
+
+		return Duration.ofHours(1);
+	}
+
 	@Inject
 	protected abstract Project getProject();
 
@@ -268,7 +277,7 @@ public abstract class CompileConfiguration implements Runnable {
 									.map(File::getAbsolutePath)
 									.collect(Collectors.joining(File.pathSeparator))
 					)
-					.collect(Collectors.joining(File.pathSeparator+File.pathSeparator));
+					.collect(Collectors.joining(File.pathSeparator + File.pathSeparator));
 
 			test.systemProperty("fabric.classPathGroups", classPathGroups);
 		});
@@ -284,24 +293,6 @@ public abstract class CompileConfiguration implements Runnable {
 						cacheDirectory, getProject().absoluteProjectPath(getProject().getPath())
 				)
 		);
-	}
-
-	record LockFile(Path file, String description) {
-		@Override
-		public String toString() {
-			return this.description;
-		}
-	}
-
-	enum LockResult {
-		// acquired immediately or after waiting for another process to release
-		ACQUIRED_CLEAN,
-		// already owned by current pid
-		ACQUIRED_ALREADY_OWNED,
-		// acquired due to current owner not existing
-		ACQUIRED_PREVIOUS_OWNER_MISSING,
-		// acquired due to previous owner disowning the lock
-		ACQUIRED_PREVIOUS_OWNER_DISOWNED
 	}
 
 	private LockResult acquireProcessLockWaiting(LockFile lockFile) {
@@ -402,15 +393,6 @@ public abstract class CompileConfiguration implements Runnable {
 		return LockResult.ACQUIRED_CLEAN;
 	}
 
-	private static Duration getDefaultTimeout() {
-		if (System.getenv("CI") != null) {
-			// Set a small timeout on CI, as it's unlikely going to unlock.
-			return Duration.ofMinutes(1);
-		}
-
-		return Duration.ofHours(1);
-	}
-
 	// When we fail to configure, write "disowned" to the lock file to release it from this process
 	// This allows the next run to rebuild without waiting for this process to exit
 	private void disownLock() {
@@ -458,5 +440,23 @@ public abstract class CompileConfiguration implements Runnable {
 				throw new UncheckedIOException(e);
 			}
 		});
+	}
+
+	enum LockResult {
+		// acquired immediately or after waiting for another process to release
+		ACQUIRED_CLEAN,
+		// already owned by current pid
+		ACQUIRED_ALREADY_OWNED,
+		// acquired due to current owner not existing
+		ACQUIRED_PREVIOUS_OWNER_MISSING,
+		// acquired due to previous owner disowning the lock
+		ACQUIRED_PREVIOUS_OWNER_DISOWNED
+	}
+
+	record LockFile(Path file, String description) {
+		@Override
+		public String toString() {
+			return this.description;
+		}
 	}
 }

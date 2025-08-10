@@ -52,13 +52,6 @@ import net.fabricmc.loom.api.MixinExtensionAPI;
 public interface MixinExtension extends MixinExtensionAPI {
 	String MIXIN_INFORMATION_CONTAINER = "mixin";
 
-	/**
-	 * An information container stores necessary information
-	 * for configuring the mixin annotation processor. It's stored
-	 * in [SourceSet].ext.mixin.
-	 */
-	record MixinInformationContainer(SourceSet sourceSet, Provider<String> refmapNameProvider, PatternSet mixinConfigPattern) { }
-
 	@Nullable
 	static MixinInformationContainer getMixinInformationContainer(SourceSet sourceSet) {
 		ExtraPropertiesExtension extra = sourceSet.getExtensions().getExtraProperties();
@@ -92,4 +85,12 @@ public interface MixinExtension extends MixinExtensionAPI {
 	void init();
 
 	Property<Boolean> getInlineDependencyRefmaps();
+
+	/**
+	 * An information container stores necessary information
+	 * for configuring the mixin annotation processor. It's stored
+	 * in [SourceSet].ext.mixin.
+	 */
+	record MixinInformationContainer(SourceSet sourceSet, Provider<String> refmapNameProvider, PatternSet mixinConfigPattern) {
+	}
 }

@@ -34,9 +34,6 @@ import java.util.Collections;
 import java.util.function.Supplier;
 
 import com.google.common.base.Suppliers;
-
-import net.fabricmc.mappingio.MappingReader;
-
 import org.gradle.api.Project;
 import org.gradle.api.file.RegularFileProperty;
 import org.gradle.api.provider.Property;
@@ -54,23 +51,13 @@ import net.fabricmc.loom.configuration.providers.minecraft.MinecraftProvider;
 import net.fabricmc.loom.util.service.Service;
 import net.fabricmc.loom.util.service.ServiceFactory;
 import net.fabricmc.loom.util.service.ServiceType;
+import net.fabricmc.mappingio.MappingReader;
 import net.fabricmc.mappingio.adapter.MappingNsCompleter;
-import net.fabricmc.mappingio.format.tiny.Tiny2FileReader;
 import net.fabricmc.mappingio.tree.MemoryMappingTree;
 
 public final class IntermediateMappingsService extends Service<IntermediateMappingsService.Options> {
 	public static final ServiceType<Options, IntermediateMappingsService> TYPE = new ServiceType<>(Options.class, IntermediateMappingsService.class);
 	private static final Logger LOGGER = LoggerFactory.getLogger(IntermediateMappingsService.class);
-
-	public interface Options extends Service.Options {
-		@InputFile
-		RegularFileProperty getIntermediaryTiny();
-		@Input
-		Property<String> getExpectedSrcNs();
-		@Input
-		Property<String> getMinecraftVersion();
-	}
-
 	private final Supplier<MemoryMappingTree> memoryMappingTree = Suppliers.memoize(this::createMemoryMappingTree);
 
 	public IntermediateMappingsService(Options options, ServiceFactory serviceFactory) {
@@ -117,10 +104,6 @@ public final class IntermediateMappingsService extends Service<IntermediateMappi
 		});
 	}
 
-	private MemoryMappingTree createMemoryMappingTree() {
-		return createMemoryMappingTree(getIntermediaryTiny(), getOptions().getExpectedSrcNs().get());
-	}
-
 	@VisibleForTesting
 	public static MemoryMappingTree createMemoryMappingTree(Path mappingFile, String expectedSrcNs) {
 		final MemoryMappingTree tree = new MemoryMappingTree();
@@ -142,11 +125,26 @@ public final class IntermediateMappingsService extends Service<IntermediateMappi
 		return tree;
 	}
 
+	private MemoryMappingTree createMemoryMappingTree() {
+		return createMemoryMappingTree(getIntermediaryTiny(), getOptions().getExpectedSrcNs().get());
+	}
+
 	public MemoryMappingTree getMemoryMappingTree() {
 		return memoryMappingTree.get();
 	}
 
 	public Path getIntermediaryTiny() {
 		return getOptions().getIntermediaryTiny().get().getAsFile().toPath();
+	}
+
+	public interface Options extends Service.Options {
+		@InputFile
+		RegularFileProperty getIntermediaryTiny();
+
+		@Input
+		Property<String> getExpectedSrcNs();
+
+		@Input
+		Property<String> getMinecraftVersion();
 	}
 }

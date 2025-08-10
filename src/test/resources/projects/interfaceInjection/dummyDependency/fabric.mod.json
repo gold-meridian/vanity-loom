@@ -5,7 +5,9 @@
   "name": "Dummy Mod",
   "custom": {
     "loom:injected_interfaces": {
-      "net/minecraft/class_2248": ["InjectedInterface"]
+      "net/minecraft/class_2248": [
+        "InjectedInterface"
+      ]
     }
   }
 }

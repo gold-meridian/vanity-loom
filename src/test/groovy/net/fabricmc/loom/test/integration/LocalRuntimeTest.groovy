@@ -40,8 +40,8 @@ class LocalRuntimeTest extends Specification implements GradleProjectTestTrait {
 
 		when:
 		def result = gradle.run(tasks: [
-			"build",
-			"publishToMavenLocal"
+				"build",
+				"publishToMavenLocal"
 		])
 
 		then:

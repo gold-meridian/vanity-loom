@@ -122,10 +122,10 @@ public final class FabricModJsonV2 extends FabricModJson {
 		final String environment = jsonPrimitive.getAsString();
 
 		return switch (environment) {
-		case "*" -> ModEnvironment.UNIVERSAL;
-		case "client" -> ModEnvironment.CLIENT;
-		case "server" -> ModEnvironment.SERVER;
-		default -> throw new FabricModJsonUtils.ParseException("Invalid environment type: " + environment);
+			case "*" -> ModEnvironment.UNIVERSAL;
+			case "client" -> ModEnvironment.CLIENT;
+			case "server" -> ModEnvironment.SERVER;
+			default -> throw new FabricModJsonUtils.ParseException("Invalid environment type: " + environment);
 		};
 	}
 }

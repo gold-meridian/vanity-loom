@@ -73,6 +73,24 @@ import net.fabricmc.loom.util.gradle.GradleUtils;
 public abstract sealed class AbstractProductionRunTask extends AbstractLoomTask permits ClientProductionRunTask, ServerProductionRunTask {
 	private static final Logger LOGGER = LoggerFactory.getLogger(AbstractProductionRunTask.class);
 
+	@Inject
+	public AbstractProductionRunTask() {
+		JavaToolchainSpec defaultToolchain = getProject().getExtensions().getByType(JavaPluginExtension.class).getToolchain();
+		getJavaLauncher().convention(getJavaToolchainService().launcherFor(defaultToolchain));
+		getRunDir().convention(getProject().getLayout().getProjectDirectory().dir("run"));
+
+		if (!GradleUtils.getBooleanProperty(getProject(), Constants.Properties.DONT_REMAP)) {
+			getMods().from(getProject().getTasks().named(RemapTaskConfiguration.REMAP_JAR_TASK_NAME));
+		}
+
+		getMods().from(getProject().getConfigurations().named(Constants.Configurations.PRODUCTION_RUNTIME_MODS));
+	}
+
+	private static String joinFiles(Stream<File> stream) {
+		return stream.map(File::getAbsolutePath)
+				.collect(Collectors.joining(File.pathSeparator));
+	}
+
 	/**
 	 * A collection of mods that will be used when running the game. The mods must be remapped to run with intermediary names.
 	 *
@@ -103,6 +121,7 @@ public abstract sealed class AbstractProductionRunTask extends AbstractLoomTask 
 	 * The {@link JavaLauncher} to use when running the game, this can be used to specify a specific Java version to use.
 	 *
 	 * <p>See: <a href="https://docs.gradle.org/current/userguide/toolchains.html#sec:plugins_toolchains">Java Toolchains</a>
+	 *
 	 * @return
 	 */
 	@Nested
@@ -122,19 +141,6 @@ public abstract sealed class AbstractProductionRunTask extends AbstractLoomTask 
 
 	@Inject
 	protected abstract JavaToolchainService getJavaToolchainService();
-
-	@Inject
-	public AbstractProductionRunTask() {
-		JavaToolchainSpec defaultToolchain = getProject().getExtensions().getByType(JavaPluginExtension.class).getToolchain();
-		getJavaLauncher().convention(getJavaToolchainService().launcherFor(defaultToolchain));
-		getRunDir().convention(getProject().getLayout().getProjectDirectory().dir("run"));
-
-		if (!GradleUtils.getBooleanProperty(getProject(), Constants.Properties.DONT_REMAP)) {
-			getMods().from(getProject().getTasks().named(RemapTaskConfiguration.REMAP_JAR_TASK_NAME));
-		}
-
-		getMods().from(getProject().getConfigurations().named(Constants.Configurations.PRODUCTION_RUNTIME_MODS));
-	}
 
 	@TaskAction
 	public void run() throws IOException {
@@ -198,10 +204,5 @@ public abstract sealed class AbstractProductionRunTask extends AbstractLoomTask 
 			Dependency serverLauncher = getProject().getDependencies().create(mavenNotation.formatted(version));
 			return getProject().getConfigurations().detachedConfiguration(serverLauncher);
 		});
-	}
-
-	private static String joinFiles(Stream<File> stream) {
-		return stream.map(File::getAbsolutePath)
-				.collect(Collectors.joining(File.pathSeparator));
 	}
 }

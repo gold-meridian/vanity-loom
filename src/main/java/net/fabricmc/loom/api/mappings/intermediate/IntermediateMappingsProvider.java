@@ -54,6 +54,7 @@ public abstract class IntermediateMappingsProvider implements Named {
 
 	/**
 	 * Generate or download a tinyv2 mapping file with intermediary and named namespaces.
+	 *
 	 * @throws IOException
 	 */
 	public abstract void provide(Path tinyMappings) throws IOException;

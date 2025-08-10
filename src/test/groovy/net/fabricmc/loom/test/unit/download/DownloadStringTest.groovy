@@ -95,7 +95,7 @@ class DownloadStringTest extends DownloadTest {
 		setup:
 		int requests = 0
 		server.get("/retryString") {
-			requests ++
+			requests++
 
 			if (requests < 3) {
 				it.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -118,7 +118,7 @@ class DownloadStringTest extends DownloadTest {
 		setup:
 		int requests = 0
 		server.get("/retryString") {
-			requests ++
+			requests++
 			it.status(HttpStatus.NOT_FOUND)
 		}
 

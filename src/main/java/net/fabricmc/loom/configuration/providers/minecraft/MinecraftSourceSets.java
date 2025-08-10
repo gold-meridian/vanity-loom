@@ -133,6 +133,7 @@ public abstract sealed class MinecraftSourceSets permits MinecraftSourceSets.Sin
 	 * Used when we have a split client/common source set and split jars.
 	 */
 	public static final class Split extends MinecraftSourceSets {
+		public static final String CLIENT_ONLY_SOURCE_SET_NAME = "client";
 		private static final ConfigurationName MINECRAFT_COMMON_NAMED = new ConfigurationName(
 				"minecraftCommonNamed",
 				Constants.Configurations.MINECRAFT_COMPILE_LIBRARIES,
@@ -144,9 +145,6 @@ public abstract sealed class MinecraftSourceSets permits MinecraftSourceSets.Sin
 				Constants.Configurations.MINECRAFT_CLIENT_COMPILE_LIBRARIES,
 				Constants.Configurations.MINECRAFT_CLIENT_RUNTIME_LIBRARIES
 		);
-
-		public static final String CLIENT_ONLY_SOURCE_SET_NAME = "client";
-
 		private static final Split INSTANCE = new Split();
 
 		@Override

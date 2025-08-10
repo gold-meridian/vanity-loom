@@ -65,7 +65,10 @@ public abstract class LoomGradleExtensionImpl extends LoomGradleExtensionApiImpl
 	private final ConfigurableFileCollection unmappedMods;
 
 	private final List<AccessWidenerFile> transitiveAccessWideners = new ArrayList<>();
-
+	private final ListProperty<LibraryProcessorManager.LibraryProcessorFactory> libraryProcessorFactories;
+	private final boolean configurationCacheActive;
+	private final boolean isolatedProjectsActive;
+	private final boolean isCollectingDependencyVerificationMetadata;
 	private LoomDependencyManager dependencyManager;
 	private MinecraftMetadataProvider metadataProvider;
 	private MinecraftProvider minecraftProvider;
@@ -74,13 +77,6 @@ public abstract class LoomGradleExtensionImpl extends LoomGradleExtensionApiImpl
 	private IntermediaryMinecraftProvider<?> intermediaryMinecraftProvider;
 	private InstallerData installerData;
 	private boolean refreshDeps;
-	private final ListProperty<LibraryProcessorManager.LibraryProcessorFactory> libraryProcessorFactories;
-	private final boolean configurationCacheActive;
-	private final boolean isolatedProjectsActive;
-	private final boolean isCollectingDependencyVerificationMetadata;
-
-	@Inject
-	protected abstract BuildFeatures getBuildFeatures();
 
 	@Inject
 	public LoomGradleExtensionImpl(Project project, LoomFiles files) {
@@ -118,6 +114,9 @@ public abstract class LoomGradleExtensionImpl extends LoomGradleExtensionApiImpl
 		}
 	}
 
+	@Inject
+	protected abstract BuildFeatures getBuildFeatures();
+
 	@Override
 	protected Project getProject() {
 		return project;
@@ -129,13 +128,13 @@ public abstract class LoomGradleExtensionImpl extends LoomGradleExtensionApiImpl
 	}
 
 	@Override
-	public void setDependencyManager(LoomDependencyManager dependencyManager) {
-		this.dependencyManager = dependencyManager;
+	public LoomDependencyManager getDependencyManager() {
+		return Objects.requireNonNull(dependencyManager, "Cannot get LoomDependencyManager before it has been setup");
 	}
 
 	@Override
-	public LoomDependencyManager getDependencyManager() {
-		return Objects.requireNonNull(dependencyManager, "Cannot get LoomDependencyManager before it has been setup");
+	public void setDependencyManager(LoomDependencyManager dependencyManager) {
+		this.dependencyManager = dependencyManager;
 	}
 
 	@Override
@@ -174,13 +173,13 @@ public abstract class LoomGradleExtensionImpl extends LoomGradleExtensionApiImpl
 	}
 
 	@Override
-	public IntermediaryMinecraftProvider<?> getIntermediaryMinecraftProvider() {
-		return Objects.requireNonNull(intermediaryMinecraftProvider, "Cannot get IntermediaryMinecraftProvider before it has been setup");
+	public void setNamedMinecraftProvider(NamedMinecraftProvider<?> namedMinecraftProvider) {
+		this.namedMinecraftProvider = namedMinecraftProvider;
 	}
 
 	@Override
-	public void setNamedMinecraftProvider(NamedMinecraftProvider<?> namedMinecraftProvider) {
-		this.namedMinecraftProvider = namedMinecraftProvider;
+	public IntermediaryMinecraftProvider<?> getIntermediaryMinecraftProvider() {
+		return Objects.requireNonNull(intermediaryMinecraftProvider, "Cannot get IntermediaryMinecraftProvider before it has been setup");
 	}
 
 	@Override
@@ -190,15 +189,16 @@ public abstract class LoomGradleExtensionImpl extends LoomGradleExtensionApiImpl
 
 	@Override
 	public void noIntermediateMappings() {
-		setIntermediateMappingsProvider(NoOpIntermediateMappingsProvider.class, p -> { });
+		setIntermediateMappingsProvider(NoOpIntermediateMappingsProvider.class, p -> {
+		});
 	}
 
 	@Override
 	public FileCollection getMinecraftJarsCollection(MappingsNamespace mappingsNamespace) {
 		return getProject().files(
-			getProject().provider(() ->
-				getProject().files(getMinecraftJars(mappingsNamespace).stream().map(Path::toFile).toList())
-			)
+				getProject().provider(() ->
+						getProject().files(getMinecraftJars(mappingsNamespace).stream().map(Path::toFile).toList())
+				)
 		);
 	}
 
@@ -207,13 +207,13 @@ public abstract class LoomGradleExtensionImpl extends LoomGradleExtensionApiImpl
 		return unmappedMods;
 	}
 
-	public void setInstallerData(InstallerData object) {
-		this.installerData = object;
-	}
-
 	@Override
 	public InstallerData getInstallerData() {
 		return installerData;
+	}
+
+	public void setInstallerData(InstallerData object) {
+		this.installerData = object;
 	}
 
 	@Override

@@ -28,10 +28,6 @@ import java.io.IOException;
 
 import javax.inject.Inject;
 
-import net.fabricmc.loom.api.metadata.ModJson;
-
-import net.fabricmc.loom.util.metadata.ModJsonFactory;
-
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.ConfigurationContainer;
 import org.gradle.api.provider.Property;
@@ -39,10 +35,20 @@ import org.gradle.api.tasks.SourceSet;
 import org.gradle.api.tasks.SourceSetContainer;
 
 import net.fabricmc.loom.LoomGradleExtension;
+import net.fabricmc.loom.api.metadata.ModJson;
 import net.fabricmc.loom.configuration.providers.minecraft.MinecraftSourceSets;
 import net.fabricmc.loom.util.gradle.SourceSetHelper;
+import net.fabricmc.loom.util.metadata.ModJsonFactory;
 
 abstract class FabricApiAbstractSourceSet {
+	private static void extendsFrom(Project project, String name, String extendsFrom) {
+		final ConfigurationContainer configurations = project.getConfigurations();
+
+		configurations.named(name, configuration -> {
+			configuration.extendsFrom(configurations.getByName(extendsFrom));
+		});
+	}
+
 	@Inject
 	protected abstract Project getProject();
 
@@ -88,14 +94,6 @@ abstract class FabricApiAbstractSourceSet {
 		extension.createRemapConfigurations(sourceSets.getByName(getSourceSetName()));
 
 		return sourceSet;
-	}
-
-	private static void extendsFrom(Project project, String name, String extendsFrom) {
-		final ConfigurationContainer configurations = project.getConfigurations();
-
-		configurations.named(name, configuration -> {
-			configuration.extendsFrom(configurations.getByName(extendsFrom));
-		});
 	}
 
 	private void dependsOn(SourceSet sourceSet, SourceSet other) {

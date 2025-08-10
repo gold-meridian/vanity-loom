@@ -50,8 +50,8 @@ public final class ExceptionUtil {
 	 * @param constructor the exception factory which takes in a message and a cause
 	 * @param message     the more general message for the resulting exception
 	 * @param cause       the causing exception
-	 * @param <E> the created exception type
-	 * @param <C> the cause type
+	 * @param <E>         the created exception type
+	 * @param <C>         the cause type
 	 * @return the created exception
 	 */
 	public static <E, C extends Throwable> E createDescriptiveWrapper(BiFunction<String, C, E> constructor, String message, C cause) {

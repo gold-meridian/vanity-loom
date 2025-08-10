@@ -44,11 +44,11 @@ import net.fabricmc.loom.LoomGradleExtension;
 import net.fabricmc.loom.util.download.DownloadException;
 
 public abstract class FabricApiVersions {
-	@Inject
-	protected abstract Project getProject();
-
 	private final HashMap<String, Map<String, String>> moduleVersionCache = new HashMap<>();
 	private final HashMap<String, Map<String, String>> deprecatedModuleVersionCache = new HashMap<>();
+
+	@Inject
+	protected abstract Project getProject();
 
 	public Dependency module(String moduleName, String fabricApiVersion) {
 		return getProject().getDependencies()

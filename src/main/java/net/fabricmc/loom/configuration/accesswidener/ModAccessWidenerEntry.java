@@ -30,8 +30,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import net.fabricmc.loom.api.metadata.ModJson;
-
 import org.jetbrains.annotations.Nullable;
 
 import net.fabricmc.accesswidener.AccessWidenerReader;
@@ -39,6 +37,7 @@ import net.fabricmc.accesswidener.AccessWidenerRemapper;
 import net.fabricmc.accesswidener.AccessWidenerVisitor;
 import net.fabricmc.accesswidener.TransitiveOnlyFilter;
 import net.fabricmc.loom.api.mappings.layered.MappingsNamespace;
+import net.fabricmc.loom.api.metadata.ModJson;
 import net.fabricmc.loom.util.LazyCloseable;
 import net.fabricmc.loom.util.fmj.FabricModJson;
 import net.fabricmc.loom.util.fmj.ModEnvironment;
@@ -56,6 +55,15 @@ public record ModAccessWidenerEntry(ModJson mod, String path, ModEnvironment env
 		}
 
 		return Collections.unmodifiableList(entries);
+	}
+
+	private static AccessWidenerRemapper getRemapper(AccessWidenerVisitor visitor, TinyRemapper tinyRemapper) {
+		return new AccessWidenerRemapper(
+				visitor,
+				tinyRemapper.getEnvironment().getRemapper(),
+				MappingsNamespace.INTERMEDIARY.toString(),
+				MappingsNamespace.NAMED.toString()
+		);
 	}
 
 	@Override
@@ -85,15 +93,6 @@ public record ModAccessWidenerEntry(ModJson mod, String path, ModEnvironment env
 
 		var reader = new AccessWidenerReader(visitor);
 		reader.read(data);
-	}
-
-	private static AccessWidenerRemapper getRemapper(AccessWidenerVisitor visitor, TinyRemapper tinyRemapper) {
-		return new AccessWidenerRemapper(
-				visitor,
-				tinyRemapper.getEnvironment().getRemapper(),
-				MappingsNamespace.INTERMEDIARY.toString(),
-				MappingsNamespace.NAMED.toString()
-		);
 	}
 
 	private byte[] readRaw() throws IOException {

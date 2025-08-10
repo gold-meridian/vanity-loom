@@ -36,8 +36,6 @@ import net.fabricmc.mappingio.MappingReader
 import net.fabricmc.mappingio.adapter.MappingSourceNsSwitch
 import net.fabricmc.mappingio.tree.MemoryMappingTree
 
-import static org.junit.jupiter.api.Assertions.*
-
 class MappingsMergerTest {
 	@TempDir
 	Path tempDir
@@ -120,9 +118,9 @@ class MappingsMergerTest {
 		then:
 		clientMappings.srcNamespace == CLIENT_OFFICIAL
 		clientMappings.dstNamespaces == [
-			INTERMEDIARY,
-			SERVER_OFFICIAL,
-			NAMED
+				INTERMEDIARY,
+				SERVER_OFFICIAL,
+				NAMED
 		]
 		def clientNamedNs = clientMappings.getNamespaceId(NAMED)
 		clientMappings.classes.size() == 3
@@ -168,9 +166,9 @@ class MappingsMergerTest {
 
 		serverMappings.srcNamespace == SERVER_OFFICIAL
 		serverMappings.dstNamespaces == [
-			INTERMEDIARY,
-			CLIENT_OFFICIAL,
-			NAMED
+				INTERMEDIARY,
+				CLIENT_OFFICIAL,
+				NAMED
 		]
 		def serverNamedNs = serverMappings.getNamespaceId(NAMED)
 		serverMappings.classes.size() == 3

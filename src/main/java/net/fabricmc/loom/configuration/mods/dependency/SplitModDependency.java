@@ -60,9 +60,9 @@ public final class SplitModDependency extends ModDependency {
 	@Override
 	public boolean isCacheInvalid(Project project, @Nullable String variant) {
 		boolean exists = switch (target) {
-		case COMMON_ONLY -> getCommonMaven().exists(variant);
-		case CLIENT_ONLY -> getClientMaven().exists(variant);
-		case SPLIT -> getCommonMaven().exists(variant) && getClientMaven().exists(variant);
+			case COMMON_ONLY -> getCommonMaven().exists(variant);
+			case CLIENT_ONLY -> getClientMaven().exists(variant);
+			case SPLIT -> getCommonMaven().exists(variant) && getClientMaven().exists(variant);
 		};
 
 		return !exists;
@@ -83,22 +83,22 @@ public final class SplitModDependency extends ModDependency {
 		}
 
 		switch (target) {
-		// Split the jar into 2
-		case SPLIT -> {
-			final String suffix = variant == null ? "" : "-" + variant;
-			final Path commonTempJar = getWorkingFile(project, "common" + suffix);
-			final Path clientTempJar = getWorkingFile(project, "client" + suffix);
+			// Split the jar into 2
+			case SPLIT -> {
+				final String suffix = variant == null ? "" : "-" + variant;
+				final Path commonTempJar = getWorkingFile(project, "common" + suffix);
+				final Path clientTempJar = getWorkingFile(project, "client" + suffix);
 
-			final JarSplitter splitter = new JarSplitter(path);
-			splitter.split(commonTempJar, clientTempJar);
+				final JarSplitter splitter = new JarSplitter(path);
+				splitter.split(commonTempJar, clientTempJar);
 
-			getCommonMaven().copyToMaven(commonTempJar, variant);
-			getClientMaven().copyToMaven(clientTempJar, variant);
-		}
+				getCommonMaven().copyToMaven(commonTempJar, variant);
+				getClientMaven().copyToMaven(clientTempJar, variant);
+			}
 
-		// No splitting to be done, just copy the input jar to the respective location.
-		case CLIENT_ONLY -> getClientMaven().copyToMaven(path, variant);
-		case COMMON_ONLY -> getCommonMaven().copyToMaven(path, variant);
+			// No splitting to be done, just copy the input jar to the respective location.
+			case CLIENT_ONLY -> getClientMaven().copyToMaven(path, variant);
+			case COMMON_ONLY -> getCommonMaven().copyToMaven(path, variant);
 		}
 	}
 

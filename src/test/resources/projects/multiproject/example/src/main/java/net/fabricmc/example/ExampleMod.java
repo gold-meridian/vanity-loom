@@ -1,12 +1,13 @@
 package net.fabricmc.example;
 
-import net.fabricmc.api.ModInitializer;
 import net.minecraft.block.BlockState;
-import techreborn.blocks.cable.CableShapeUtil;
-import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.block.Blocks;
-import net.minecraft.recipe.BrewingRecipeRegistry;
 import net.minecraft.item.Items;
+import net.minecraft.recipe.BrewingRecipeRegistry;
+import net.minecraft.util.shape.VoxelShape;
+import techreborn.blocks.cable.CableShapeUtil;
+
+import net.fabricmc.api.ModInitializer;
 
 public class ExampleMod implements ModInitializer {
 	@Override

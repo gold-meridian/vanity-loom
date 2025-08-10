@@ -46,11 +46,8 @@ import net.fabricmc.loom.util.service.ServiceType;
 public final class KotlinClasspathService extends Service<KotlinClasspathService.Options> implements KotlinClasspath {
 	public static ServiceType<Options, KotlinClasspathService> TYPE = new ServiceType<>(Options.class, KotlinClasspathService.class);
 
-	public interface Options extends Service.Options {
-		@InputFiles
-		ConfigurableFileCollection getClasspath();
-		@Input
-		Property<String> getKotlinVersion();
+	public KotlinClasspathService(Options options, ServiceFactory serviceFactory) {
+		super(options, serviceFactory);
 	}
 
 	public static Provider<Options> createOptions(Project project) {
@@ -79,8 +76,12 @@ public final class KotlinClasspathService extends Service<KotlinClasspathService
 		});
 	}
 
-	public KotlinClasspathService(Options options, ServiceFactory serviceFactory) {
-		super(options, serviceFactory);
+	private static URL fileToUrl(File file) {
+		try {
+			return file.toURI().toURL();
+		} catch (MalformedURLException e) {
+			throw new UncheckedIOException(e);
+		}
 	}
 
 	@Override
@@ -98,11 +99,11 @@ public final class KotlinClasspathService extends Service<KotlinClasspathService
 				.collect(Collectors.toSet());
 	}
 
-	private static URL fileToUrl(File file) {
-		try {
-			return file.toURI().toURL();
-		} catch (MalformedURLException e) {
-			throw new UncheckedIOException(e);
-		}
+	public interface Options extends Service.Options {
+		@InputFiles
+		ConfigurableFileCollection getClasspath();
+
+		@Input
+		Property<String> getKotlinVersion();
 	}
 }

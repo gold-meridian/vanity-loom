@@ -36,8 +36,8 @@ class ZipTestUtils {
 	static Path createZip(Map<String, String> entries, String suffix = ".zip") {
 		return createZipFromBytes(entries.collectEntries { k, v ->
 			[
-				k,
-				v.getBytes(StandardCharsets.UTF_8)
+					k,
+					v.getBytes(StandardCharsets.UTF_8)
 			]
 		}, suffix)
 	}

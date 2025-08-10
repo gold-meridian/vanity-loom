@@ -162,5 +162,6 @@ public record ParchmentTreeV1(
 	public record Package(
 			String name,
 			List<String> javadoc
-	) { }
+	) {
+	}
 }

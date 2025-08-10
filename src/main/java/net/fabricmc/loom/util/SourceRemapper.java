@@ -63,6 +63,59 @@ public class SourceRemapper {
 		this.toNamed = toNamed;
 	}
 
+	public static void copyNonJavaFiles(Path from, Path to, Logger logger, Path source) throws IOException {
+		Files.walk(from).forEach(path -> {
+			Path targetPath = to.resolve(from.relativize(path).toString());
+
+			if (!isJavaFile(path) && !Files.exists(targetPath)) {
+				try {
+					Files.copy(path, targetPath);
+				} catch (IOException e) {
+					logger.warn("Could not copy non-java sources '" + source + "' fully!", e);
+				}
+			}
+		});
+	}
+
+	public static Mercury createMercuryWithClassPath(Project project, boolean toNamed) {
+		Mercury m = new Mercury();
+		m.setGracefulClasspathChecks(true);
+
+		final List<Path> classPath = new ArrayList<>();
+
+		for (File file : project.getConfigurations().getByName(Constants.Configurations.MINECRAFT_COMPILE_LIBRARIES).getFiles()) {
+			classPath.add(file.toPath());
+		}
+
+		if (!toNamed) {
+			for (File file : project.getConfigurations().getByName("compileClasspath").getFiles()) {
+				classPath.add(file.toPath());
+			}
+		} else {
+			final LoomGradleExtension extension = LoomGradleExtension.get(project);
+
+			for (RemapConfigurationSettings entry : extension.getRemapConfigurations()) {
+				for (File inputFile : entry.getSourceConfiguration().get().getFiles()) {
+					classPath.add(inputFile.toPath());
+				}
+			}
+		}
+
+		for (Path path : classPath) {
+			if (Files.exists(path)) {
+				m.getClassPath().add(path);
+			}
+		}
+
+		return m;
+	}
+
+	private static boolean isJavaFile(Path path) {
+		String name = path.getFileName().toString();
+		// ".java" is not a valid java file
+		return name.endsWith(".java") && name.length() != 5;
+	}
+
 	public void scheduleRemapSources(File source, File destination, boolean reproducibleFileOrder, boolean preserveFileTimestamps, Runnable completionCallback) {
 		remapTasks.add((logger) -> {
 			try {
@@ -202,58 +255,5 @@ public class SourceRemapper {
 
 		this.mercury = mercury;
 		return this.mercury;
-	}
-
-	public static void copyNonJavaFiles(Path from, Path to, Logger logger, Path source) throws IOException {
-		Files.walk(from).forEach(path -> {
-			Path targetPath = to.resolve(from.relativize(path).toString());
-
-			if (!isJavaFile(path) && !Files.exists(targetPath)) {
-				try {
-					Files.copy(path, targetPath);
-				} catch (IOException e) {
-					logger.warn("Could not copy non-java sources '" + source + "' fully!", e);
-				}
-			}
-		});
-	}
-
-	public static Mercury createMercuryWithClassPath(Project project, boolean toNamed) {
-		Mercury m = new Mercury();
-		m.setGracefulClasspathChecks(true);
-
-		final List<Path> classPath = new ArrayList<>();
-
-		for (File file : project.getConfigurations().getByName(Constants.Configurations.MINECRAFT_COMPILE_LIBRARIES).getFiles()) {
-			classPath.add(file.toPath());
-		}
-
-		if (!toNamed) {
-			for (File file : project.getConfigurations().getByName("compileClasspath").getFiles()) {
-				classPath.add(file.toPath());
-			}
-		} else {
-			final LoomGradleExtension extension = LoomGradleExtension.get(project);
-
-			for (RemapConfigurationSettings entry : extension.getRemapConfigurations()) {
-				for (File inputFile : entry.getSourceConfiguration().get().getFiles()) {
-					classPath.add(inputFile.toPath());
-				}
-			}
-		}
-
-		for (Path path : classPath) {
-			if (Files.exists(path)) {
-				m.getClassPath().add(path);
-			}
-		}
-
-		return m;
-	}
-
-	private static boolean isJavaFile(Path path) {
-		String name = path.getFileName().toString();
-		// ".java" is not a valid java file
-		return name.endsWith(".java") && name.length() != 5;
 	}
 }

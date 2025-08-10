@@ -45,7 +45,8 @@ public interface LayeredMappingSpecBuilder {
 	 * Add a layer that uses the official mappings provided by Mojang with the default decompilerOptions.
 	 */
 	default LayeredMappingSpecBuilder officialMojangMappings() {
-		return officialMojangMappings(builder -> { });
+		return officialMojangMappings(builder -> {
+		});
 	}
 
 	/**
@@ -87,7 +88,8 @@ public interface LayeredMappingSpecBuilder {
 	 */
 	@ApiStatus.Experimental
 	default LayeredMappingSpecBuilder mappings(Object file) {
-		return mappings(file, builder -> { });
+		return mappings(file, builder -> {
+		});
 	}
 
 	/**

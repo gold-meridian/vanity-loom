@@ -46,16 +46,6 @@ import net.fabricmc.loom.util.LoomVersions;
 import net.fabricmc.tinyremapper.TinyRemapper;
 
 public abstract class JarManifestService implements BuildService<JarManifestService.Params> {
-	interface Params extends BuildServiceParameters {
-		Property<String> getGradleVersion();
-		Property<String> getLoomVersion();
-		Property<String> getMCEVersion();
-		Property<String> getMinecraftVersion();
-		Property<String> getTinyRemapperVersion();
-		Property<String> getFabricLoaderVersion();
-		Property<MixinVersion> getMixinVersion();
-	}
-
 	public static Provider<JarManifestService> get(Project project) {
 		return project.getGradle().getSharedServices().registerIfAbsent("LoomJarManifestService:" + project.getName(), JarManifestService.class, spec -> {
 			spec.parameters(params -> {
@@ -70,6 +60,24 @@ public abstract class JarManifestService implements BuildService<JarManifestServ
 				params.getFabricLoaderVersion().set(project.provider(() -> Optional.ofNullable(extension.getInstallerData()).map(InstallerData::version).orElse("unknown")));
 				params.getMixinVersion().set(getMixinVersion(project));
 			});
+		});
+	}
+
+	private static Provider<MixinVersion> getMixinVersion(Project project) {
+		return project.getConfigurations().named(Constants.Configurations.LOADER_DEPENDENCIES).map(configuration -> {
+			// Not super ideal that this uses the mod compile classpath, should prob look into making this not a thing at somepoint
+			Optional<Dependency> dependency = configuration
+					.getDependencies()
+					.stream()
+					.filter(dep -> "sponge-mixin".equals(dep.getName()))
+					.findFirst();
+
+			if (dependency.isEmpty()) {
+				project.getLogger().warn("Could not determine Mixin version for jar manifest");
+			}
+
+			return dependency.map(d -> new MixinVersion(d.getGroup(), d.getVersion()))
+					.orElse(new MixinVersion("unknown", "unknown"));
 		});
 	}
 
@@ -103,24 +111,23 @@ public abstract class JarManifestService implements BuildService<JarManifestServ
 		}
 	}
 
+	interface Params extends BuildServiceParameters {
+		Property<String> getGradleVersion();
+
+		Property<String> getLoomVersion();
+
+		Property<String> getMCEVersion();
+
+		Property<String> getMinecraftVersion();
+
+		Property<String> getTinyRemapperVersion();
+
+		Property<String> getFabricLoaderVersion();
+
+		Property<MixinVersion> getMixinVersion();
+	}
+
 	// Must be public for configuration cache
-	public record MixinVersion(String group, String version) implements Serializable { }
-
-	private static Provider<MixinVersion> getMixinVersion(Project project) {
-		return project.getConfigurations().named(Constants.Configurations.LOADER_DEPENDENCIES).map(configuration -> {
-			// Not super ideal that this uses the mod compile classpath, should prob look into making this not a thing at somepoint
-			Optional<Dependency> dependency = configuration
-					.getDependencies()
-					.stream()
-					.filter(dep -> "sponge-mixin".equals(dep.getName()))
-					.findFirst();
-
-			if (dependency.isEmpty()) {
-				project.getLogger().warn("Could not determine Mixin version for jar manifest");
-			}
-
-			return dependency.map(d -> new MixinVersion(d.getGroup(), d.getVersion()))
-					.orElse(new MixinVersion("unknown", "unknown"));
-		});
+	public record MixinVersion(String group, String version) implements Serializable {
 	}
 }

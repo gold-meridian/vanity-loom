@@ -34,7 +34,7 @@ import net.fabricmc.loom.test.util.GradleProjectTestTrait
 import net.fabricmc.loom.test.util.MockMavenServerTrait
 
 import static java.lang.System.setProperty
-import static net.fabricmc.loom.test.LoomTestConstants.*
+import static net.fabricmc.loom.test.LoomTestConstants.STANDARD_TEST_VERSIONS
 import static org.gradle.testkit.runner.TaskOutcome.SUCCESS
 
 /**
@@ -79,10 +79,10 @@ class SignedProjectTest extends Specification implements MockMavenServerTrait, G
 
 		when:
 		def setupResult = gradle.run(tasks: [
-			"--write-verification-metadata",
-			"pgp,sha256",
-			"dependencies",
-			"--refresh-keys"
+				"--write-verification-metadata",
+				"pgp,sha256",
+				"dependencies",
+				"--refresh-keys"
 		])
 		def checkResult = gradle.run(tasks: ["dependencies"])
 

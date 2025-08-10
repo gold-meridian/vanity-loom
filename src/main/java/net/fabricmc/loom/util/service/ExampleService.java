@@ -40,10 +40,8 @@ import org.gradle.api.tasks.Nested;
 public final class ExampleService extends Service<ExampleService.Options> implements Closeable {
 	public static ServiceType<Options, ExampleService> TYPE = new ServiceType<>(Options.class, ExampleService.class);
 
-	// Options use Gradle's Property's thus can be used in task inputs.
-	public interface Options extends Service.Options {
-		@Nested
-		Property<AnotherService.Options> getNested();
+	public ExampleService(Options options, ServiceFactory serviceFactory) {
+		super(options, serviceFactory);
 	}
 
 	// Options can be created using data from the Project
@@ -61,10 +59,6 @@ public final class ExampleService extends Service<ExampleService.Options> implem
 		exampleService.doSomething();
 	}
 
-	public ExampleService(Options options, ServiceFactory serviceFactory) {
-		super(options, serviceFactory);
-	}
-
 	public void doSomething() {
 		// The service factory used to the creation the current service can be used to get or create other services based on the current service's options.
 		AnotherService another = getServiceFactory().get(getOptions().getNested());
@@ -76,12 +70,17 @@ public final class ExampleService extends Service<ExampleService.Options> implem
 		// Anything that needs to be cleaned up when the service is no longer needed.
 	}
 
+	// Options use Gradle's Property's thus can be used in task inputs.
+	public interface Options extends Service.Options {
+		@Nested
+		Property<AnotherService.Options> getNested();
+	}
+
 	public static final class AnotherService extends Service<AnotherService.Options> {
 		public static ServiceType<Options, AnotherService> TYPE = new ServiceType<>(Options.class, AnotherService.class);
 
-		public interface Options extends Service.Options {
-			@Input
-			Property<String> getExample();
+		public AnotherService(Options options, ServiceFactory serviceFactory) {
+			super(options, serviceFactory);
 		}
 
 		static Provider<AnotherService.Options> createOptions(Project project, String example) {
@@ -90,13 +89,14 @@ public final class ExampleService extends Service<ExampleService.Options> implem
 			});
 		}
 
-		public AnotherService(Options options, ServiceFactory serviceFactory) {
-			super(options, serviceFactory);
-		}
-
 		// Services can expose any methods they wish, either to return data or do a job.
 		public String getExample() {
 			return getOptions().getExample().get();
+		}
+
+		public interface Options extends Service.Options {
+			@Input
+			Property<String> getExample();
 		}
 	}
 }

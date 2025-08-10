@@ -38,10 +38,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import net.fabricmc.loom.api.metadata.ModJson;
-
-import net.fabricmc.loom.util.metadata.ModJsonFactory;
-
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.artifacts.ProjectDependency;
@@ -51,17 +47,17 @@ import org.jetbrains.annotations.Nullable;
 
 import net.fabricmc.loom.LoomGradleExtension;
 import net.fabricmc.loom.api.RemapConfigurationSettings;
+import net.fabricmc.loom.api.metadata.ModJson;
 import net.fabricmc.loom.api.processor.SpecContext;
 import net.fabricmc.loom.configuration.providers.minecraft.MinecraftSourceSets;
 import net.fabricmc.loom.util.Constants;
-import net.fabricmc.loom.util.fmj.FabricModJson;
-import net.fabricmc.loom.util.fmj.FabricModJsonFactory;
 import net.fabricmc.loom.util.fmj.FabricModJsonHelpers;
 import net.fabricmc.loom.util.gradle.GradleUtils;
+import net.fabricmc.loom.util.metadata.ModJsonFactory;
 
 /**
- * @param modDependencies External mods that are depended on
- * @param localMods Mods found in the current project.
+ * @param modDependencies    External mods that are depended on
+ * @param localMods          Mods found in the current project.
  * @param compileRuntimeMods Dependent mods found in both the compile and runtime classpath.
  */
 public record SpecContextImpl(
@@ -162,7 +158,7 @@ public record SpecContextImpl(
 				project,
 				fmjCache,
 				extension.getCompileRemapConfigurations().stream()
-					.filter(settings -> settings.getApplyDependencyTransforms().get()))
+						.filter(settings -> settings.getApplyDependencyTransforms().get()))
 				// Only check based on the modid, as there may be differing versions used between the compile and runtime classpath.
 				// We assume that the version used at runtime will be binary compatible with the version used to compile against.
 				// It's not perfect but better than silently not supplying the mod, and this could happen with regular API that you compile against anyway.

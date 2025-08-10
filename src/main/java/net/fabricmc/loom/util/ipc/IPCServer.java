@@ -70,7 +70,7 @@ public class IPCServer implements AutoCloseable {
 			startupLock.countDown();
 
 			try (SocketChannel clientChannel = serverChannel.accept();
-					Scanner scanner = new Scanner(clientChannel, StandardCharsets.UTF_8)) {
+				 Scanner scanner = new Scanner(clientChannel, StandardCharsets.UTF_8)) {
 				while (!Thread.currentThread().isInterrupted()) {
 					if (scanner.hasNextLine()) {
 						receivedMessage = true;

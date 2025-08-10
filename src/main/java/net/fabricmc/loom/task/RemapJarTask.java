@@ -34,10 +34,6 @@ import java.util.stream.Stream;
 import javax.inject.Inject;
 
 import com.google.gson.JsonObject;
-
-import net.fabricmc.loom.api.metadata.ModJson;
-import net.fabricmc.loom.util.metadata.ModJsonFactory;
-
 import org.gradle.api.artifacts.ConfigurationContainer;
 import org.gradle.api.file.ConfigurableFileCollection;
 import org.gradle.api.file.FileCollection;
@@ -60,9 +56,9 @@ import net.fabricmc.accesswidener.AccessWidenerReader;
 import net.fabricmc.accesswidener.AccessWidenerRemapper;
 import net.fabricmc.accesswidener.AccessWidenerWriter;
 import net.fabricmc.loom.LoomGradleExtension;
+import net.fabricmc.loom.api.metadata.ModJson;
 import net.fabricmc.loom.build.nesting.JarNester;
 import net.fabricmc.loom.build.nesting.NestableJarGenerationTask;
-import net.fabricmc.loom.configuration.accesswidener.AccessWidenerFile;
 import net.fabricmc.loom.configuration.mods.ArtifactMetadata;
 import net.fabricmc.loom.task.service.ClientEntriesService;
 import net.fabricmc.loom.task.service.MixinRefmapService;
@@ -74,34 +70,13 @@ import net.fabricmc.loom.util.SidedClassVisitor;
 import net.fabricmc.loom.util.ZipUtils;
 import net.fabricmc.loom.util.fmj.FabricModJsonFactory;
 import net.fabricmc.loom.util.fmj.FabricModJsonUtils;
+import net.fabricmc.loom.util.metadata.ModJsonFactory;
 import net.fabricmc.loom.util.service.ScopedServiceFactory;
 import net.fabricmc.loom.util.service.ServiceFactory;
 import net.fabricmc.tinyremapper.OutputConsumerPath;
 import net.fabricmc.tinyremapper.TinyRemapper;
 
 public abstract class RemapJarTask extends AbstractRemapJarTask {
-	@InputFiles
-	public abstract ConfigurableFileCollection getNestedJars();
-
-	@Input
-	public abstract Property<Boolean> getAddNestedDependencies();
-
-	/**
-	 * Whether to optimize the fabric.mod.json file, by default this is false.
-	 *
-	 * <p>The schemaVersion entry will be placed first in the json file
-	 */
-	@Input
-	public abstract Property<Boolean> getOptimizeFabricModJson();
-
-	@Input
-	@ApiStatus.Internal
-	public abstract Property<Boolean> getUseMixinAP();
-	@Nested
-	public abstract Property<TinyRemapperService.Options> getTinyRemapperServiceOptions();
-	@Nested
-	public abstract ListProperty<MixinRefmapService.Options> getMixinRefmapServiceOptions();
-
 	@Inject
 	public RemapJarTask() {
 		super();
@@ -125,6 +100,30 @@ public abstract class RemapJarTask extends AbstractRemapJarTask {
 		getTinyRemapperServiceOptions().set(TinyRemapperService.createOptions(this));
 		getMixinRefmapServiceOptions().set(MixinRefmapService.createOptions(this));
 	}
+
+	@InputFiles
+	public abstract ConfigurableFileCollection getNestedJars();
+
+	@Input
+	public abstract Property<Boolean> getAddNestedDependencies();
+
+	/**
+	 * Whether to optimize the fabric.mod.json file, by default this is false.
+	 *
+	 * <p>The schemaVersion entry will be placed first in the json file
+	 */
+	@Input
+	public abstract Property<Boolean> getOptimizeFabricModJson();
+
+	@Input
+	@ApiStatus.Internal
+	public abstract Property<Boolean> getUseMixinAP();
+
+	@Nested
+	public abstract Property<TinyRemapperService.Options> getTinyRemapperServiceOptions();
+
+	@Nested
+	public abstract ListProperty<MixinRefmapService.Options> getMixinRefmapServiceOptions();
 
 	@TaskAction
 	public void run() {
@@ -153,14 +152,22 @@ public abstract class RemapJarTask extends AbstractRemapJarTask {
 		});
 	}
 
+	@Override
+	protected Provider<? extends ClientEntriesService.Options> getClientOnlyEntriesOptionsProvider(SourceSet clientSourceSet) {
+		return ClientEntriesService.Classes.createOptions(getProject(), clientSourceSet);
+	}
+
 	public interface RemapParams extends AbstractRemapParams {
 		ConfigurableFileCollection getNestedJars();
+
 		ConfigurableFileCollection getRemapClasspath();
 
 		Property<Boolean> getUseMixinExtension();
+
 		Property<Boolean> getOptimizeFmj();
 
 		Property<TinyRemapperService.Options> getTinyRemapperServiceOptions();
+
 		ListProperty<MixinRefmapService.Options> getMixinRefmapServiceOptions();
 	}
 
@@ -318,10 +325,5 @@ public abstract class RemapJarTask extends AbstractRemapJarTask {
 
 			ZipUtils.transformJson(JsonObject.class, outputFile, FabricModJsonFactory.FABRIC_MOD_JSON, FabricModJsonUtils::optimizeFmj);
 		}
-	}
-
-	@Override
-	protected Provider<? extends ClientEntriesService.Options> getClientOnlyEntriesOptionsProvider(SourceSet clientSourceSet) {
-		return ClientEntriesService.Classes.createOptions(getProject(), clientSourceSet);
 	}
 }

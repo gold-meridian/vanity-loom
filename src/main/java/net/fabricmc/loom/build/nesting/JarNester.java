@@ -36,15 +36,13 @@ import java.util.stream.Stream;
 
 import com.google.common.base.Preconditions;
 import com.google.gson.JsonObject;
-
-import net.fabricmc.loom.util.metadata.ModJsonFactory;
-
-import org.slf4j.Logger;
 import org.gradle.api.UncheckedIOException;
+import org.slf4j.Logger;
 
 import net.fabricmc.loom.util.Pair;
 import net.fabricmc.loom.util.ZipUtils;
 import net.fabricmc.loom.util.fmj.FabricModJsonFactory;
+import net.fabricmc.loom.util.metadata.ModJsonFactory;
 
 public class JarNester {
 	public static void nestJars(Collection<File> jars, File modJar, Logger logger) {

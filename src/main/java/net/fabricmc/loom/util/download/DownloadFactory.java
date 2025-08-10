@@ -38,6 +38,12 @@ import net.fabricmc.loom.LoomGradleExtension;
  * Can be used to create a {@link DownloadBuilder} with the correct settings for the project within a task.
  */
 public abstract class DownloadFactory {
+	@Inject
+	public DownloadFactory() {
+		getIsOffline().set(getProject().getGradle().getStartParameter().isOffline());
+		getIsManualRefreshDependencies().set(LoomGradleExtension.get(getProject()).refreshDeps());
+	}
+
 	@Input
 	protected abstract Property<Boolean> getIsOffline();
 
@@ -46,12 +52,6 @@ public abstract class DownloadFactory {
 
 	@Inject
 	public abstract Project getProject();
-
-	@Inject
-	public DownloadFactory() {
-		getIsOffline().set(getProject().getGradle().getStartParameter().isOffline());
-		getIsManualRefreshDependencies().set(LoomGradleExtension.get(getProject()).refreshDeps());
-	}
 
 	// Matches the logic in LoomGradleExtensionImpl
 	public DownloadBuilder download(String url) {

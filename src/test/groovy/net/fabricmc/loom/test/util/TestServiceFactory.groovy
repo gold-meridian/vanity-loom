@@ -31,12 +31,7 @@ import org.gradle.api.internal.MutationGuard
 import org.gradle.api.internal.MutationGuards
 import org.gradle.api.internal.collections.DefaultDomainObjectCollectionFactory
 import org.gradle.api.internal.collections.DomainObjectCollectionFactory
-import org.gradle.api.internal.file.DefaultFileCollectionFactory
-import org.gradle.api.internal.file.DefaultFileLookup
-import org.gradle.api.internal.file.DefaultFilePropertyFactory
-import org.gradle.api.internal.file.FileCollectionFactory
-import org.gradle.api.internal.file.FilePropertyFactory
-import org.gradle.api.internal.file.FileResolver
+import org.gradle.api.internal.file.*
 import org.gradle.api.internal.file.collections.DirectoryFileTreeFactory
 import org.gradle.api.internal.model.DefaultObjectFactory
 import org.gradle.api.internal.model.NamedObjectInstantiator
@@ -90,46 +85,46 @@ class TestServiceFactory {
 
 			//noinspection unused
 			it.addProvider(new ServiceRegistrationProvider() {
-						@Provides
-						InstantiatorFactory createInstantiatorFactory(
-								CrossBuildInMemoryCacheFactory crossBuildInMemoryCacheFactory) {
-							return new DefaultInstantiatorFactory(
-									crossBuildInMemoryCacheFactory,
-									[],
-									new OutputPropertyRoleAnnotationHandler([])
-									)
-						}
+				@Provides
+				InstantiatorFactory createInstantiatorFactory(
+						CrossBuildInMemoryCacheFactory crossBuildInMemoryCacheFactory) {
+					return new DefaultInstantiatorFactory(
+							crossBuildInMemoryCacheFactory,
+							[],
+							new OutputPropertyRoleAnnotationHandler([])
+					)
+				}
 
-						@Provides
-						FilePropertyFactory createFilePropertyFactory(
-								PropertyHost propertyHost,
-								FileCollectionFactory fileCollectionFactory) {
-							return new DefaultFilePropertyFactory(
-									propertyHost,
-									fileResolver(),
-									fileCollectionFactory)
-						}
+				@Provides
+				FilePropertyFactory createFilePropertyFactory(
+						PropertyHost propertyHost,
+						FileCollectionFactory fileCollectionFactory) {
+					return new DefaultFilePropertyFactory(
+							propertyHost,
+							fileResolver(),
+							fileCollectionFactory)
+				}
 
-						@Provides
-						ObjectFactory createObjectFactory(
-								InstantiatorFactory instantiatorFactory,
-								NamedObjectInstantiator namedObjectInstantiator,
-								PropertyFactory propertyFactory,
-								FilePropertyFactory filePropertyFactory,
-								FileCollectionFactory fileCollectionFactory,
-								DomainObjectCollectionFactory domainObjectCollectionFactory) {
-							return new DefaultObjectFactory(
-									instantiatorFactory.decorate(services),
-									namedObjectInstantiator,
-									mock(DirectoryFileTreeFactory),
-									mock(PatternSetFactory),
-									propertyFactory,
-									filePropertyFactory,
-									DefaultTaskDependencyFactory.withNoAssociatedProject(),
-									fileCollectionFactory,
-									domainObjectCollectionFactory)
-						}
-					})
+				@Provides
+				ObjectFactory createObjectFactory(
+						InstantiatorFactory instantiatorFactory,
+						NamedObjectInstantiator namedObjectInstantiator,
+						PropertyFactory propertyFactory,
+						FilePropertyFactory filePropertyFactory,
+						FileCollectionFactory fileCollectionFactory,
+						DomainObjectCollectionFactory domainObjectCollectionFactory) {
+					return new DefaultObjectFactory(
+							instantiatorFactory.decorate(services),
+							namedObjectInstantiator,
+							mock(DirectoryFileTreeFactory),
+							mock(PatternSetFactory),
+							propertyFactory,
+							filePropertyFactory,
+							DefaultTaskDependencyFactory.withNoAssociatedProject(),
+							fileCollectionFactory,
+							domainObjectCollectionFactory)
+				}
+			})
 		}
 
 		return services

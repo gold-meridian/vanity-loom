@@ -36,11 +36,11 @@ class ClassEntryTest extends Specification {
 		// Just make sure the constructor doesn't throw an exception
 		classEntry != null
 		where:
-		name | innerClasses | superClasses
-		"net/fabricmc/Test.class" | [] | []
+		name                      | innerClasses | superClasses
+		"net/fabricmc/Test.class" | []           | []
 		"net/fabricmc/Test.class" | [
-			"net/fabricmc/Test\$Inner.class"
-		] | ["java/lang/List.class"]
+				"net/fabricmc/Test\$Inner.class"
+		]                                        | ["java/lang/List.class"]
 	}
 
 	def "invalid class entry"() {
@@ -49,15 +49,15 @@ class ClassEntryTest extends Specification {
 		then:
 		thrown IllegalArgumentException
 		where:
-		name | innerClasses | superClasses
-		"net/fabricmc/Test" | [] | []
+		name                      | innerClasses                 | superClasses
+		"net/fabricmc/Test"       | []                           | []
 		"net/fabricmc/Test.class" | ["net/fabricmc/Test\$Inner"] | ["java/lang/List.class"]
 		"net/fabricmc/Test.class" | [
-			"net/fabricmc/Test\$Inner.class"
-		] | ["java/lang/List"]
-		"net/fabricmc/Test.class" | ["net/Test\$Inner.class"] | ["java/lang/List.class"]
+				"net/fabricmc/Test\$Inner.class"
+		]                                                        | ["java/lang/List"]
+		"net/fabricmc/Test.class" | ["net/Test\$Inner.class"]    | ["java/lang/List.class"]
 		"net/fabricmc/Test.class" | [
-			"net/fabricmc/Bar\$Inner.class"
-		] | []
+				"net/fabricmc/Bar\$Inner.class"
+		]                                                        | []
 	}
 }

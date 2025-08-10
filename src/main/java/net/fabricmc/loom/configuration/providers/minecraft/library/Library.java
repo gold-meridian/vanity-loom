@@ -27,25 +27,6 @@ package net.fabricmc.loom.configuration.providers.minecraft.library;
 import org.jetbrains.annotations.Nullable;
 
 public record Library(String group, String name, String version, @Nullable String classifier, Target target) {
-	public enum Target {
-		/**
-		 * A runtime only library.
-		 */
-		RUNTIME,
-		/**
-		 * A runtime and compile library.
-		 */
-		COMPILE,
-		/**
-		 * Natives.
-		 */
-		NATIVES,
-		/**
-		 * A mod library that needs remapping.
-		 */
-		LOCAL_MOD
-	}
-
 	public static Library fromMaven(String name, Target target) {
 		String[] split = name.split(":");
 		assert split.length == 3 || split.length == 4;
@@ -87,5 +68,24 @@ public record Library(String group, String name, String version, @Nullable Strin
 
 	public Library withTarget(Target target) {
 		return new Library(this.group, this.name, this.version, this.classifier, target);
+	}
+
+	public enum Target {
+		/**
+		 * A runtime only library.
+		 */
+		RUNTIME,
+		/**
+		 * A runtime and compile library.
+		 */
+		COMPILE,
+		/**
+		 * Natives.
+		 */
+		NATIVES,
+		/**
+		 * A mod library that needs remapping.
+		 */
+		LOCAL_MOD
 	}
 }

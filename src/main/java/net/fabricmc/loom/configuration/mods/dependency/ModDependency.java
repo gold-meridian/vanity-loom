@@ -73,6 +73,7 @@ public abstract sealed class ModDependency permits SplitModDependency, SimpleMod
 
 	/**
 	 * Create a maven helper for the local cache.
+	 *
 	 * @param type The jar type, e.g "common" or "client" for split dependencies.
 	 */
 	protected LocalMavenHelper createMavenHelper(Project project, @Nullable String type) {
@@ -121,7 +122,7 @@ public abstract sealed class ModDependency permits SplitModDependency, SimpleMod
 	public Path getWorkingFile(Project project, @Nullable String classifier) {
 		final LoomGradleExtension extension = LoomGradleExtension.get(project);
 		final String fileName = classifier == null ? String.format("%s-%s-%s.jar", getGroup(), getName(), version)
-													: String.format("%s-%s-%s-%s.jar", getGroup(), getName(), version, classifier);
+				: String.format("%s-%s-%s-%s.jar", getGroup(), getName(), version, classifier);
 
 		return extension.getFiles().getProjectBuildCache().toPath().resolve("remapped_working").resolve(fileName);
 	}

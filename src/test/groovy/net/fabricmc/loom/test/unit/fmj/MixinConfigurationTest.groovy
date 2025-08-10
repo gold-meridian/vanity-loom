@@ -98,8 +98,8 @@ class MixinConfigurationTest extends Specification {
 		def mod = Mock(FabricModJson.Mockable)
 		mod.getSource() >> modSource
 		mod.getMixinConfigurations() >> [
-			"config1.json",
-			"config2.json"
+				"config1.json",
+				"config2.json"
 		]
 		modSource.read("config1.json") >> '{"refmap": "refmap1.json"}'.bytes
 		modSource.read("refmap1.json") >> REFMAP.bytes
@@ -117,7 +117,7 @@ class MixinConfigurationTest extends Specification {
 
 	static MixinRefmap.NamespacePair NAMESPACE = new MixinRefmap.NamespacePair("named", "intermediary")
 	@Language("JSON")
-	static String REFMAP ='''
+	static String REFMAP = '''
 {
   "mappings": {
     "net/fabricmc/fabric/mixin/block/ChunkSectionBlockStateCounterMixin": {

@@ -47,6 +47,21 @@ import net.fabricmc.loom.util.ExceptionUtil;
 public abstract class TracyCapture {
 	private static final Logger LOGGER = LoggerFactory.getLogger(TracyCapture.class);
 
+	@Inject
+	public TracyCapture() {
+		getMaxShutdownWaitSeconds().convention(10);
+	}
+
+	private static void captureLog(InputStream inputStream, Consumer<String> lineConsumer) {
+		new Thread(() -> {
+			try {
+				new BufferedReader(new InputStreamReader(inputStream)).lines().forEach(lineConsumer);
+			} catch (Exception e) {
+				// Don't really care, this will happen when the stream is closed
+			}
+		}).start();
+	}
+
 	/**
 	 * The path to the tracy-capture executable.
 	 */
@@ -68,11 +83,6 @@ public abstract class TracyCapture {
 	@OutputFile
 	@Optional
 	public abstract RegularFileProperty getOutput();
-
-	@Inject
-	public TracyCapture() {
-		getMaxShutdownWaitSeconds().convention(10);
-	}
 
 	void runWithTracy(IORunnable runnable) throws IOException {
 		TracyCaptureRunner tracyCaptureRunner = createRunner();
@@ -110,6 +120,11 @@ public abstract class TracyCapture {
 		return new TracyCaptureRunner(process, getMaxShutdownWaitSeconds().get());
 	}
 
+	@FunctionalInterface
+	public interface IORunnable {
+		void run() throws IOException;
+	}
+
 	private record TracyCaptureRunner(Process process, int shutdownWait) implements AutoCloseable {
 		@Override
 		public void close() throws Exception {
@@ -140,20 +155,5 @@ public abstract class TracyCapture {
 				throw new RuntimeException("Tracy capture failed with exit code " + exitCode);
 			}
 		}
-	}
-
-	private static void captureLog(InputStream inputStream, Consumer<String> lineConsumer) {
-		new Thread(() -> {
-			try {
-				new BufferedReader(new InputStreamReader(inputStream)).lines().forEach(lineConsumer);
-			} catch (Exception e) {
-				// Don't really care, this will happen when the stream is closed
-			}
-		}).start();
-	}
-
-	@FunctionalInterface
-	public interface IORunnable {
-		void run() throws IOException;
 	}
 }

@@ -45,18 +45,18 @@ abstract class ServiceTestBase extends Specification {
 
 	def setup() {
 		this.scopedServiceFactory = new ScopedServiceFactory() {
-					@Override
-					protected ServiceFactory getEffectiveServiceFactory() {
-						return factory
-					}
-				}
+			@Override
+			protected ServiceFactory getEffectiveServiceFactory() {
+				return factory
+			}
+		}
 		this.factory = new ServiceFactory() {
-					@Override
-					<O extends Service.Options, S extends Service<O>> S get(O options) {
-						def self = ServiceTestBase.this
-						return mockedServices.get(options) as S ?: scopedServiceFactory.get(options) as S
-					}
-				}
+			@Override
+			<O extends Service.Options, S extends Service<O>> S get(O options) {
+				def self = ServiceTestBase.this
+				return mockedServices.get(options) as S ?: scopedServiceFactory.get(options) as S
+			}
+		}
 	}
 
 	Service.Options mockService(ServiceType type) {

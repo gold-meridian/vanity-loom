@@ -27,6 +27,14 @@ package net.fabricmc.loom.util;
 public interface Platform {
 	Platform CURRENT = CurrentPlatform.INSTANCE;
 
+	OperatingSystem getOperatingSystem();
+
+	Architecture getArchitecture();
+
+	boolean supportsUnixDomainSockets();
+
+	boolean isRaspberryPi();
+
 	enum OperatingSystem {
 		WINDOWS,
 		MAC_OS,
@@ -45,8 +53,6 @@ public interface Platform {
 		}
 	}
 
-	OperatingSystem getOperatingSystem();
-
 	interface Architecture {
 		boolean is64Bit();
 
@@ -58,10 +64,4 @@ public interface Platform {
 			return is64Bit() && !isArm() && !isRiscV();
 		}
 	}
-
-	Architecture getArchitecture();
-
-	boolean supportsUnixDomainSockets();
-
-	boolean isRaspberryPi();
 }

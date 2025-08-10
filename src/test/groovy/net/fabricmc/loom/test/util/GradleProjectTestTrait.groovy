@@ -50,8 +50,8 @@ trait GradleProjectTestTrait {
 		setupProject(options, projectDir)
 
 		println([
-			projectDir: projectDir.absolutePath,
-			gradleHomeDir: gradleHomeDir.absolutePath
+				projectDir   : projectDir.absolutePath,
+				gradleHomeDir: gradleHomeDir.absolutePath
 		])
 
 		return new GradleProject(
@@ -59,7 +59,7 @@ trait GradleProjectTestTrait {
 				projectDir: projectDir.absolutePath,
 				gradleHomeDir: gradleHomeDir.absolutePath,
 				warningMode: warningMode
-				)
+		)
 	}
 
 	private void setupProject(Map options, File projectDir) {
@@ -69,7 +69,7 @@ trait GradleProjectTestTrait {
 		}
 
 		if (options.repo) {
-			String repo  = options.repo
+			String repo = options.repo
 			String commit = options.commit
 
 			if (options.allowExistingRepo && projectDir.listFiles()?.length > 0) {
@@ -211,7 +211,7 @@ trait GradleProjectTestTrait {
 					.withPluginClasspath()
 					.withGradleVersion(gradleVersion)
 					.forwardOutput()
-					// Only enable debugging when the current gradle version matches the version we are testing
+			// Only enable debugging when the current gradle version matches the version we are testing
 					.withDebug(enableDebugging && gradleVersion == GradleVersion.current().getVersion())
 		}
 

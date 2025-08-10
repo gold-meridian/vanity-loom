@@ -46,7 +46,7 @@ class FabricAPIBenchmark implements GradleProjectTestTrait {
 				repo: "https://github.com/FabricMC/fabric.git",
 				commit: "41bc64cd617f03d49ecc4a4f7788cb65d465415c",
 				patch: "fabric_api"
-				)
+		)
 
 		if (!gradle.buildGradle.text.contains("loom.mixin.useLegacyMixinAp")) {
 			gradle.buildGradle << """
@@ -59,14 +59,14 @@ class FabricAPIBenchmark implements GradleProjectTestTrait {
 		def timeStart = new Date()
 
 		def result = gradle.run(tasks: [
-			"clean",
-			"build",
-			"-x",
-			"test",
-			"-x",
-			"check",
-			"-x",
-			":fabric-data-generation-api-v1:runDatagen"
+				"clean",
+				"build",
+				"-x",
+				"test",
+				"-x",
+				"check",
+				"-x",
+				":fabric-data-generation-api-v1:runDatagen"
 		], args: [])
 
 		def timeStop = new Date()

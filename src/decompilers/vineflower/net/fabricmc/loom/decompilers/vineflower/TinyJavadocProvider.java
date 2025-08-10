@@ -52,6 +52,26 @@ public class TinyJavadocProvider implements IFabricJavadocProvider {
 		mappingTree = readMappings(tinyFile);
 	}
 
+	private static MappingTree readMappings(File input) {
+		try (BufferedReader reader = Files.newBufferedReader(input.toPath())) {
+			MemoryMappingTree mappingTree = new MemoryMappingTree();
+			MappingSourceNsSwitch nsSwitch = new MappingSourceNsSwitch(mappingTree, "named");
+			MappingReader.read(reader, nsSwitch);
+
+			return mappingTree;
+		} catch (IOException e) {
+			throw new RuntimeException("Failed to read mappings", e);
+		}
+	}
+
+	public static boolean isRecord(StructClass structClass) {
+		return (structClass.getAccessFlags() & ACC_RECORD) != 0;
+	}
+
+	public static boolean isStatic(StructField structField) {
+		return (structField.getAccessFlags() & ACC_STATIC) != 0;
+	}
+
 	@Override
 	public String getClassDoc(StructClass structClass) {
 		MappingTree.ClassMapping classMapping = mappingTree.getClass(structClass.qualifiedName);
@@ -164,25 +184,5 @@ public class TinyJavadocProvider implements IFabricJavadocProvider {
 		}
 
 		return null;
-	}
-
-	private static MappingTree readMappings(File input) {
-		try (BufferedReader reader = Files.newBufferedReader(input.toPath())) {
-			MemoryMappingTree mappingTree = new MemoryMappingTree();
-			MappingSourceNsSwitch nsSwitch = new MappingSourceNsSwitch(mappingTree, "named");
-			MappingReader.read(reader, nsSwitch);
-
-			return mappingTree;
-		} catch (IOException e) {
-			throw new RuntimeException("Failed to read mappings", e);
-		}
-	}
-
-	public static boolean isRecord(StructClass structClass) {
-		return (structClass.getAccessFlags() & ACC_RECORD) != 0;
-	}
-
-	public static boolean isStatic(StructField structField) {
-		return (structField.getAccessFlags() & ACC_STATIC) != 0;
 	}
 }

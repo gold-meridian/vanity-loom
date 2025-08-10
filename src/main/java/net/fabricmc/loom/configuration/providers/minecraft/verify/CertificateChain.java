@@ -42,27 +42,6 @@ import org.jetbrains.annotations.Nullable;
  */
 public interface CertificateChain {
 	/**
-	 * The certificate itself.
-	 */
-	X509Certificate certificate();
-
-	/**
-	 * The issuer of this certificate, or null if this is a root certificate.
-	 */
-	@Nullable CertificateChain issuer();
-
-	/**
-	 * The children of this certificate, or an empty list if this is a leaf certificate.
-	 */
-	List<CertificateChain> children();
-
-	/**
-	 * Verify that this certificate chain matches exactly with another one.
-	 * @param other the other certificate chain
-	 */
-	void verifyChainMatches(CertificateChain other) throws SignatureVerificationFailure;
-
-	/**
 	 * Recursively visit all certificates in the chain, including this one.
 	 */
 	static void visitAll(CertificateChain chain, CertificateConsumer consumer) throws SignatureVerificationFailure {
@@ -134,6 +113,28 @@ public interface CertificateChain {
 
 		return roots.get(0);
 	}
+
+	/**
+	 * The certificate itself.
+	 */
+	X509Certificate certificate();
+
+	/**
+	 * The issuer of this certificate, or null if this is a root certificate.
+	 */
+	@Nullable CertificateChain issuer();
+
+	/**
+	 * The children of this certificate, or an empty list if this is a leaf certificate.
+	 */
+	List<CertificateChain> children();
+
+	/**
+	 * Verify that this certificate chain matches exactly with another one.
+	 *
+	 * @param other the other certificate chain
+	 */
+	void verifyChainMatches(CertificateChain other) throws SignatureVerificationFailure;
 
 	@FunctionalInterface
 	interface CertificateConsumer {

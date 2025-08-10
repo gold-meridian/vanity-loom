@@ -51,11 +51,11 @@ import net.fabricmc.loom.util.gradle.SourceSetHelper;
 
 public abstract class FabricApiTesting extends FabricApiAbstractSourceSet {
 	@Inject
-	protected abstract Project getProject();
-
-	@Inject
 	public FabricApiTesting() {
 	}
+
+	@Inject
+	protected abstract Project getProject();
 
 	@Override
 	protected String getSourceSetName() {

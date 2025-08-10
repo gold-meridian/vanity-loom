@@ -34,14 +34,11 @@ import io.javalin.http.HttpStatus
 import spock.lang.IgnoreIf
 
 import net.fabricmc.loom.util.Checksum
-import net.fabricmc.loom.util.download.Download
-import net.fabricmc.loom.util.download.DownloadException
-import net.fabricmc.loom.util.download.DownloadExecutor
-import net.fabricmc.loom.util.download.DownloadProgressListener
-import net.fabricmc.loom.util.download.DownloadResult
+import net.fabricmc.loom.util.download.*
 
 class DownloadFileTest extends DownloadTest {
-	@IgnoreIf({ os.windows }) // Requires admin on windows.
+	@IgnoreIf({ os.windows })
+	// Requires admin on windows.
 	def "Directory: Symlink"() {
 		setup:
 		server.get("/symlinkFile") {
@@ -112,7 +109,7 @@ class DownloadFileTest extends DownloadTest {
 
 		server.get("/sha1.txt") {
 			it.result("Hello World")
-			requestCount ++
+			requestCount++
 		}
 
 		def output = new File(File.createTempDir(), "file.txt").toPath()
@@ -157,7 +154,7 @@ class DownloadFileTest extends DownloadTest {
 
 		server.get("/offline.txt") {
 			it.result("Hello World")
-			requestCount ++
+			requestCount++
 		}
 
 		def output = new File(File.createTempDir(), "offline.txt").toPath()
@@ -180,7 +177,7 @@ class DownloadFileTest extends DownloadTest {
 
 		server.get("/maxage.txt") {
 			it.result("Hello World")
-			requestCount ++
+			requestCount++
 		}
 
 		def output = new File(File.createTempDir(), "maxage.txt").toPath()
@@ -223,7 +220,7 @@ class DownloadFileTest extends DownloadTest {
 			}
 
 			it.result(result)
-			requestCount ++
+			requestCount++
 		}
 
 		def output = new File(File.createTempDir(), "etag.txt").toPath()
@@ -253,7 +250,7 @@ class DownloadFileTest extends DownloadTest {
 			def etag = result.hashCode().toString()
 			it.header("ETag", etag)
 
-			requestCount ++
+			requestCount++
 
 			if (clientEtag == etag) {
 				// Etag matches, no need to send the data.
@@ -262,7 +259,7 @@ class DownloadFileTest extends DownloadTest {
 			}
 
 			it.result(result)
-			downloadCount ++
+			downloadCount++
 		}
 
 		def output = new File(File.createTempDir(), "etag.txt").toPath()

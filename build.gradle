@@ -57,7 +57,7 @@ configurations.configureEach {
 		failOnNonReproducibleResolution()
 	}
 
-	if (canBeConsumed)  {
+	if (canBeConsumed) {
 		attributes {
 			attribute(GradlePluginApiVersion.GRADLE_PLUGIN_API_VERSION_ATTRIBUTE, objects.named(GradlePluginApiVersion, GradleVersion.current().getVersion()))
 		}
@@ -97,7 +97,7 @@ dependencies {
 	implementation libs.bundles.asm
 
 	// game handling utils
-	implementation (project(":stitch")) {
+	implementation(project(":stitch")) {
 		exclude module: 'enigma'
 	}
 
@@ -105,7 +105,7 @@ dependencies {
 	implementation libs.fabric.tiny.remapper
 	implementation libs.fabric.access.widener
 	implementation libs.fabric.mapping.io
-	implementation (project(":lorenz-tiny")) {
+	implementation(project(":lorenz-tiny")) {
 		transitive = false
 	}
 
@@ -151,7 +151,7 @@ dependencies {
 	}
 	testImplementation testLibs.junit.jupiter.engine
 	testRuntimeOnly testLibs.junit.platform.launcher
-	testImplementation (testLibs.javalin) {
+	testImplementation(testLibs.javalin) {
 		exclude group: 'org.jetbrains.kotlin'
 	}
 	testImplementation testLibs.mockito
@@ -163,7 +163,7 @@ dependencies {
 	compileOnly runtimeLibs.jetbrains.annotations
 	testCompileOnly runtimeLibs.jetbrains.annotations
 
-	testCompileOnly (testLibs.mixin) {
+	testCompileOnly(testLibs.mixin) {
 		transitive = false
 	}
 }
@@ -241,10 +241,10 @@ test {
 // Workaround https://github.com/gradle/gradle/issues/25898
 tasks.withType(Test).configureEach {
 	jvmArgs = [
-		'--add-opens=java.base/java.lang=ALL-UNNAMED',
-		'--add-opens=java.base/java.util=ALL-UNNAMED',
-		'--add-opens=java.base/java.lang.invoke=ALL-UNNAMED',
-		'--add-opens=java.base/java.net=ALL-UNNAMED'
+			'--add-opens=java.base/java.lang=ALL-UNNAMED',
+			'--add-opens=java.base/java.util=ALL-UNNAMED',
+			'--add-opens=java.base/java.lang.invoke=ALL-UNNAMED',
+			'--add-opens=java.base/java.net=ALL-UNNAMED'
 	]
 }
 

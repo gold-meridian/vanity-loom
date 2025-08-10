@@ -58,8 +58,8 @@ class GradleTestUtil {
 
 	static SourceSet mockSourceSet(String name) {
 		def sourceSet = new DefaultSourceSet(name, mockObjectFactory()) {
-					final ExtensionContainer extensions = null
-				}
+			final ExtensionContainer extensions = null
+		}
 		return sourceSet
 	}
 

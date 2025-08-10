@@ -87,24 +87,24 @@ public enum MappingsNamespace {
 	 */
 	public static @Nullable MappingsNamespace of(String namespace) {
 		return switch (namespace) {
-		case "official" -> OFFICIAL;
-		case "clientOfficial" -> CLIENT_OFFICIAL;
-		case "serverOfficial" -> SERVER_OFFICIAL;
-		case "intermediary" -> INTERMEDIARY;
-		case "named" -> NAMED;
-		case "glue" -> GLUE;
-		case "server" -> SERVER;
-		case "client" -> CLIENT;
-		default -> null;
+			case "official" -> OFFICIAL;
+			case "clientOfficial" -> CLIENT_OFFICIAL;
+			case "serverOfficial" -> SERVER_OFFICIAL;
+			case "intermediary" -> INTERMEDIARY;
+			case "named" -> NAMED;
+			case "glue" -> GLUE;
+			case "server" -> SERVER;
+			case "client" -> CLIENT;
+			default -> null;
 		};
 	}
 
 	@Override
 	public String toString() {
 		return switch (this) {
-		case CLIENT_OFFICIAL -> "clientOfficial";
-		case SERVER_OFFICIAL -> "serverOfficial";
-		default -> name().toLowerCase(Locale.ROOT);
+			case CLIENT_OFFICIAL -> "clientOfficial";
+			case SERVER_OFFICIAL -> "serverOfficial";
+			default -> name().toLowerCase(Locale.ROOT);
 		};
 	}
 }

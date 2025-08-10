@@ -48,52 +48,7 @@ public class MinecraftClassMerger {
 	private static final String ITF_LIST_DESCRIPTOR = "Lnet/fabricmc/api/EnvironmentInterfaces;";
 	private static final String SIDED_DESCRIPTOR = "Lnet/fabricmc/api/Environment;";
 
-	private abstract static class Merger<T> {
-		private final Map<String, T> entriesClient, entriesServer;
-		private final List<String> entryNames;
-
-		Merger(List<T> entriesClient, List<T> entriesServer) {
-			this.entriesClient = new LinkedHashMap<>();
-			this.entriesServer = new LinkedHashMap<>();
-
-			List<String> listClient = toMap(entriesClient, this.entriesClient);
-			List<String> listServer = toMap(entriesServer, this.entriesServer);
-
-			this.entryNames = mergePreserveOrder(listClient, listServer);
-		}
-
-		public abstract String getName(T entry);
-
-		public abstract void applySide(T entry, String side);
-
-		private List<String> toMap(List<T> entries, Map<String, T> map) {
-			List<String> list = new ArrayList<>(entries.size());
-
-			for (T entry : entries) {
-				String name = getName(entry);
-				map.put(name, entry);
-				list.add(name);
-			}
-
-			return list;
-		}
-
-		public void merge(List<T> list) {
-			for (String s : entryNames) {
-				T entryClient = entriesClient.get(s);
-				T entryServer = entriesServer.get(s);
-
-				if (entryClient != null && entryServer != null) {
-					list.add(entryClient);
-				} else if (entryClient != null) {
-					applySide(entryClient, "CLIENT");
-					list.add(entryClient);
-				} else {
-					applySide(entryServer, "SERVER");
-					list.add(entryServer);
-				}
-			}
-		}
+	public MinecraftClassMerger() {
 	}
 
 	private static void visitSideAnnotation(AnnotationVisitor av, String side) {
@@ -110,23 +65,47 @@ public class MinecraftClassMerger {
 		}
 	}
 
-	public static class SidedClassVisitor extends ClassVisitor {
-		private final String side;
+	private static List<String> mergePreserveOrder(List<String> first, List<String> second) {
+		List<String> out = new ArrayList<>();
+		int i = 0;
+		int j = 0;
 
-		public SidedClassVisitor(int api, ClassVisitor cv, String side) {
-			super(api, cv);
-			this.side = side;
+		while (i < first.size() || j < second.size()) {
+			int saved = i + j;
+
+			while (i < first.size() && j < second.size()
+					&& first.get(i).equals(second.get(j))) {
+				out.add(first.get(i));
+				i++;
+				j++;
+			}
+
+			while (i < first.size() && !second.contains(first.get(i))) {
+				out.add(first.get(i));
+				i++;
+			}
+
+			while (j < second.size() && !first.contains(second.get(j))) {
+				out.add(second.get(j));
+				j++;
+			}
+
+			// if the order is scrambled, it's not possible to merge
+			// the lists while preserving the order from both sides
+			if (i + j == saved) {
+				for (; i < first.size(); i++) {
+					out.add(first.get(i));
+				}
+
+				for (; j < second.size(); j++) {
+					if (!first.contains(second.get(j))) {
+						out.add(second.get(j));
+					}
+				}
+			}
 		}
 
-		@Override
-		public void visitEnd() {
-			AnnotationVisitor av = cv.visitAnnotation(SIDED_DESCRIPTOR, true);
-			visitSideAnnotation(av, side);
-			super.visitEnd();
-		}
-	}
-
-	public MinecraftClassMerger() {
+		return out;
 	}
 
 	public byte[] merge(byte[] classClient, byte[] classServer) {
@@ -251,46 +230,67 @@ public class MinecraftClassMerger {
 		return writer.toByteArray();
 	}
 
-	private static List<String> mergePreserveOrder(List<String> first, List<String> second) {
-		List<String> out = new ArrayList<>();
-		int i = 0;
-		int j = 0;
+	private abstract static class Merger<T> {
+		private final Map<String, T> entriesClient, entriesServer;
+		private final List<String> entryNames;
 
-		while (i < first.size() || j < second.size()) {
-			int saved = i + j;
+		Merger(List<T> entriesClient, List<T> entriesServer) {
+			this.entriesClient = new LinkedHashMap<>();
+			this.entriesServer = new LinkedHashMap<>();
 
-			while (i < first.size() && j < second.size()
-					&& first.get(i).equals(second.get(j))) {
-				out.add(first.get(i));
-				i++;
-				j++;
+			List<String> listClient = toMap(entriesClient, this.entriesClient);
+			List<String> listServer = toMap(entriesServer, this.entriesServer);
+
+			this.entryNames = mergePreserveOrder(listClient, listServer);
+		}
+
+		public abstract String getName(T entry);
+
+		public abstract void applySide(T entry, String side);
+
+		private List<String> toMap(List<T> entries, Map<String, T> map) {
+			List<String> list = new ArrayList<>(entries.size());
+
+			for (T entry : entries) {
+				String name = getName(entry);
+				map.put(name, entry);
+				list.add(name);
 			}
 
-			while (i < first.size() && !second.contains(first.get(i))) {
-				out.add(first.get(i));
-				i++;
-			}
+			return list;
+		}
 
-			while (j < second.size() && !first.contains(second.get(j))) {
-				out.add(second.get(j));
-				j++;
-			}
+		public void merge(List<T> list) {
+			for (String s : entryNames) {
+				T entryClient = entriesClient.get(s);
+				T entryServer = entriesServer.get(s);
 
-			// if the order is scrambled, it's not possible to merge
-			// the lists while preserving the order from both sides
-			if (i + j == saved) {
-				for (; i < first.size(); i++) {
-					out.add(first.get(i));
-				}
-
-				for (; j < second.size(); j++) {
-					if (!first.contains(second.get(j))) {
-						out.add(second.get(j));
-					}
+				if (entryClient != null && entryServer != null) {
+					list.add(entryClient);
+				} else if (entryClient != null) {
+					applySide(entryClient, "CLIENT");
+					list.add(entryClient);
+				} else {
+					applySide(entryServer, "SERVER");
+					list.add(entryServer);
 				}
 			}
 		}
+	}
 
-		return out;
+	public static class SidedClassVisitor extends ClassVisitor {
+		private final String side;
+
+		public SidedClassVisitor(int api, ClassVisitor cv, String side) {
+			super(api, cv);
+			this.side = side;
+		}
+
+		@Override
+		public void visitEnd() {
+			AnnotationVisitor av = cv.visitAnnotation(SIDED_DESCRIPTOR, true);
+			visitSideAnnotation(av, side);
+			super.visitEnd();
+		}
 	}
 }

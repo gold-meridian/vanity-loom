@@ -72,18 +72,46 @@ import net.fabricmc.tinyremapper.extension.mixin.common.data.Constant;
  * }</pre>
  */
 public abstract class ValidateMixinNameTask extends SourceTask {
-	@Input
-	abstract Property<Boolean> getSoftFailures();
-
-	@Inject
-	protected abstract WorkerExecutor getWorkerExecutor();
-
 	@Inject
 	public ValidateMixinNameTask() {
 		setGroup("verification");
 		getProject().getTasks().getByName("check").dependsOn(this);
 		getSoftFailures().convention(false);
 	}
+
+	private static String toSimpleName(String internalName) {
+		return internalName.substring(internalName.lastIndexOf("/") + 1);
+	}
+
+	@Nullable
+	private static Mixin getMixin(File file) {
+		try (InputStream is = new FileInputStream(file)) {
+			return getMixin(is);
+		} catch (IOException e) {
+			throw new UncheckedIOException("Failed to read input file: " + file, e);
+		}
+	}
+
+	@Nullable
+	@VisibleForTesting
+	public static Mixin getMixin(InputStream is) throws IOException {
+		final ClassReader reader = new ClassReader(is);
+
+		var classVisitor = new MixinTargetClassVisitor();
+		reader.accept(classVisitor, ClassReader.SKIP_CODE);
+
+		if (classVisitor.mixinTarget != null && classVisitor.targets == 1) {
+			return new Mixin(classVisitor.className, classVisitor.mixinTarget, classVisitor.accessor);
+		}
+
+		return null;
+	}
+
+	@Input
+	abstract Property<Boolean> getSoftFailures();
+
+	@Inject
+	protected abstract WorkerExecutor getWorkerExecutor();
 
 	@TaskAction
 	public void run() {
@@ -97,6 +125,7 @@ public abstract class ValidateMixinNameTask extends SourceTask {
 
 	public interface ValidateMixinsParams extends WorkParameters {
 		ConfigurableFileCollection getInputClasses();
+
 		Property<Boolean> getSoftFailures();
 	}
 
@@ -143,39 +172,11 @@ public abstract class ValidateMixinNameTask extends SourceTask {
 		}
 	}
 
-	private static String toSimpleName(String internalName) {
-		return internalName.substring(internalName.lastIndexOf("/") + 1);
-	}
-
 	@VisibleForTesting
 	public record Mixin(String className, Type target, boolean accessor) {
 		public String expectedClassName() {
 			return toSimpleName(target.getInternalName()).replace("$", "") + (accessor ? "Accessor" : "Mixin");
 		}
-	}
-
-	@Nullable
-	private static Mixin getMixin(File file) {
-		try (InputStream is = new FileInputStream(file)) {
-			return getMixin(is);
-		} catch (IOException e) {
-			throw new UncheckedIOException("Failed to read input file: " + file, e);
-		}
-	}
-
-	@Nullable
-	@VisibleForTesting
-	public static Mixin getMixin(InputStream is) throws IOException {
-		final ClassReader reader = new ClassReader(is);
-
-		var classVisitor = new MixinTargetClassVisitor();
-		reader.accept(classVisitor, ClassReader.SKIP_CODE);
-
-		if (classVisitor.mixinTarget != null && classVisitor.targets == 1) {
-			return new Mixin(classVisitor.className, classVisitor.mixinTarget, classVisitor.accessor);
-		}
-
-		return null;
 	}
 
 	private static class MixinTargetClassVisitor extends ClassVisitor {

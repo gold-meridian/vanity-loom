@@ -24,22 +24,17 @@
 
 package net.fabricmc.loom.util.fmj;
 
-import static net.fabricmc.loom.util.fmj.FabricModJsonUtils.readString;
-
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-
-import net.fabricmc.loom.api.metadata.ModJson;
-
-import net.fabricmc.loom.util.Constants;
-
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.VisibleForTesting;
+
+import net.fabricmc.loom.api.metadata.ModJson;
+import net.fabricmc.loom.util.Constants;
 
 public abstract sealed class FabricModJson implements ModJson permits FabricModJsonV0, FabricModJsonV1, FabricModJsonV2, FabricModJson.Mockable {
 	protected final JsonObject jsonObject;
@@ -97,14 +92,6 @@ public abstract sealed class FabricModJson implements ModJson permits FabricModJ
 		return Objects.hash(getId(), getVersion());
 	}
 
-	@VisibleForTesting
-	public abstract non-sealed class Mockable extends FabricModJson {
-		private Mockable() {
-			super(null, null);
-			throw new AssertionError();
-		}
-	}
-
 	@Override
 	public JsonObject stripNestedJars(JsonObject json) {
 		json.remove("jars");
@@ -115,7 +102,7 @@ public abstract sealed class FabricModJson implements ModJson permits FabricModJ
 	public JsonObject addNestedJars(JsonObject json, List<String> files) {
 		JsonArray nestedJars = json.has("jars") ? json.getAsJsonArray("jars") : new JsonArray();
 
-		for (String nestedJarPath: files) {
+		for (String nestedJarPath : files) {
 			for (JsonElement nestedJar : nestedJars) {
 				JsonObject jarObject = nestedJar.getAsJsonObject();
 
@@ -132,5 +119,13 @@ public abstract sealed class FabricModJson implements ModJson permits FabricModJ
 		json.add("jars", nestedJars);
 
 		return json;
+	}
+
+	@VisibleForTesting
+	public abstract non-sealed class Mockable extends FabricModJson {
+		private Mockable() {
+			super(null, null);
+			throw new AssertionError();
+		}
 	}
 }

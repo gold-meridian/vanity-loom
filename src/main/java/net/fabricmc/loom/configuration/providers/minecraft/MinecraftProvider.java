@@ -32,9 +32,6 @@ import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.google.common.base.Preconditions;
-
-import net.fabricmc.loom.configuration.DependencyInfo;
-
 import org.gradle.api.JavaVersion;
 import org.gradle.api.Project;
 import org.jetbrains.annotations.Nullable;
@@ -59,7 +56,7 @@ public abstract class MinecraftProvider {
 	private static boolean globalSkipVerification = false;
 
 	private final MinecraftMetadataProvider metadataProvider;
-
+	private final ConfigContext configContext;
 	private File minecraftClientJar;
 	// Note this will be the boostrap jar starting with 21w39a
 	private File minecraftServerJar;
@@ -68,11 +65,20 @@ public abstract class MinecraftProvider {
 	@Nullable
 	private BundleMetadata serverBundleMetadata;
 
-	private final ConfigContext configContext;
-
 	public MinecraftProvider(MinecraftMetadataProvider metadataProvider, ConfigContext configContext) {
 		this.metadataProvider = metadataProvider;
 		this.configContext = configContext;
+	}
+
+	public static File minecraftWorkingDirectory(Project project, String version) {
+		LoomGradleExtension extension = LoomGradleExtension.get(project);
+		File workingDir = new File(extension.getFiles().getUserCache(), version);
+		workingDir.mkdirs();
+		return workingDir;
+	}
+
+	public static void skipVerification() {
+		globalSkipVerification = true;
 	}
 
 	public void init() {
@@ -174,7 +180,7 @@ public abstract class MinecraftProvider {
 		AtomicBoolean didDownload = new AtomicBoolean(false);
 
 		try (ProgressGroup progressGroup = new ProgressGroup(getProject(), "Download Minecraft jars");
-				DownloadExecutor executor = new DownloadExecutor(2)) {
+			 DownloadExecutor executor = new DownloadExecutor(2)) {
 			if (provideClient()) {
 				final MinecraftVersionMeta.Download client = getVersionInfo().download("client");
 				getExtension().download(client.url())
@@ -294,16 +300,5 @@ public abstract class MinecraftProvider {
 
 	public boolean refreshDeps() {
 		return getExtension().refreshDeps();
-	}
-
-	public static File minecraftWorkingDirectory(Project project, String version) {
-		LoomGradleExtension extension = LoomGradleExtension.get(project);
-		File workingDir = new File(extension.getFiles().getUserCache(), version);
-		workingDir.mkdirs();
-		return workingDir;
-	}
-
-	public static void skipVerification() {
-		globalSkipVerification = true;
 	}
 }

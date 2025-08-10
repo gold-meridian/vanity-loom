@@ -36,8 +36,8 @@ class ServerRunner {
 	static final String LOADER_VERSION = LoomTestVersions.FABRIC_LOADER.version()
 	static final String INSTALLER_VERSION = LoomVersions.FABRIC_INSTALLER.version()
 	static final Map<String, String> FABRIC_API_URLS = [
-		"1.16.5": "https://github.com/FabricMC/fabric/releases/download/0.37.1%2B1.16/fabric-api-0.37.1+1.16.jar",
-		"1.17.1": "https://github.com/FabricMC/fabric/releases/download/0.37.1%2B1.17/fabric-api-0.37.1+1.17.jar"
+			"1.16.5": "https://github.com/FabricMC/fabric/releases/download/0.37.1%2B1.16/fabric-api-0.37.1+1.16.jar",
+			"1.17.1": "https://github.com/FabricMC/fabric/releases/download/0.37.1%2B1.17/fabric-api-0.37.1+1.17.jar"
 	]
 	static final String FABRIC_LANG_KOTLIN = "https://maven.fabricmc.net/net/fabricmc/fabric-language-kotlin/1.8.5%2Bkotlin.1.7.20/fabric-language-kotlin-1.8.5%2Bkotlin.1.7.20.jar"
 
@@ -136,7 +136,7 @@ class ServerRunner {
 					}
 				}),
 				new ForwardingAppendable([System.err, out])
-				)
+		)
 
 		addShutdownHook {
 			if (process.alive) {

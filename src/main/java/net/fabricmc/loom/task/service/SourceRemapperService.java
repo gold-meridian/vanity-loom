@@ -55,15 +55,11 @@ import net.fabricmc.loom.util.service.ServiceType;
 import net.fabricmc.lorenztiny.TinyMappingsReader;
 
 public final class SourceRemapperService extends Service<SourceRemapperService.Options> {
+	private static final Logger LOGGER = LoggerFactory.getLogger(SourceRemapperService.class);
 	public static ServiceType<Options, SourceRemapperService> TYPE = new ServiceType<>(Options.class, SourceRemapperService.class);
 
-	public interface Options extends Service.Options {
-		@Nested
-		Property<MappingsService.Options> getMappings();
-		@Input
-		Property<Integer> getJavaCompileRelease();
-		@InputFiles
-		ConfigurableFileCollection getClasspath();
+	public SourceRemapperService(Options options, ServiceFactory serviceFactory) {
+		super(options, serviceFactory);
 	}
 
 	public static Provider<Options> createOptions(RemapSourcesJarTask task) {
@@ -74,10 +70,28 @@ public final class SourceRemapperService extends Service<SourceRemapperService.O
 		});
 	}
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(SourceRemapperService.class);
+	public static int getJavaCompileRelease(Project project) {
+		AtomicInteger release = new AtomicInteger(-1);
 
-	public SourceRemapperService(Options options, ServiceFactory serviceFactory) {
-		super(options, serviceFactory);
+		project.getTasks().withType(JavaCompile.class, javaCompile -> {
+			Property<Integer> releaseProperty = javaCompile.getOptions().getRelease();
+
+			if (!releaseProperty.isPresent()) {
+				return;
+			}
+
+			int compileRelease = releaseProperty.get();
+			release.set(Math.max(release.get(), compileRelease));
+		});
+
+		final int i = release.get();
+
+		if (i < 0) {
+			// Unable to find the release used to compile with, default to the current version
+			return Integer.parseInt(JavaVersion.current().getMajorVersion());
+		}
+
+		return i;
 	}
 
 	public void remapSourcesJar(Path source, Path destination) throws IOException {
@@ -137,27 +151,14 @@ public final class SourceRemapperService extends Service<SourceRemapperService.O
 		return mercury;
 	}
 
-	public static int getJavaCompileRelease(Project project) {
-		AtomicInteger release = new AtomicInteger(-1);
+	public interface Options extends Service.Options {
+		@Nested
+		Property<MappingsService.Options> getMappings();
 
-		project.getTasks().withType(JavaCompile.class, javaCompile -> {
-			Property<Integer> releaseProperty = javaCompile.getOptions().getRelease();
+		@Input
+		Property<Integer> getJavaCompileRelease();
 
-			if (!releaseProperty.isPresent()) {
-				return;
-			}
-
-			int compileRelease = releaseProperty.get();
-			release.set(Math.max(release.get(), compileRelease));
-		});
-
-		final int i = release.get();
-
-		if (i < 0) {
-			// Unable to find the release used to compile with, default to the current version
-			return Integer.parseInt(JavaVersion.current().getMajorVersion());
-		}
-
-		return i;
+		@InputFiles
+		ConfigurableFileCollection getClasspath();
 	}
 }

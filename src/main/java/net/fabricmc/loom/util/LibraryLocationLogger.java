@@ -59,6 +59,9 @@ public final class LibraryLocationLogger {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(LibraryLocationLogger.class);
 
+	private LibraryLocationLogger() {
+	}
+
 	public static void logLibraryVersions() {
 		for (Class<?> clazz : libraryClasses) {
 			LOGGER.info("({}) with version ({}) was loaded from ({})",
@@ -67,8 +70,5 @@ public final class LibraryLocationLogger {
 					clazz.getProtectionDomain().getCodeSource().getLocation().getPath()
 			);
 		}
-	}
-
-	private LibraryLocationLogger() {
 	}
 }

@@ -94,7 +94,7 @@ public final class UnobfuscatedMappingNsCompleter extends ForwardingMappingVisit
 				srcIdx = -1;
 			} else {
 				srcIdx = dstNamespaces.indexOf(src);
-				if (srcIdx < 0) throw new RuntimeException("invalid alternative mapping ns "+src+": not in "+dstNamespaces+" or "+srcNamespace);
+				if (srcIdx < 0) throw new RuntimeException("invalid alternative mapping ns " + src + ": not in " + dstNamespaces + " or " + srcNamespace);
 			}
 
 			alternativesMapping[i] = srcIdx;
@@ -184,7 +184,8 @@ public final class UnobfuscatedMappingNsCompleter extends ForwardingMappingVisit
 			}
 		}
 
-		nsLoop: for (int i = 0; i < dstNames.length; i++) {
+		nsLoop:
+		for (int i = 0; i < dstNames.length; i++) {
 			String name = dstNames[i];
 
 			if (name == null) {

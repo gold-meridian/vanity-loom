@@ -59,6 +59,20 @@ public abstract class MavenPublication implements Runnable {
 	);
 	private static final Set<Publication> EXCLUDED_PUBLICATIONS = Collections.newSetFromMap(new WeakHashMap<>());
 
+	private static boolean hasSoftwareComponent(Publication publication) {
+		try {
+			Method getComponent = publication.getClass().getMethod("getComponent");
+			return getComponent.invoke(publication) != null;
+		} catch (ReflectiveOperationException e) {
+			// our hacks have broken!
+			return false;
+		}
+	}
+
+	public static void excludePublication(Publication publication) {
+		EXCLUDED_PUBLICATIONS.add(publication);
+	}
+
 	@Inject
 	protected abstract Project getProject();
 
@@ -78,16 +92,6 @@ public abstract class MavenPublication implements Runnable {
 				}
 			});
 		});
-	}
-
-	private static boolean hasSoftwareComponent(Publication publication) {
-		try {
-			Method getComponent = publication.getClass().getMethod("getComponent");
-			return getComponent.invoke(publication) != null;
-		} catch (ReflectiveOperationException e) {
-			// our hacks have broken!
-			return false;
-		}
 	}
 
 	private void processEntry(String scope, Configuration config, PublishingExtension mavenPublish, AtomicBoolean reportedDeprecation) {
@@ -150,9 +154,5 @@ public abstract class MavenPublication implements Runnable {
 				}));
 			}
 		});
-	}
-
-	public static void excludePublication(Publication publication) {
-		EXCLUDED_PUBLICATIONS.add(publication);
 	}
 }

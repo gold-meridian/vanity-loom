@@ -79,7 +79,7 @@ public class ZipUtils {
 
 	public static void unpackAll(Path zip, Path output) throws IOException {
 		try (FileSystemUtil.Delegate fs = FileSystemUtil.getJarFileSystem(zip, false);
-				Stream<Path> walk = Files.walk(fs.getRoot())) {
+			 Stream<Path> walk = Files.walk(fs.getRoot())) {
 			Iterator<Path> iterator = walk.iterator();
 
 			while (iterator.hasNext()) {
@@ -134,7 +134,7 @@ public class ZipUtils {
 		int count = 0;
 
 		try (FileSystemUtil.Delegate fs = FileSystemUtil.getJarFileSystem(zip, true);
-				Stream<Path> walk = Files.walk(from)) {
+			 Stream<Path> walk = Files.walk(from)) {
 			Iterator<Path> iterator = walk.iterator();
 
 			while (iterator.hasNext()) {
@@ -256,6 +256,18 @@ public class ZipUtils {
 		return replacedCount;
 	}
 
+	private static <T> Map<String, UnsafeUnaryOperator<T>> collectTransformersStream(Stream<Pair<String, UnsafeUnaryOperator<T>>> transforms) {
+		Map<String, UnsafeUnaryOperator<T>> map = new HashMap<>();
+		Iterator<Pair<String, UnsafeUnaryOperator<T>>> iterator = transforms.iterator();
+
+		while (iterator.hasNext()) {
+			Pair<String, UnsafeUnaryOperator<T>> next = iterator.next();
+			map.put(next.left(), next.right());
+		}
+
+		return map;
+	}
+
 	@FunctionalInterface
 	public interface UnsafeUnaryOperator<T> {
 		T apply(T arg) throws IOException;
@@ -273,17 +285,5 @@ public class ZipUtils {
 
 			return writer.toByteArray();
 		}
-	}
-
-	private static <T> Map<String, UnsafeUnaryOperator<T>> collectTransformersStream(Stream<Pair<String, UnsafeUnaryOperator<T>>> transforms) {
-		Map<String, UnsafeUnaryOperator<T>> map = new HashMap<>();
-		Iterator<Pair<String, UnsafeUnaryOperator<T>>> iterator = transforms.iterator();
-
-		while (iterator.hasNext()) {
-			Pair<String, UnsafeUnaryOperator<T>> next = iterator.next();
-			map.put(next.left(), next.right());
-		}
-
-		return map;
 	}
 }

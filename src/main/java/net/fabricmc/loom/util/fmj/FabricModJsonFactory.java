@@ -70,9 +70,9 @@ public final class FabricModJsonFactory {
 		}
 
 		return switch (schemaVersion) {
-		case 0 -> new FabricModJsonV0(jsonObject, source);
-		case 1 -> new FabricModJsonV1(jsonObject, source);
-		case 2 -> new FabricModJsonV2(jsonObject, source);
+			case 0 -> new FabricModJsonV0(jsonObject, source);
+			case 1 -> new FabricModJsonV1(jsonObject, source);
+			case 2 -> new FabricModJsonV2(jsonObject, source);
 			default -> throw new UnsupportedOperationException(String.format("This version of vanity-loom doesn't support the newer fabric.mod.json schema version of (%s) Please update vanity-loom to be able to read this.", schemaVersion));
 		};
 	}

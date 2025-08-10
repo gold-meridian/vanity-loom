@@ -30,7 +30,7 @@ import net.fabricmc.loom.configuration.providers.mappings.mojmap.MojangMappingsS
 import net.fabricmc.loom.configuration.providers.mappings.parchment.ParchmentMappingsSpec
 
 class ParchmentMappingLayerTest extends LayeredMappingsSpecification {
-	def "Read parchment mappings" () {
+	def "Read parchment mappings"() {
 		setup:
 		intermediaryUrl = INTERMEDIARY_1_16_5_URL
 		mockMinecraftProvider.getVersionInfo() >> VERSION_META_1_16_5
@@ -41,7 +41,7 @@ class ParchmentMappingLayerTest extends LayeredMappingsSpecification {
 				new IntermediaryMappingsSpec(),
 				new MojangMappingsSpec(true),
 				new ParchmentMappingsSpec(FileSpec.create(PARCHMENT_NOTATION), false)
-				)
+		)
 		def tiny = getTiny(mappings)
 		def reorderedMappings = reorder(mappings)
 		then:
@@ -55,7 +55,7 @@ class ParchmentMappingLayerTest extends LayeredMappingsSpecification {
 		reorderedMappings.getClass("net/minecraft/class_2573").getMethod("<init>", "()V") != null
 	}
 
-	def "Read parchment mappings remove prefix" () {
+	def "Read parchment mappings remove prefix"() {
 		setup:
 		intermediaryUrl = INTERMEDIARY_1_16_5_URL
 		mockMinecraftProvider.getVersionInfo() >> VERSION_META_1_16_5
@@ -66,7 +66,7 @@ class ParchmentMappingLayerTest extends LayeredMappingsSpecification {
 				new IntermediaryMappingsSpec(),
 				new MojangMappingsSpec(true),
 				new ParchmentMappingsSpec(FileSpec.create(PARCHMENT_NOTATION), true)
-				)
+		)
 		def tiny = getTiny(mappings)
 		def reorderedMappings = reorder(mappings)
 		then:

@@ -56,9 +56,8 @@ import net.fabricmc.tinyremapper.api.TrField;
 public class UnpickRemapperService extends Service<UnpickRemapperService.Options> {
 	public static final ServiceType<Options, UnpickRemapperService> TYPE = new ServiceType<>(Options.class, UnpickRemapperService.class);
 
-	public interface Options extends Service.Options {
-		@Nested
-		Property<TinyRemapperService.Options> getTinyRemapper();
+	public UnpickRemapperService(Options options, ServiceFactory serviceFactory) {
+		super(options, serviceFactory);
 	}
 
 	public static Provider<Options> createOptions(Project project, UnpickMetadata.V2 metadata) {
@@ -68,10 +67,6 @@ public class UnpickRemapperService extends Service<UnpickRemapperService.Options
 					project.provider(MappingsNamespace.NAMED::toString)
 			));
 		});
-	}
-
-	public UnpickRemapperService(Options options, ServiceFactory serviceFactory) {
-		super(options, serviceFactory);
 	}
 
 	/**
@@ -89,11 +84,16 @@ public class UnpickRemapperService extends Service<UnpickRemapperService.Options
 
 	private String doRemap(File input, TinyRemapper remapper, JarPackageIndex packageIndex) throws IOException {
 		try (Reader fileReader = new BufferedReader(new FileReader(input));
-				var reader = new UnpickV3Reader(fileReader)) {
+			 var reader = new UnpickV3Reader(fileReader)) {
 			var writer = new UnpickV3Writer();
 			reader.accept(new UnpickRemapper(writer, remapper, packageIndex));
 			return writer.getOutput().replace(System.lineSeparator(), "\n");
 		}
+	}
+
+	public interface Options extends Service.Options {
+		@Nested
+		Property<TinyRemapperService.Options> getTinyRemapper();
 	}
 
 	private static final class UnpickRemapper extends UnpickV3Remapper {

@@ -44,27 +44,21 @@ import net.fabricmc.lorenztiny.TinyMappingsReader;
 
 public final class LorenzMappingService extends Service<LorenzMappingService.Options> {
 	public static final ServiceType<Options, LorenzMappingService> TYPE = new ServiceType<>(Options.class, LorenzMappingService.class);
-
-	public interface Options extends Service.Options {
-		@Nested
-		Property<MappingsService.Options> getMappings();
-	}
-
-	public static Provider<Options> createOptions(Project project, MappingConfiguration mappingConfiguration, MappingsNamespace from, MappingsNamespace to) {
-		return TYPE.create(project, options -> options.getMappings().set(
-			MappingsService.createOptions(
-				project,
-				mappingConfiguration.tinyMappings,
-				from.toString(),
-				to.toString(),
-				false)
-		));
-	}
-
 	private final Supplier<MappingSet> mappings = Suppliers.memoize(this::readMappings);
 
 	public LorenzMappingService(Options options, ServiceFactory serviceFactory) {
 		super(options, serviceFactory);
+	}
+
+	public static Provider<Options> createOptions(Project project, MappingConfiguration mappingConfiguration, MappingsNamespace from, MappingsNamespace to) {
+		return TYPE.create(project, options -> options.getMappings().set(
+				MappingsService.createOptions(
+						project,
+						mappingConfiguration.tinyMappings,
+						from.toString(),
+						to.toString(),
+						false)
+		));
 	}
 
 	private MappingSet readMappings() {
@@ -81,5 +75,10 @@ public final class LorenzMappingService extends Service<LorenzMappingService.Opt
 
 	public MappingSet getMappings() {
 		return mappings.get();
+	}
+
+	public interface Options extends Service.Options {
+		@Nested
+		Property<MappingsService.Options> getMappings();
 	}
 }

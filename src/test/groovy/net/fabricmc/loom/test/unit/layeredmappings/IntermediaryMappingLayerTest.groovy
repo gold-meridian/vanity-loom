@@ -27,7 +27,7 @@ package net.fabricmc.loom.test.unit.layeredmappings
 import net.fabricmc.loom.configuration.providers.mappings.intermediary.IntermediaryMappingsSpec
 
 class IntermediaryMappingLayerTest extends LayeredMappingsSpecification {
-	def "Read intermediary mappings" () {
+	def "Read intermediary mappings"() {
 		setup:
 		intermediaryUrl = INTERMEDIARY_1_17_URL
 		mockMinecraftProvider.getVersionInfo() >> VERSION_META_1_17

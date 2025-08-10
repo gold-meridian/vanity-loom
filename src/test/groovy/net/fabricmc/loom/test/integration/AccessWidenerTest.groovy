@@ -30,7 +30,8 @@ import spock.lang.Unroll
 import net.fabricmc.loom.test.util.GradleProjectTestTrait
 import net.fabricmc.loom.util.ZipUtils
 
-import static net.fabricmc.loom.test.LoomTestConstants.*
+import static net.fabricmc.loom.test.LoomTestConstants.DEFAULT_GRADLE
+import static net.fabricmc.loom.test.LoomTestConstants.STANDARD_TEST_VERSIONS
 import static org.gradle.testkit.runner.TaskOutcome.SUCCESS
 
 class AccessWidenerTest extends Specification implements GradleProjectTestTrait {
@@ -81,9 +82,9 @@ class AccessWidenerTest extends Specification implements GradleProjectTestTrait 
 		result.output.contains(errorPrefix + error)
 
 		where:
-		awLine 																					| error																									| version
-		'accessible\tclass\tnet/minecraft/DoesntExists'											| "Could not find class (net/minecraft/DoesntExists)"													| DEFAULT_GRADLE
-		'accessible\tfield\tnet/minecraft/screen/slot/Slot\tabc\tI'								| "Could not find field (abcI) in class (net/minecraft/screen/slot/Slot)"								| DEFAULT_GRADLE
-		'accessible\tmethod\tnet/minecraft/client/main/Main\tmain\t([Ljava/lang/NotAString;)V'	| "Could not find method (main([Ljava/lang/NotAString;)V) in class (net/minecraft/client/main/Main)"	| DEFAULT_GRADLE
+		awLine                                                                                 | error                                                                                              | version
+		'accessible\tclass\tnet/minecraft/DoesntExists'                                        | "Could not find class (net/minecraft/DoesntExists)"                                                | DEFAULT_GRADLE
+		'accessible\tfield\tnet/minecraft/screen/slot/Slot\tabc\tI'                            | "Could not find field (abcI) in class (net/minecraft/screen/slot/Slot)"                            | DEFAULT_GRADLE
+		'accessible\tmethod\tnet/minecraft/client/main/Main\tmain\t([Ljava/lang/NotAString;)V' | "Could not find method (main([Ljava/lang/NotAString;)V) in class (net/minecraft/client/main/Main)" | DEFAULT_GRADLE
 	}
 }

@@ -80,10 +80,10 @@ class SimpleProjectTest extends Specification implements GradleProjectTestTrait 
 		then:
 		result.task(":${ide}").outcome == SUCCESS
 		where:
-		ide 				| _
-		'ideaSyncTask' 		| _
-		'genEclipseRuns'	| _
-		'vscode'			| _
+		ide              | _
+		'ideaSyncTask'   | _
+		'genEclipseRuns' | _
+		'vscode'         | _
 	}
 
 	@Unroll
@@ -175,8 +175,8 @@ class SimpleProjectTest extends Specification implements GradleProjectTestTrait 
 
 		when:
 		def result = gradle.run(tasks: [
-			"remapMojmap",
-			"remapMojmapSources"
+				"remapMojmap",
+				"remapMojmapSources"
 		])
 		def sourcesJar = gradle.getOutputFile("fabric-example-mod-1.0.0-mojmap-sources.jar").toPath()
 		def classesJar = gradle.getOutputFile("fabric-example-mod-1.0.0-mojmap.jar").toPath()

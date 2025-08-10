@@ -65,11 +65,6 @@ public final class Download {
 			.proxy(ProxySelector.getDefault())
 			.connectTimeout(TIMEOUT)
 			.build();
-
-	public static DownloadBuilder create(String url) throws URISyntaxException {
-		return DownloadBuilder.create(url);
-	}
-
 	private final URI url;
 	private final String expectedHash;
 	private final boolean useEtag;
@@ -79,7 +74,6 @@ public final class Download {
 	private final DownloadProgressListener progressListener;
 	private final HttpClient.Version httpVersion;
 	private final int downloadAttempt;
-
 	Download(URI url, String expectedHash, boolean useEtag, boolean forceDownload, boolean offline, Duration maxAge, DownloadProgressListener progressListener, HttpClient.Version httpVersion, int downloadAttempt) {
 		this.url = url;
 		this.expectedHash = expectedHash;
@@ -90,6 +84,15 @@ public final class Download {
 		this.progressListener = progressListener;
 		this.httpVersion = httpVersion;
 		this.downloadAttempt = downloadAttempt;
+	}
+
+	public static DownloadBuilder create(String url) throws URISyntaxException {
+		return DownloadBuilder.create(url);
+	}
+
+	// A faster exists check
+	private static boolean exists(Path path) {
+		return path.getFileSystem() == FileSystems.getDefault() ? path.toFile().exists() : Files.exists(path);
 	}
 
 	private HttpRequest.Builder requestBuilder() {
@@ -301,9 +304,9 @@ public final class Download {
 		final String encoding = response.headers().firstValue("Content-Encoding").orElse("");
 
 		return switch (encoding) {
-		case "gzip" -> new GZIPInputStream(response.body());
-		case "" -> response.body();
-		default -> throw error("Unsupported encoding: %s", encoding);
+			case "gzip" -> new GZIPInputStream(response.body());
+			case "" -> response.body();
+			default -> throw error("Unsupported encoding: %s", encoding);
 		};
 	}
 
@@ -358,8 +361,8 @@ public final class Download {
 
 		try {
 			Checksum.Result computedHash = switch (algorithm) {
-			case "sha1" -> Checksum.of(path).sha1();
-			default -> throw error("Unsupported hash algorithm (%s)", algorithm);
+				case "sha1" -> Checksum.of(path).sha1();
+				default -> throw error("Unsupported hash algorithm (%s)", algorithm);
 			};
 
 			return computedHash.matchesStr(hash);
@@ -430,11 +433,6 @@ public final class Download {
 		}
 	}
 
-	// A faster exists check
-	private static boolean exists(Path path) {
-		return path.getFileSystem() == FileSystems.getDefault() ? path.toFile().exists() : Files.exists(path);
-	}
-
 	private Path getLockFile(Path output) {
 		return output.resolveSibling(output.getFileName() + ".lock");
 	}
@@ -484,5 +482,6 @@ public final class Download {
 		return new DownloadException(message.formatted(args), throwable);
 	}
 
-	private record DownloadResultImpl(boolean didDownload) implements DownloadResult { }
+	private record DownloadResultImpl(boolean didDownload) implements DownloadResult {
+	}
 }

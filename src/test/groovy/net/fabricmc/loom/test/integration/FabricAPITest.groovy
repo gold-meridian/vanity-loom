@@ -34,7 +34,7 @@ import net.fabricmc.loom.test.util.GradleProjectTestTrait
 import net.fabricmc.loom.test.util.ServerRunner
 import net.fabricmc.loom.util.ZipUtils
 
-import static net.fabricmc.loom.test.LoomTestConstants.*
+import static net.fabricmc.loom.test.LoomTestConstants.PRE_RELEASE_GRADLE
 import static org.gradle.testkit.runner.TaskOutcome.SUCCESS
 
 @Timeout(value = 30, unit = TimeUnit.MINUTES)
@@ -47,7 +47,7 @@ class FabricAPITest extends Specification implements GradleProjectTestTrait {
 				commit: "f84dc5662589fd56ac4b36a4b94920a15b1da29d",
 				version: version,
 				patch: "fabric_api"
-				)
+		)
 
 		// Disable the mixin ap if needed. Fabric API is a large enough test project to see if something breaks.
 		if (disableMixinAp) {
@@ -82,17 +82,17 @@ class FabricAPITest extends Specification implements GradleProjectTestTrait {
 		"""
 		when:
 		def result = gradle.run(tasks: [
-			"clean",
-			"build",
-			"publishToMavenLocal"
+				"clean",
+				"build",
+				"publishToMavenLocal"
 		], args: [
-			"--parallel",
-			"-x",
-			"check",
-			"-x",
-			"runDatagen",
-			"-x",
-			"runGametest"
+				"--parallel",
+				"-x",
+				"check",
+				"-x",
+				"runDatagen",
+				"-x",
+				"runGametest"
 		], configurationCache: false) // Note: checkstyle does not appear to like being ran in a test runner
 		gradle.printOutputFiles()
 
@@ -123,8 +123,8 @@ class FabricAPITest extends Specification implements GradleProjectTestTrait {
 
 		where:
 		[version, disableMixinAp] << [
-			[PRE_RELEASE_GRADLE],
-			[false, true].shuffled()
+				[PRE_RELEASE_GRADLE],
+				[false, true].shuffled()
 		].combinations()
 	}
 }

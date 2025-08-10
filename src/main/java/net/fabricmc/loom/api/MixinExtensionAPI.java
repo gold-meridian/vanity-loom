@@ -45,58 +45,66 @@ public interface MixinExtensionAPI {
 
 	/**
 	 * Apply Mixin AP to sourceSet.
-	 * @param sourceSet the sourceSet that applies Mixin AP.
+	 *
+	 * @param sourceSet  the sourceSet that applies Mixin AP.
 	 * @param refmapName the output ref-map name. By default this will be {@link #getDefaultRefmapName()}
-	 * @param action used for filter the mixin json files. By default this will be all files
-	 *                  with name {@code *.mixins.json} that is inside the {@code resources} folder
-	 *                  of {@code sourceSet}.
+	 * @param action     used for filter the mixin json files. By default this will be all files
+	 *                   with name {@code *.mixins.json} that is inside the {@code resources} folder
+	 *                   of {@code sourceSet}.
 	 */
 	void add(SourceSet sourceSet, String refmapName, Action<PatternSet> action);
 
 	/**
 	 * Apply Mixin AP to sourceSet. See {@link MixinExtensionAPI#add(SourceSet, String, Action)} for more detail.
-	 * @param sourceSet the sourceSet that applies Mixin AP.
+	 *
+	 * @param sourceSet  the sourceSet that applies Mixin AP.
 	 * @param refmapName the output ref-map name.
 	 */
 	void add(SourceSet sourceSet, String refmapName);
 
 	/**
 	 * Apply Mixin AP to sourceSet. See {@link MixinExtensionAPI#add(SourceSet, String, Action)} for more detail.
+	 *
 	 * @param sourceSet the sourceSet that applies Mixin AP.
-	 * @param action used for filter the mixin json files.
+	 * @param action    used for filter the mixin json files.
 	 */
 	void add(SourceSet sourceSet, Action<PatternSet> action);
 
 	/**
 	 * Apply Mixin AP to sourceSet. See {@link MixinExtensionAPI#add(SourceSet, String, Action)} for more detail.
+	 *
 	 * @param sourceSet the sourceSet that applies Mixin AP.
 	 */
 	void add(SourceSet sourceSet);
 
 	/**
 	 * Apply Mixin AP to sourceSet. See {@link MixinExtensionAPI#add(SourceSet, String, Action)} for more detail.
+	 *
 	 * @param sourceSetName the name of sourceSet that applies Mixin AP.
-	 * @param refmapName the output ref-map name.
-	 * @param action used for filter the mixin json files.
+	 * @param refmapName    the output ref-map name.
+	 * @param action        used for filter the mixin json files.
 	 */
 	void add(String sourceSetName, String refmapName, Action<PatternSet> action);
 
 	/**
 	 * Apply Mixin AP to sourceSet. See {@link MixinExtensionAPI#add(SourceSet, String, Action)} for more detail.
+	 *
 	 * @param sourceSetName the name of sourceSet that applies Mixin AP.
-	 * @param refmapName the output ref-map name.
+	 * @param refmapName    the output ref-map name.
 	 */
 	void add(String sourceSetName, String refmapName);
 
 	/**
 	 * Apply Mixin AP to sourceSet. See {@link MixinExtensionAPI#add(SourceSet, String, Action)} for more detail.
+	 *
 	 * @param sourceSetName the name of sourceSet that applies Mixin AP.
-	 * @param action used for filter the mixin json files.
+	 * @param action        used for filter the mixin json files.
 	 */
 	void add(String sourceSetName, Action<PatternSet> action);
 
 	/**
 	 * Apply Mixin AP to sourceSet. See {@link MixinExtensionAPI#add(SourceSet, String, Action)} for more detail.
+	 *
 	 * @param sourceSetName the name of sourceSet that applies Mixin AP.
 	 */
 	void add(String sourceSetName);

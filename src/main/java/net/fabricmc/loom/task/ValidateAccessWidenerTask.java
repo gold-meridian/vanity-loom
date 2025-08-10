@@ -51,13 +51,6 @@ import net.fabricmc.tinyremapper.TinyRemapper;
 import net.fabricmc.tinyremapper.api.TrEnvironment;
 
 public abstract class ValidateAccessWidenerTask extends DefaultTask {
-	@SkipWhenEmpty
-	@InputFile
-	public abstract RegularFileProperty getAccessWidener();
-
-	@InputFiles
-	public abstract ConfigurableFileCollection getTargetJars();
-
 	@Inject
 	public ValidateAccessWidenerTask() {
 		final LoomGradleExtension extension = LoomGradleExtension.get(getProject());
@@ -68,6 +61,13 @@ public abstract class ValidateAccessWidenerTask extends DefaultTask {
 		// Ignore outputs for up-to-date checks as there aren't any (so only inputs are checked)
 		getOutputs().upToDateWhen(task -> true);
 	}
+
+	@SkipWhenEmpty
+	@InputFile
+	public abstract RegularFileProperty getAccessWidener();
+
+	@InputFiles
+	public abstract ConfigurableFileCollection getTargetJars();
 
 	@TaskAction
 	public void run() {

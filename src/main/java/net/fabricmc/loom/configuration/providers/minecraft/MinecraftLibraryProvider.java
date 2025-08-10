@@ -129,8 +129,8 @@ public class MinecraftLibraryProvider {
 		final List<Library> libraries = MinecraftLibraryHelper.getAllLibraries(minecraftProvider.getVersionInfo());
 		Configuration detachedConfiguration = project.getConfigurations().detachedConfiguration(
 				libraries.stream()
-					.map(library -> project.getDependencies().create(library.mavenNotation()))
-					.toArray(Dependency[]::new)
+						.map(library -> project.getDependencies().create(library.mavenNotation()))
+						.toArray(Dependency[]::new)
 		);
 		detachedConfiguration.getFiles();
 	}
@@ -155,19 +155,19 @@ public class MinecraftLibraryProvider {
 
 	private void applyClientLibrary(Library library) {
 		switch (library.target()) {
-		case COMPILE -> addLibrary(Constants.Configurations.MINECRAFT_CLIENT_COMPILE_LIBRARIES, library);
-		case RUNTIME -> addLibrary(Constants.Configurations.MINECRAFT_CLIENT_RUNTIME_LIBRARIES, library);
-		case NATIVES -> addLibrary(Constants.Configurations.MINECRAFT_NATIVES, library);
-		case LOCAL_MOD -> applyLocalModLibrary(library);
+			case COMPILE -> addLibrary(Constants.Configurations.MINECRAFT_CLIENT_COMPILE_LIBRARIES, library);
+			case RUNTIME -> addLibrary(Constants.Configurations.MINECRAFT_CLIENT_RUNTIME_LIBRARIES, library);
+			case NATIVES -> addLibrary(Constants.Configurations.MINECRAFT_NATIVES, library);
+			case LOCAL_MOD -> applyLocalModLibrary(library);
 		}
 	}
 
 	private void applyServerLibrary(Library library) {
 		switch (library.target()) {
-		case COMPILE -> addLibrary(Constants.Configurations.MINECRAFT_SERVER_COMPILE_LIBRARIES, library);
-		case RUNTIME -> addLibrary(Constants.Configurations.MINECRAFT_SERVER_RUNTIME_LIBRARIES, library);
-		case LOCAL_MOD -> applyLocalModLibrary(library);
-		default -> throw new IllegalStateException("Target not supported for server library: %s".formatted(library));
+			case COMPILE -> addLibrary(Constants.Configurations.MINECRAFT_SERVER_COMPILE_LIBRARIES, library);
+			case RUNTIME -> addLibrary(Constants.Configurations.MINECRAFT_SERVER_RUNTIME_LIBRARIES, library);
+			case LOCAL_MOD -> applyLocalModLibrary(library);
+			default -> throw new IllegalStateException("Target not supported for server library: %s".formatted(library));
 		}
 	}
 

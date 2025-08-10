@@ -38,11 +38,11 @@ class StringsTest extends Specification {
 		result == expected
 
 		where:
-		input | expected
-		'' | ''
-		' \n ' | ' \n '
-		'world' | 'World'
-		'helloWorld' | 'HelloWorld'
+		input              | expected
+		''                 | ''
+		' \n '             | ' \n '
+		'world'            | 'World'
+		'helloWorld'       | 'HelloWorld'
 		'\u00E4mp\u00E4ri' | '\u00C4mp\u00E4ri'
 	}
 }

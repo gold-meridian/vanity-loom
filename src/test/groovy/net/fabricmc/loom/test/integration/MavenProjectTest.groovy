@@ -33,7 +33,8 @@ import net.fabricmc.loom.test.util.GradleProjectTestTrait
 import net.fabricmc.loom.test.util.MockMavenServerTrait
 
 import static java.lang.System.setProperty
-import static net.fabricmc.loom.test.LoomTestConstants.*
+import static net.fabricmc.loom.test.LoomTestConstants.DEFAULT_GRADLE
+import static net.fabricmc.loom.test.LoomTestConstants.PRE_RELEASE_GRADLE
 import static org.gradle.testkit.runner.TaskOutcome.SUCCESS
 
 /**
@@ -83,18 +84,18 @@ class MavenProjectTest extends Specification implements MockMavenServerTrait, Gr
 		gradle.hasOutputZipEntry("fabric-example-mod-1.0.0.jar", "net/fabricmc/examplemod/ExampleMod.class")
 
 		where:
-		version                      | gradleVersion
-		'1.0.0'                      | DEFAULT_GRADLE
-		'1.0.0'                      | PRE_RELEASE_GRADLE
-		'1.1.+'                      | DEFAULT_GRADLE
-		'1.2.0+meta'                 | DEFAULT_GRADLE
-		'2.0.0-SNAPSHOT'             | DEFAULT_GRADLE
-		'master-SNAPSHOT'            | DEFAULT_GRADLE
-		'1.0.0:classifier'           | DEFAULT_GRADLE
-		'1.1.+:classifier'           | DEFAULT_GRADLE
-		'1.2.0+meta:classifier'      | DEFAULT_GRADLE
-		'2.0.0-SNAPSHOT:classifier'  | DEFAULT_GRADLE
-		'master-SNAPSHOT:classifier' | DEFAULT_GRADLE
+		version                                                                         | gradleVersion
+		'1.0.0'                                                                         | DEFAULT_GRADLE
+		'1.0.0'                                                                         | PRE_RELEASE_GRADLE
+		'1.1.+'                                                                         | DEFAULT_GRADLE
+		'1.2.0+meta'                                                                    | DEFAULT_GRADLE
+		'2.0.0-SNAPSHOT'                                                                | DEFAULT_GRADLE
+		'master-SNAPSHOT'                                                               | DEFAULT_GRADLE
+		'1.0.0:classifier'                                                              | DEFAULT_GRADLE
+		'1.1.+:classifier'                                                              | DEFAULT_GRADLE
+		'1.2.0+meta:classifier'                                                         | DEFAULT_GRADLE
+		'2.0.0-SNAPSHOT:classifier'                                                     | DEFAULT_GRADLE
+		'master-SNAPSHOT:classifier'                                                    | DEFAULT_GRADLE
 		getLatestSnapshotVersion("com.example", "fabric-example-lib", "2.0.0-SNAPSHOT") | DEFAULT_GRADLE
 		getLatestSnapshotVersion("com.example", "fabric-example-lib", "2.0.0-SNAPSHOT") | PRE_RELEASE_GRADLE
 	}

@@ -61,13 +61,13 @@ public interface LoomGradleExtension extends LoomGradleExtensionAPI {
 
 	ConfigurableFileCollection getUnmappedModCollection();
 
-	void setInstallerData(InstallerData data);
-
 	InstallerData getInstallerData();
 
-	void setDependencyManager(LoomDependencyManager dependencyManager);
+	void setInstallerData(InstallerData data);
 
 	LoomDependencyManager getDependencyManager();
+
+	void setDependencyManager(LoomDependencyManager dependencyManager);
 
 	MinecraftMetadataProvider getMetadataProvider();
 
@@ -83,18 +83,18 @@ public interface LoomGradleExtension extends LoomGradleExtensionAPI {
 
 	NamedMinecraftProvider<?> getNamedMinecraftProvider();
 
-	IntermediaryMinecraftProvider<?> getIntermediaryMinecraftProvider();
-
 	void setNamedMinecraftProvider(NamedMinecraftProvider<?> namedMinecraftProvider);
+
+	IntermediaryMinecraftProvider<?> getIntermediaryMinecraftProvider();
 
 	void setIntermediaryMinecraftProvider(IntermediaryMinecraftProvider<?> intermediaryMinecraftProvider);
 
 	default List<Path> getMinecraftJars(MappingsNamespace mappingsNamespace) {
 		return switch (mappingsNamespace) {
-		case NAMED -> getNamedMinecraftProvider().getMinecraftJarPaths();
-		case INTERMEDIARY -> getIntermediaryMinecraftProvider().getMinecraftJarPaths();
-		case OFFICIAL, CLIENT_OFFICIAL, SERVER_OFFICIAL, GLUE -> getMinecraftProvider().getMinecraftJars();
-		case SERVER, CLIENT -> null;
+			case NAMED -> getNamedMinecraftProvider().getMinecraftJarPaths();
+			case INTERMEDIARY -> getIntermediaryMinecraftProvider().getMinecraftJarPaths();
+			case OFFICIAL, CLIENT_OFFICIAL, SERVER_OFFICIAL, GLUE -> getMinecraftProvider().getMinecraftJars();
+			case SERVER, CLIENT -> null;
 		};
 	}
 

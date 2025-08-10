@@ -51,20 +51,10 @@ import net.fabricmc.loom.configuration.ide.RunConfigSettings;
 import net.fabricmc.loom.util.Constants;
 
 public abstract class GenEclipseRunsTask extends AbstractLoomTask {
-	@Nested
-	protected abstract ListProperty<EclipseRunConfig> getEclipseRunConfigs();
-
 	@Inject
 	public GenEclipseRunsTask() {
 		setGroup(Constants.TaskGroup.IDE);
 		getEclipseRunConfigs().set(getProject().provider(() -> getRunConfigs(getProject())));
-	}
-
-	@TaskAction
-	public void genRuns() throws IOException {
-		for (EclipseRunConfig runConfig : getEclipseRunConfigs().get()) {
-			runConfig.writeLaunchFile();
-		}
 	}
 
 	private static List<EclipseRunConfig> getRunConfigs(Project project) {
@@ -98,6 +88,16 @@ public abstract class GenEclipseRunsTask extends AbstractLoomTask {
 		}
 
 		return runConfigs;
+	}
+
+	@Nested
+	protected abstract ListProperty<EclipseRunConfig> getEclipseRunConfigs();
+
+	@TaskAction
+	public void genRuns() throws IOException {
+		for (EclipseRunConfig runConfig : getEclipseRunConfigs().get()) {
+			runConfig.writeLaunchFile();
+		}
 	}
 
 	public interface EclipseRunConfig {

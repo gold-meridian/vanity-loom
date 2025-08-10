@@ -114,12 +114,6 @@ public record ClassLineNumbers(Map<String, ClassLineNumbers.Entry> lineMap) {
 		return new ClassLineNumbers(Collections.unmodifiableMap(lineMap));
 	}
 
-	public void write(Writer writer) throws IOException {
-		for (Map.Entry<String, ClassLineNumbers.Entry> entry : lineMap.entrySet()) {
-			entry.getValue().write(writer);
-		}
-	}
-
 	/**
 	 * Merge two ClassLineNumbers together, throwing an exception if there are any duplicate class line mappings.
 	 */
@@ -140,6 +134,12 @@ public record ClassLineNumbers(Map<String, ClassLineNumbers.Entry> lineMap) {
 		}
 
 		return new ClassLineNumbers(Collections.unmodifiableMap(lineMap));
+	}
+
+	public void write(Writer writer) throws IOException {
+		for (Map.Entry<String, ClassLineNumbers.Entry> entry : lineMap.entrySet()) {
+			entry.getValue().write(writer);
+		}
 	}
 
 	public record Entry(String className, int maxLine, int maxLineDest, Map<Integer, Integer> lineMap) {

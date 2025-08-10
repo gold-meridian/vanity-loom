@@ -42,20 +42,6 @@ import net.fabricmc.tinyremapper.TinyRemapper;
 import net.fabricmc.tinyremapper.api.TrClass;
 
 public record SignatureFixerApplyVisitor(Map<String, String> signatureFixes) implements TinyRemapper.ApplyVisitorProvider {
-	@Override
-	public ClassVisitor insertApplyVisitor(TrClass cls, ClassVisitor next) {
-		return new ClassVisitor(Constants.ASM_VERSION, next) {
-			@Override
-			public void visit(int version, int access, String name, String signature, String superName, String[] interfaces) {
-				if (signature == null) {
-					signature = signatureFixes.getOrDefault(name, null);
-				}
-
-				super.visit(version, access, name, signature, superName, interfaces);
-			}
-		};
-	}
-
 	public static Map<String, String> getRemappedSignatures(boolean toIntermediary, MappingConfiguration mappingConfiguration, Project project, ServiceFactory serviceFactory, String targetNamespace) throws IOException {
 		if (mappingConfiguration.getSignatureFixes() == null) {
 			// No fixes
@@ -82,5 +68,19 @@ public record SignatureFixerApplyVisitor(Map<String, String> signatureFixes) imp
 
 		sigTinyRemapper.finish();
 		return remapped;
+	}
+
+	@Override
+	public ClassVisitor insertApplyVisitor(TrClass cls, ClassVisitor next) {
+		return new ClassVisitor(Constants.ASM_VERSION, next) {
+			@Override
+			public void visit(int version, int access, String name, String signature, String superName, String[] interfaces) {
+				if (signature == null) {
+					signature = signatureFixes.getOrDefault(name, null);
+				}
+
+				super.visit(version, access, name, signature, superName, interfaces);
+			}
+		};
 	}
 }

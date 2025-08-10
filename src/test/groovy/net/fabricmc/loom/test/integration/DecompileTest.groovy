@@ -29,7 +29,8 @@ import spock.lang.Unroll
 
 import net.fabricmc.loom.test.util.GradleProjectTestTrait
 
-import static net.fabricmc.loom.test.LoomTestConstants.*
+import static net.fabricmc.loom.test.LoomTestConstants.PRE_RELEASE_GRADLE
+import static net.fabricmc.loom.test.LoomTestConstants.STANDARD_TEST_VERSIONS
 import static org.gradle.testkit.runner.TaskOutcome.SUCCESS
 
 class DecompileTest extends Specification implements GradleProjectTestTrait {
@@ -45,11 +46,11 @@ class DecompileTest extends Specification implements GradleProjectTestTrait {
 		result.task(":${task}").outcome == SUCCESS
 
 		where:
-		decompiler 		| task								| version
-		'vineflower'	| "genSourcesWithVineFlower"		| PRE_RELEASE_GRADLE
-		'fernflower'	| "genSourcesWithFernFlower"		| PRE_RELEASE_GRADLE
-		'cfr' 			| "genSourcesWithCfr"				| PRE_RELEASE_GRADLE
-		'vineflower' 	| "genSourcesWithVineflower"		| PRE_RELEASE_GRADLE
+		decompiler   | task                       | version
+		'vineflower' | "genSourcesWithVineFlower" | PRE_RELEASE_GRADLE
+		'fernflower' | "genSourcesWithFernFlower" | PRE_RELEASE_GRADLE
+		'cfr'        | "genSourcesWithCfr"        | PRE_RELEASE_GRADLE
+		'vineflower' | "genSourcesWithVineflower" | PRE_RELEASE_GRADLE
 	}
 
 	@Unroll

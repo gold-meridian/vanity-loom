@@ -74,7 +74,7 @@ class LoomNativeSupportLibraryProcessorTest extends LibraryProcessorTest {
 
 		where:
 		version                 || result
-		JavaVersion.VERSION_20 || LibraryProcessor.ApplicationResult.CAN_APPLY
+		JavaVersion.VERSION_20  || LibraryProcessor.ApplicationResult.CAN_APPLY
 		JavaVersion.VERSION_19  || LibraryProcessor.ApplicationResult.CAN_APPLY
 		JavaVersion.VERSION_17  || LibraryProcessor.ApplicationResult.CAN_APPLY
 		JavaVersion.VERSION_1_8 || LibraryProcessor.ApplicationResult.CAN_APPLY

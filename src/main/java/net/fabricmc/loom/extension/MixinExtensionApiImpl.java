@@ -88,7 +88,8 @@ public abstract class MixinExtensionApiImpl implements MixinExtensionAPI {
 
 	@Override
 	public void add(SourceSet sourceSet, String refmapName) {
-		add(sourceSet, refmapName, x -> { });
+		add(sourceSet, refmapName, x -> {
+		});
 	}
 
 	@Override
@@ -107,7 +108,8 @@ public abstract class MixinExtensionApiImpl implements MixinExtensionAPI {
 
 	@Override
 	public void add(String sourceSetName, String refmapName) {
-		add(sourceSetName, refmapName, x -> { });
+		add(sourceSetName, refmapName, x -> {
+		});
 	}
 
 	@Override
@@ -117,7 +119,8 @@ public abstract class MixinExtensionApiImpl implements MixinExtensionAPI {
 
 	@Override
 	public void add(SourceSet sourceSet) {
-		add(sourceSet, x -> { });
+		add(sourceSet, x -> {
+		});
 	}
 
 	@Override
@@ -127,7 +130,8 @@ public abstract class MixinExtensionApiImpl implements MixinExtensionAPI {
 
 	@Override
 	public void add(String sourceSetName) {
-		add(sourceSetName, x -> { });
+		add(sourceSetName, x -> {
+		});
 	}
 
 	@Override

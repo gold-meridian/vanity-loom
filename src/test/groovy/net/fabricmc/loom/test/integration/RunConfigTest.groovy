@@ -42,11 +42,11 @@ import static org.gradle.testkit.runner.TaskOutcome.SUCCESS
 // This test runs a mod that exits on mod init
 class RunConfigTest extends Specification implements GradleProjectTestTrait {
 	private static final List<String> tasks = [
-		"runClient",
-		"runServer",
-		"runTestmodClient",
-		"runTestmodServer",
-		"runAutoTestServer"
+			"runClient",
+			"runServer",
+			"runTestmodClient",
+			"runTestmodServer",
+			"runAutoTestServer"
 	]
 	private static final String TRACY_CAPTURE_LINUX = "https://github.com/modmuss50/tracy-utils/releases/download/0.0.2/linux-x86_64-tracy-capture"
 
@@ -166,7 +166,8 @@ class RunConfigTest extends Specification implements GradleProjectTestTrait {
 
 	@Timeout(value = 10, unit = TimeUnit.MINUTES)
 	@Unroll
-	@IgnoreIf({ !os.linux }) // XVFB is installed on the CI for this test
+	@IgnoreIf({ !os.linux })
+	// XVFB is installed on the CI for this test
 	def "prod client (gradle #version)"() {
 		setup:
 		def tracyCapture = new File(LoomTestConstants.TEST_DIR, "tracy-capture")

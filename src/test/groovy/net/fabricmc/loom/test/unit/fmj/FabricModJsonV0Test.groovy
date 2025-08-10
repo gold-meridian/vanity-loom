@@ -81,8 +81,8 @@ class FabricModJsonV0Test extends Specification {
 		def fmj = FabricModJsonFactory.create(JSON_OBJECT, mockSource)
 		then:
 		fmj.mixinConfigurations == [
-			"mixins.client.json",
-			"mixins.common.json"
+				"mixins.client.json",
+				"mixins.common.json"
 		]
 	}
 

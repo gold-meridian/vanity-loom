@@ -30,7 +30,7 @@ import spock.lang.Unroll
 import net.fabricmc.loom.test.util.GradleProjectTestTrait
 import net.fabricmc.loom.test.util.ServerRunner
 
-import static net.fabricmc.loom.test.LoomTestConstants.*
+import static net.fabricmc.loom.test.LoomTestConstants.STANDARD_TEST_VERSIONS
 import static org.gradle.testkit.runner.TaskOutcome.SUCCESS
 
 class KotlinTest extends Specification implements GradleProjectTestTrait {
@@ -44,8 +44,8 @@ class KotlinTest extends Specification implements GradleProjectTestTrait {
 
 		when:
 		def result = gradle.run(tasks: [
-			"build",
-			"publishToMavenLocal"
+				"build",
+				"publishToMavenLocal"
 		])
 		def serverResult = server.run()
 

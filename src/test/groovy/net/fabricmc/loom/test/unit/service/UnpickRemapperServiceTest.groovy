@@ -42,25 +42,25 @@ import static org.mockito.Mockito.when
 // Based on https://github.com/Earthcomputer/unpick-v3-parser/blob/68b11c50a7c97a75218f70f5ec1291a38b178ad7/src/test/java/net/earthcomputer/unpickv3parser/remapper/TestRemapper.java
 class UnpickRemapperServiceTest extends ServiceTestBase {
 	private static final Map<String, List<String>> PACKAGES = [
-		"unmapped.foo": [
-			"unmapped.foo.A",
-			"unmapped.foo.B"
-		],
-		"unmapped.bar": ["unmapped.bar.C"]
+			"unmapped.foo": [
+					"unmapped.foo.A",
+					"unmapped.foo.B"
+			],
+			"unmapped.bar": ["unmapped.bar.C"]
 	]
 
 	private static final Map<String, String> CLASSES = [
-		"unmapped.foo.A": "mapped.foo.X",
-		"unmapped.foo.B": "mapped.bar.Y",
-		"unmapped.bar.C": "mapped.bar.Z"
+			"unmapped.foo.A": "mapped.foo.X",
+			"unmapped.foo.B": "mapped.bar.Y",
+			"unmapped.bar.C": "mapped.bar.Z"
 	]
 
 	private static final Map<MemberKey, String> FIELDS = [
-		(new MemberKey("unmapped.foo.B", "baz", "I")): "quux"
+			(new MemberKey("unmapped.foo.B", "baz", "I")): "quux"
 	]
 
 	private static final Map<MemberKey, String> METHODS = [
-		(new MemberKey("unmapped.foo.B", "foo2", "(Lunmapped/foo/A;)V")): "bar2"
+			(new MemberKey("unmapped.foo.B", "foo2", "(Lunmapped/foo/A;)V")): "bar2"
 	]
 
 	@TempDir

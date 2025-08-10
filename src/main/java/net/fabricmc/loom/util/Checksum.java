@@ -42,6 +42,12 @@ import org.gradle.api.file.FileCollection;
 import org.jetbrains.annotations.NotNull;
 
 public final class Checksum {
+	private final DataConsumer consumer;
+
+	private Checksum(DataConsumer consumer) {
+		this.consumer = consumer;
+	}
+
 	public static Checksum of(byte[] data) {
 		return new Checksum(digest -> digest.write(data));
 	}
@@ -84,12 +90,6 @@ public final class Checksum {
 		});
 	}
 
-	private final DataConsumer consumer;
-
-	private Checksum(DataConsumer consumer) {
-		this.consumer = consumer;
-	}
-
 	public Result sha1() {
 		return computeResult("SHA-1");
 	}
@@ -120,6 +120,11 @@ public final class Checksum {
 		return new Result(digest.digest());
 	}
 
+	@FunctionalInterface
+	private interface DataConsumer {
+		void accept(MessageDigestOutputStream os) throws IOException;
+	}
+
 	public record Result(byte[] digest) {
 		public String hex() {
 			return HexFormat.of().formatHex(digest());
@@ -132,11 +137,6 @@ public final class Checksum {
 		public boolean matchesStr(String other) {
 			return hex().equalsIgnoreCase(other);
 		}
-	}
-
-	@FunctionalInterface
-	private interface DataConsumer {
-		void accept(MessageDigestOutputStream os) throws IOException;
 	}
 
 	private static class MessageDigestOutputStream extends OutputStream {
@@ -152,7 +152,7 @@ public final class Checksum {
 		}
 
 		@Override
-		public void write(byte @NotNull[] b, int off, int len) {
+		public void write(byte @NotNull [] b, int off, int len) {
 			digest.update(b, off, len);
 		}
 

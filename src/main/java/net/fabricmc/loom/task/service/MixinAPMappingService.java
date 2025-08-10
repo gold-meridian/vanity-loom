@@ -62,16 +62,11 @@ public class MixinAPMappingService extends Service<MixinAPMappingService.Options
 	// Again look into what the result of changing this would be.
 	private static final boolean USE_ALL_SOURCE_SETS = true;
 	private static final Logger LOGGER = LoggerFactory.getLogger(MixinAPMappingService.class);
+	private IMappingProvider mappingProvider = null;
+	private boolean exists = true;
 
-	public interface Options extends Service.Options {
-		@InputFiles // We need to depend on all the outputs, as we don't know if the mixin mapping will exist at the time of task creation
-		ConfigurableFileCollection getCompileOutputs();
-		@Input
-		Property<String> getMixinMappingFileName();
-		@Input
-		Property<String> getFrom();
-		@Input
-		Property<String> getTo();
+	public MixinAPMappingService(Options options, ServiceFactory serviceFactory) {
+		super(options, serviceFactory);
 	}
 
 	public static Provider<List<Options>> createOptions(Project thisProject, Provider<String> from, Provider<String> to) {
@@ -153,13 +148,6 @@ public class MixinAPMappingService extends Service<MixinAPMappingService.Options
 		});
 	}
 
-	private IMappingProvider mappingProvider = null;
-	private boolean exists = true;
-
-	public MixinAPMappingService(Options options, ServiceFactory serviceFactory) {
-		super(options, serviceFactory);
-	}
-
 	@Nullable
 	public IMappingProvider getMappingsProvider() {
 		if (!exists) {
@@ -198,5 +186,20 @@ public class MixinAPMappingService extends Service<MixinAPMappingService.Options
 		}
 
 		throw new RuntimeException("Failed to find mixin mappings file: " + getOptions().getMixinMappingFileName().get());
+	}
+
+	public interface Options extends Service.Options {
+		@InputFiles
+			// We need to depend on all the outputs, as we don't know if the mixin mapping will exist at the time of task creation
+		ConfigurableFileCollection getCompileOutputs();
+
+		@Input
+		Property<String> getMixinMappingFileName();
+
+		@Input
+		Property<String> getFrom();
+
+		@Input
+		Property<String> getTo();
 	}
 }

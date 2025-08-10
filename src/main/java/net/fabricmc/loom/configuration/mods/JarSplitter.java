@@ -56,6 +56,34 @@ public class JarSplitter {
 		this.inputJar = inputJar;
 	}
 
+	// Based off tiny-remapper's MetaInfFixer
+	private static void stripSignatureData(Manifest manifest) {
+		for (Iterator<Attributes> it = manifest.getEntries().values().iterator(); it.hasNext(); ) {
+			Attributes attrs = it.next();
+
+			for (Iterator<Object> it2 = attrs.keySet().iterator(); it2.hasNext(); ) {
+				Attributes.Name attrName = (Attributes.Name) it2.next();
+				String name = attrName.toString();
+
+				if (name.endsWith("-Digest") || name.contains("-Digest-") || name.equals("Magic")) {
+					it2.remove();
+				}
+			}
+
+			if (attrs.isEmpty()) it.remove();
+		}
+	}
+
+	private static void writeBytes(byte[] bytes, Path path) throws IOException {
+		final Path parent = path.getParent();
+
+		if (parent != null) {
+			Files.createDirectories(parent);
+		}
+
+		Files.write(path, bytes);
+	}
+
 	@Nullable
 	public Target analyseTarget() {
 		try (FileSystemUtil.Delegate input = FileSystemUtil.getJarFileSystem(inputJar)) {
@@ -136,8 +164,8 @@ public class JarSplitter {
 			}
 
 			try (FileSystemUtil.Delegate commonOutput = FileSystemUtil.getJarFileSystem(commonOutputJar, true);
-					FileSystemUtil.Delegate clientOutput = FileSystemUtil.getJarFileSystem(clientOutputJar, true);
-					Stream<Path> walk = Files.walk(input.get().getPath("/"))) {
+				 FileSystemUtil.Delegate clientOutput = FileSystemUtil.getJarFileSystem(clientOutputJar, true);
+				 Stream<Path> walk = Files.walk(input.get().getPath("/"))) {
 				final Iterator<Path> iterator = walk.iterator();
 
 				while (iterator.hasNext()) {
@@ -222,34 +250,6 @@ public class JarSplitter {
 				|| fileName.endsWith(".DSA")
 				|| fileName.endsWith(".RSA")
 				|| fileName.startsWith("SIG-");
-	}
-
-	// Based off tiny-remapper's MetaInfFixer
-	private static void stripSignatureData(Manifest manifest) {
-		for (Iterator<Attributes> it = manifest.getEntries().values().iterator(); it.hasNext(); ) {
-			Attributes attrs = it.next();
-
-			for (Iterator<Object> it2 = attrs.keySet().iterator(); it2.hasNext(); ) {
-				Attributes.Name attrName = (Attributes.Name) it2.next();
-				String name = attrName.toString();
-
-				if (name.endsWith("-Digest") || name.contains("-Digest-") || name.equals("Magic")) {
-					it2.remove();
-				}
-			}
-
-			if (attrs.isEmpty()) it.remove();
-		}
-	}
-
-	private static void writeBytes(byte[] bytes, Path path) throws IOException {
-		final Path parent = path.getParent();
-
-		if (parent != null) {
-			Files.createDirectories(parent);
-		}
-
-		Files.write(path, bytes);
 	}
 
 	public enum Target {

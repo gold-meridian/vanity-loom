@@ -54,20 +54,13 @@ import net.fabricmc.tinyremapper.IMappingProvider;
  * A service that provides mappings for remapping.
  */
 public final class MappingsService extends Service<MappingsService.Options> implements Closeable {
-	public static ServiceType<Options, MappingsService> TYPE = new ServiceType<>(Options.class, MappingsService.class);
-
 	private static final Logger LOGGER = LoggerFactory.getLogger(TinyRemapperService.class);
+	public static ServiceType<Options, MappingsService> TYPE = new ServiceType<>(Options.class, MappingsService.class);
+	private IMappingProvider mappingProvider = null;
+	private MemoryMappingTree memoryMappingTree = null;
 
-	// TODO use a nested TinyMappingsService instead of duplicating it
-	public interface Options extends Service.Options {
-		@InputFile
-		RegularFileProperty getMappingsFile();
-		@Input
-		Property<String> getFrom();
-		@Input
-		Property<String> getTo();
-		@Input
-		Property<Boolean> getRemapLocals();
+	public MappingsService(Options options, ServiceFactory serviceFactory) {
+		super(options, serviceFactory);
 	}
 
 	/**
@@ -127,13 +120,6 @@ public final class MappingsService extends Service<MappingsService.Options> impl
 		});
 	}
 
-	public MappingsService(Options options, ServiceFactory serviceFactory) {
-		super(options, serviceFactory);
-	}
-
-	private IMappingProvider mappingProvider = null;
-	private MemoryMappingTree memoryMappingTree = null;
-
 	public IMappingProvider getMappingsProvider() {
 		if (mappingProvider == null) {
 			try {
@@ -180,5 +166,20 @@ public final class MappingsService extends Service<MappingsService.Options> impl
 	@Override
 	public void close() {
 		mappingProvider = null;
+	}
+
+	// TODO use a nested TinyMappingsService instead of duplicating it
+	public interface Options extends Service.Options {
+		@InputFile
+		RegularFileProperty getMappingsFile();
+
+		@Input
+		Property<String> getFrom();
+
+		@Input
+		Property<String> getTo();
+
+		@Input
+		Property<Boolean> getRemapLocals();
 	}
 }

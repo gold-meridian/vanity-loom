@@ -115,7 +115,7 @@ class LibraryContextTest extends Specification {
 		context.isJava19OrLater() == isJava19OrLater
 
 		where:
-		javaVersion       	   || isJava19OrLater
+		javaVersion            || isJava19OrLater
 		JavaVersion.VERSION_17 || false
 		JavaVersion.VERSION_19 || true
 		JavaVersion.VERSION_20 || true

@@ -48,6 +48,25 @@ public abstract class RemapperExtensionHolder {
 		this.getRemapperParameters().set(remapperParameters);
 	}
 
+	private static Constructor<?> getInjectedConstructor(Class<?> clazz) {
+		Constructor<?>[] constructors = clazz.getConstructors();
+		Constructor<?> injectedConstructor = null;
+
+		for (Constructor<?> constructor : constructors) {
+			if (injectedConstructor != null) {
+				throw new RuntimeException("RemapperExtension class " + clazz.getName() + " has more than one constructor");
+			}
+
+			injectedConstructor = constructor;
+		}
+
+		if (injectedConstructor == null) {
+			throw new RuntimeException("RemapperExtension class " + clazz.getName() + " does not have a constructor");
+		}
+
+		return injectedConstructor;
+	}
+
 	@Input
 	public abstract Property<String> getRemapperExtensionClass();
 
@@ -94,25 +113,6 @@ public abstract class RemapperExtensionHolder {
 		} catch (Exception e) {
 			throw new RuntimeException("Failed to create remapper extension for class: " + getRemapperExtensionClass().get(), e);
 		}
-	}
-
-	private static Constructor<?> getInjectedConstructor(Class<?> clazz) {
-		Constructor<?>[] constructors = clazz.getConstructors();
-		Constructor<?> injectedConstructor = null;
-
-		for (Constructor<?> constructor : constructors) {
-			if (injectedConstructor != null) {
-				throw new RuntimeException("RemapperExtension class " + clazz.getName() + " has more than one constructor");
-			}
-
-			injectedConstructor = constructor;
-		}
-
-		if (injectedConstructor == null) {
-			throw new RuntimeException("RemapperExtension class " + clazz.getName() + " does not have a constructor");
-		}
-
-		return injectedConstructor;
 	}
 
 	private static final class RemapperExtensionImpl implements TinyRemapper.ApplyVisitorProvider {

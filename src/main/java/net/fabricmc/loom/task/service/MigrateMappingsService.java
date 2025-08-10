@@ -71,21 +71,6 @@ public class MigrateMappingsService extends Service<MigrateMappingsService.Optio
 		super(options, serviceFactory);
 	}
 
-	public interface Options extends Service.Options {
-		@Nested
-		Property<MappingsService.Options> getSourceMappings();
-		@Nested
-		Property<TinyMappingsService.Options> getTargetMappings();
-		@InputDirectory
-		DirectoryProperty getInputDir();
-		@Input
-		Property<String> getSourceCompatibility();
-		@InputFiles
-		ConfigurableFileCollection getClasspath();
-		@OutputDirectory
-		DirectoryProperty getOutputDir();
-	}
-
 	public static Provider<Options> createOptions(Project project, Provider<String> targetMappings, DirectoryProperty inputDir, DirectoryProperty outputDir) {
 		LoomGradleExtension extension = LoomGradleExtension.get(project);
 		final Provider<String> from = project.provider(() -> "intermediary");
@@ -107,6 +92,34 @@ public class MigrateMappingsService extends Service<MigrateMappingsService.Optio
 			o.getClasspath().from(classpath);
 			o.getOutputDir().set(outputDir);
 		});
+	}
+
+	/**
+	 * Return a mappings file for the requested mappings.
+	 */
+	private static FileCollection getTargetMappingsFile(Project project, String mappings) {
+		if (mappings == null || mappings.isEmpty()) {
+			throw new IllegalArgumentException("No mappings were specified. Use --mappings=\"\" to specify target mappings");
+		}
+
+		try {
+			if (mappings.startsWith("net.minecraft:mappings:")) {
+				if (!mappings.endsWith(":" + LoomGradleExtension.get(project).getMinecraftProvider().minecraftVersion())) {
+					throw new UnsupportedOperationException("Migrating Mojang mappings is currently only supported for the specified minecraft version");
+				}
+
+				LayeredMappingsFactory dep = new LayeredMappingsFactory(LayeredMappingSpecBuilderImpl.buildOfficialMojangMappings());
+				return project.files(dep.resolve(project).toFile());
+			} else {
+				Dependency dependency = project.getDependencies().create(mappings);
+				return project.getConfigurations().detachedConfiguration(dependency);
+			}
+		} catch (IllegalDependencyNotation ignored) {
+			LOGGER.info("Could not locate mappings, presuming V2 Yarn");
+			return project.getConfigurations().detachedConfiguration(project.getDependencies().create(Map.of("group", "net.fabricmc", "name", "yarn", "version", mappings, "classifier", "v2")));
+		} catch (IOException e) {
+			throw new UncheckedIOException("Failed to resolve mappings", e);
+		}
 	}
 
 	public void migrateMapppings() throws IOException {
@@ -152,31 +165,23 @@ public class MigrateMappingsService extends Service<MigrateMappingsService.Optio
 		System.gc();
 	}
 
-	/**
-	 * Return a mappings file for the requested mappings.
-	 */
-	private static FileCollection getTargetMappingsFile(Project project, String mappings) {
-		if (mappings == null || mappings.isEmpty()) {
-			throw new IllegalArgumentException("No mappings were specified. Use --mappings=\"\" to specify target mappings");
-		}
+	public interface Options extends Service.Options {
+		@Nested
+		Property<MappingsService.Options> getSourceMappings();
 
-		try {
-			if (mappings.startsWith("net.minecraft:mappings:")) {
-				if (!mappings.endsWith(":" + LoomGradleExtension.get(project).getMinecraftProvider().minecraftVersion())) {
-					throw new UnsupportedOperationException("Migrating Mojang mappings is currently only supported for the specified minecraft version");
-				}
+		@Nested
+		Property<TinyMappingsService.Options> getTargetMappings();
 
-				LayeredMappingsFactory dep = new LayeredMappingsFactory(LayeredMappingSpecBuilderImpl.buildOfficialMojangMappings());
-				return project.files(dep.resolve(project).toFile());
-			} else {
-				Dependency dependency = project.getDependencies().create(mappings);
-				return project.getConfigurations().detachedConfiguration(dependency);
-			}
-		} catch (IllegalDependencyNotation ignored) {
-			LOGGER.info("Could not locate mappings, presuming V2 Yarn");
-			return project.getConfigurations().detachedConfiguration(project.getDependencies().create(Map.of("group", "net.fabricmc", "name", "yarn", "version", mappings, "classifier", "v2")));
-		} catch (IOException e) {
-			throw new UncheckedIOException("Failed to resolve mappings", e);
-		}
+		@InputDirectory
+		DirectoryProperty getInputDir();
+
+		@Input
+		Property<String> getSourceCompatibility();
+
+		@InputFiles
+		ConfigurableFileCollection getClasspath();
+
+		@OutputDirectory
+		DirectoryProperty getOutputDir();
 	}
 }

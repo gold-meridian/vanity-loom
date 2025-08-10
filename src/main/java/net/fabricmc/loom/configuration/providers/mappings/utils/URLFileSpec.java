@@ -38,6 +38,7 @@ import net.fabricmc.loom.util.download.DownloadException;
 
 public record URLFileSpec(String url) implements FileSpec {
 	private static final Logger LOGGER = LoggerFactory.getLogger(URLFileSpec.class);
+
 	@Override
 	public Path get(MappingContext context) {
 		try {

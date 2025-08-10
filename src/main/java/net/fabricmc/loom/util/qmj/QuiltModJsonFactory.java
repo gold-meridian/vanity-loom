@@ -46,12 +46,13 @@ import org.slf4j.LoggerFactory;
 
 import net.fabricmc.loom.LoomGradlePlugin;
 import net.fabricmc.loom.util.ZipUtils;
-import net.fabricmc.loom.util.gradle.SourceSetHelper;
 import net.fabricmc.loom.util.fmj.FabricModJsonSource;
+import net.fabricmc.loom.util.gradle.SourceSetHelper;
 
 public final class QuiltModJsonFactory {
 	private static final String QUILT_MOD_JSON = "quilt.mod.json";
 	private static final Logger LOGGER = LoggerFactory.getLogger(QuiltModJsonFactory.class);
+
 	private QuiltModJsonFactory() {
 	}
 
@@ -65,8 +66,8 @@ public final class QuiltModJsonFactory {
 		}
 
 		return switch (schemaVersion) {
-		case 1 -> new QuiltModJsonV1(jsonObject, source);
-		default -> throw new UnsupportedOperationException(String.format("This version of quilt-loom doesn't support the newer quilt.mod.json schema version of (%s) Please update quilt-loom to be able to read this.", schemaVersion));
+			case 1 -> new QuiltModJsonV1(jsonObject, source);
+			default -> throw new UnsupportedOperationException(String.format("This version of quilt-loom doesn't support the newer quilt.mod.json schema version of (%s) Please update quilt-loom to be able to read this.", schemaVersion));
 		};
 	}
 

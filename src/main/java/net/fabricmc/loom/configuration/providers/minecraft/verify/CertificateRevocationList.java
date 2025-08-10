@@ -106,6 +106,7 @@ public record CertificateRevocationList(Collection<X509CRL> crls, boolean downlo
 
 	/**
 	 * Verify that none of the certs in the chain are revoked.
+	 *
 	 * @throws SignatureVerificationFailure if the certificate is revoked
 	 */
 	public void verify(CertificateChain certificateChain) throws SignatureVerificationFailure {

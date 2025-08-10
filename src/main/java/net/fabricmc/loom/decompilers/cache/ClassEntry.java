@@ -38,7 +38,7 @@ import org.slf4j.LoggerFactory;
 import net.fabricmc.loom.util.Checksum;
 
 /**
- * @param name The class name
+ * @param name         The class name
  * @param innerClasses A list of inner class names
  * @param superClasses A list of parent classes (super and interface) from the class and all inner classes
  */
@@ -79,9 +79,9 @@ public record ClassEntry(String name, List<String> innerClasses, List<String> su
 
 	/**
 	 * Copy the class and its inner classes to the target root.
+	 *
 	 * @param sourceRoot The root of the source jar
 	 * @param targetRoot The root of the target jar
-	 *
 	 * @throws IOException If an error occurs while copying the files
 	 */
 	public void copyTo(Path sourceRoot, Path targetRoot) throws IOException {
@@ -103,9 +103,9 @@ public record ClassEntry(String name, List<String> innerClasses, List<String> su
 
 	/**
 	 * Hash the class and its inner classes using sha256.
+	 *
 	 * @param root The root of the jar
 	 * @return The hash of the class and its inner classes
-	 *
 	 * @throws IOException If an error occurs while hashing the files
 	 */
 	public String hash(Path root) throws IOException {

@@ -69,6 +69,57 @@ public abstract class NestableJarGenerationTask extends AbstractLoomTask {
 	private static final String SEMVER_REGEX = "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?$";
 	private static final Pattern SEMVER_PATTERN = Pattern.compile(SEMVER_REGEX);
 
+	// Generates a barebones mod for a dependency
+	private static String generateModForDependency(Metadata metadata) {
+		String modId = (metadata.group() + "_" + metadata.name() + metadata.classifier())
+				.replaceAll("\\.", "_")
+				.toLowerCase(Locale.ENGLISH);
+
+		// Fabric Loader can't handle modIds longer than 64 characters
+		if (modId.length() > 64) {
+			String hash = Checksum.of(modId).sha256().hex();
+			modId = modId.substring(0, 50) + hash.substring(0, 14);
+		}
+
+		final JsonObject jsonObject = new JsonObject();
+		jsonObject.addProperty("schemaVersion", 1);
+
+		jsonObject.addProperty("id", modId);
+		String version = getVersion(metadata);
+		jsonObject.addProperty("version", version);
+		jsonObject.addProperty("name", metadata.name());
+
+		JsonObject custom = new JsonObject();
+		custom.addProperty("fabric-loom:generated", true);
+		jsonObject.add("custom", custom);
+
+		return LoomGradlePlugin.GSON.toJson(jsonObject);
+	}
+
+	private static String getVersion(Metadata metadata) {
+		String version = metadata.version();
+
+		if (validSemVer(version)) {
+			return version;
+		}
+
+		if (version.endsWith(".Final") || version.endsWith(".final")) {
+			String trimmedVersion = version.substring(0, version.length() - 6);
+
+			if (validSemVer(trimmedVersion)) {
+				return trimmedVersion;
+			}
+		}
+
+		LOGGER.warn("({}) is not valid semver for dependency {}", version, metadata);
+		return version;
+	}
+
+	private static boolean validSemVer(String version) {
+		Matcher matcher = SEMVER_PATTERN.matcher(version);
+		return matcher.find();
+	}
+
 	@InputFiles
 	@PathSensitive(PathSensitivity.NAME_ONLY)
 	protected abstract ConfigurableFileCollection getJars();
@@ -97,7 +148,7 @@ public abstract class NestableJarGenerationTask extends AbstractLoomTask {
 		getJars().forEach(file -> {
 			File targetFile = getOutputDirectory().file(file.getName()).get().getAsFile();
 			targetFile.delete();
-			String fabricModJson = Objects.requireNonNull(fabricModJsons.get(file.getName()), "Could not generate fabric.mod.json for included dependency "+file.getName());
+			String fabricModJson = Objects.requireNonNull(fabricModJsons.get(file.getName()), "Could not generate fabric.mod.json for included dependency " + file.getName());
 			makeNestableJar(file, targetFile, fabricModJson);
 		});
 	}
@@ -160,57 +211,6 @@ public abstract class NestableJarGenerationTask extends AbstractLoomTask {
 			});
 			return map;
 		}));
-	}
-
-	// Generates a barebones mod for a dependency
-	private static String generateModForDependency(Metadata metadata) {
-		String modId = (metadata.group() + "_" + metadata.name() + metadata.classifier())
-				.replaceAll("\\.", "_")
-				.toLowerCase(Locale.ENGLISH);
-
-		// Fabric Loader can't handle modIds longer than 64 characters
-		if (modId.length() > 64) {
-			String hash = Checksum.of(modId).sha256().hex();
-			modId = modId.substring(0, 50) + hash.substring(0, 14);
-		}
-
-		final JsonObject jsonObject = new JsonObject();
-		jsonObject.addProperty("schemaVersion", 1);
-
-		jsonObject.addProperty("id", modId);
-		String version = getVersion(metadata);
-		jsonObject.addProperty("version", version);
-		jsonObject.addProperty("name", metadata.name());
-
-		JsonObject custom = new JsonObject();
-		custom.addProperty("fabric-loom:generated", true);
-		jsonObject.add("custom", custom);
-
-		return LoomGradlePlugin.GSON.toJson(jsonObject);
-	}
-
-	private static String getVersion(Metadata metadata) {
-		String version = metadata.version();
-
-		if (validSemVer(version)) {
-			return version;
-		}
-
-		if (version.endsWith(".Final") || version.endsWith(".final")) {
-			String trimmedVersion = version.substring(0, version.length() - 6);
-
-			if (validSemVer(trimmedVersion)) {
-				return trimmedVersion;
-			}
-		}
-
-		LOGGER.warn("({}) is not valid semver for dependency {}", version, metadata);
-		return version;
-	}
-
-	private static boolean validSemVer(String version) {
-		Matcher matcher = SEMVER_PATTERN.matcher(version);
-		return matcher.find();
 	}
 
 	private void makeNestableJar(final File input, final File output, final String modJsonFile) {

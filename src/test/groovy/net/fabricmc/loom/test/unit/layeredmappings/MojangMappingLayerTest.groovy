@@ -28,7 +28,7 @@ import net.fabricmc.loom.configuration.providers.mappings.intermediary.Intermedi
 import net.fabricmc.loom.configuration.providers.mappings.mojmap.MojangMappingsSpecBuilderImpl
 
 class MojangMappingLayerTest extends LayeredMappingsSpecification {
-	def "Read mojang mappings with synthetic field names" () {
+	def "Read mojang mappings with synthetic field names"() {
 		setup:
 		intermediaryUrl = INTERMEDIARY_1_17_URL
 		mockMinecraftProvider.getVersionInfo() >> VERSION_META_1_17
@@ -37,7 +37,7 @@ class MojangMappingLayerTest extends LayeredMappingsSpecification {
 		def mappings = getLayeredMappings(
 				new IntermediaryMappingsSpec(),
 				buildMojangMappingsSpec(true)
-				)
+		)
 		def tiny = getTiny(mappings)
 		then:
 		mappings.srcNamespace == "named"
@@ -49,7 +49,7 @@ class MojangMappingLayerTest extends LayeredMappingsSpecification {
 		tiny.contains('this$0')
 	}
 
-	def "Read mojang mappings without synthetic field names" () {
+	def "Read mojang mappings without synthetic field names"() {
 		setup:
 		intermediaryUrl = INTERMEDIARY_1_17_URL
 		mockMinecraftProvider.getVersionInfo() >> VERSION_META_1_17
@@ -58,7 +58,7 @@ class MojangMappingLayerTest extends LayeredMappingsSpecification {
 		def mappings = getLayeredMappings(
 				new IntermediaryMappingsSpec(),
 				buildMojangMappingsSpec(false)
-				)
+		)
 		def tiny = getTiny(mappings)
 		then:
 		mappings.srcNamespace == "named"
@@ -70,7 +70,7 @@ class MojangMappingLayerTest extends LayeredMappingsSpecification {
 		!tiny.contains('this$0')
 	}
 
-	def "Read mojang mappings with synthetic field names drop roots" () {
+	def "Read mojang mappings with synthetic field names drop roots"() {
 		setup:
 		intermediaryUrl = INTERMEDIARY_1_17_URL
 		mockMinecraftProvider.getVersionInfo() >> VERSION_META_1_17
@@ -79,7 +79,7 @@ class MojangMappingLayerTest extends LayeredMappingsSpecification {
 		def mappings = getLayeredMappingsDropNoneIntermediaryRoots(
 				new IntermediaryMappingsSpec(),
 				buildMojangMappingsSpec(true)
-				)
+		)
 		def tiny = getTiny(mappings)
 		then:
 		mappings.srcNamespace == "named"
@@ -91,7 +91,7 @@ class MojangMappingLayerTest extends LayeredMappingsSpecification {
 		tiny.contains('this$0')
 	}
 
-	def "Read mojang mappings without synthetic field names drop roots" () {
+	def "Read mojang mappings without synthetic field names drop roots"() {
 		setup:
 		intermediaryUrl = INTERMEDIARY_1_17_URL
 		mockMinecraftProvider.getVersionInfo() >> VERSION_META_1_17
@@ -100,7 +100,7 @@ class MojangMappingLayerTest extends LayeredMappingsSpecification {
 		def mappings = getLayeredMappingsDropNoneIntermediaryRoots(
 				new IntermediaryMappingsSpec(),
 				buildMojangMappingsSpec(false)
-				)
+		)
 		def tiny = getTiny(mappings)
 		then:
 		mappings.srcNamespace == "named"
@@ -112,7 +112,7 @@ class MojangMappingLayerTest extends LayeredMappingsSpecification {
 		!tiny.contains('this$0')
 	}
 
-	def "Read mojang mappings with no intermediary" () {
+	def "Read mojang mappings with no intermediary"() {
 		setup:
 		intermediaryUrl = INTERMEDIARY_1_17_URL
 		mockMinecraftProvider.getVersionInfo() >> VERSION_META_1_17
@@ -120,7 +120,7 @@ class MojangMappingLayerTest extends LayeredMappingsSpecification {
 		def mappings = getLayeredMappings(
 				new NoIntermediateMappingsSpec(),
 				buildMojangMappingsSpec(true)
-				)
+		)
 		def tiny = getTiny(mappings)
 		def intermediaryId = mappings.getNamespaceId("intermediary")
 		def officialId = mappings.getNamespaceId("official")

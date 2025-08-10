@@ -35,11 +35,6 @@ public final class ParchmentPrefixStripingMappingVisitor extends ForwardingMappi
 		super(next);
 	}
 
-	@Override
-	public boolean visitMethodArg(int argPosition, int lvIndex, String srcName) throws IOException {
-		return super.visitMethodArg(argPosition, lvIndex, stripMethodArg(srcName));
-	}
-
 	public static String stripMethodArg(String arg) {
 		if (arg.length() > 1 && arg.startsWith("p") && Character.isUpperCase(arg.charAt(1))) {
 			String a2 = arg.substring(1); // Remove p
@@ -47,5 +42,10 @@ public final class ParchmentPrefixStripingMappingVisitor extends ForwardingMappi
 		}
 
 		return arg;
+	}
+
+	@Override
+	public boolean visitMethodArg(int argPosition, int lvIndex, String srcName) throws IOException {
+		return super.visitMethodArg(argPosition, lvIndex, stripMethodArg(srcName));
 	}
 }

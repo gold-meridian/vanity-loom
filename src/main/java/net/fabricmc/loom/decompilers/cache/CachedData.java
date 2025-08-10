@@ -69,41 +69,6 @@ public record CachedData(String className, String sources, @Nullable ClassLineNu
 		}
 	}
 
-	public void write(FileChannel fileChannel) {
-		try (var c = new RiffChunk(HEADER_ID, fileChannel)) {
-			writeClassname(fileChannel);
-			writeSource(fileChannel);
-
-			if (lineNumbers != null) {
-				writeLineNumbers(fileChannel);
-			}
-		} catch (IOException e) {
-			throw new RuntimeException("Failed to write cached data", e);
-		}
-	}
-
-	private void writeClassname(FileChannel fileChannel) throws IOException {
-		try (var c = new RiffChunk(NAME_ID, fileChannel)) {
-			fileChannel.write(ByteBuffer.wrap(className.getBytes(StandardCharsets.UTF_8)));
-		}
-	}
-
-	private void writeSource(FileChannel fileChannel) throws IOException {
-		try (var c = new RiffChunk(SOURCES_ID, fileChannel)) {
-			fileChannel.write(ByteBuffer.wrap(sources.getBytes(StandardCharsets.UTF_8)));
-		}
-	}
-
-	private void writeLineNumbers(FileChannel fileChannel) throws IOException {
-		Objects.requireNonNull(lineNumbers);
-
-		try (var c = new RiffChunk(LINE_NUMBERS_ID, fileChannel);
-				StringWriter stringWriter = new StringWriter()) {
-			lineNumbers.write(stringWriter);
-			fileChannel.write(ByteBuffer.wrap(stringWriter.toString().getBytes(StandardCharsets.UTF_8)));
-		}
-	}
-
 	public static CachedData read(InputStream inputStream) throws IOException {
 		// Read and validate the RIFF header
 		final String header = readHeader(inputStream);
@@ -125,40 +90,40 @@ public record CachedData(String className, String sources, @Nullable ClassLineNu
 			byte[] chunkData = readBytes(inputStream, chunkLength);
 
 			switch (chunkHeader) {
-			case NAME_ID -> {
-				if (className != null) {
-					throw new IOException("Duplicate name chunk");
-				}
-
-				className = new String(chunkData, StandardCharsets.UTF_8);
-			}
-			case SOURCES_ID -> {
-				if (sources != null) {
-					throw new IOException("Duplicate sources chunk");
-				}
-
-				sources = new String(chunkData, StandardCharsets.UTF_8);
-			}
-			case LINE_NUMBERS_ID -> {
-				if (lineNumbers != null) {
-					throw new IOException("Duplicate line numbers chunk");
-				}
-
-				try (var br = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(chunkData), StandardCharsets.UTF_8))) {
-					ClassLineNumbers classLineNumbers = ClassLineNumbers.readMappings(br);
-
-					if (classLineNumbers.lineMap().size() != 1) {
-						throw new IOException("Expected exactly one class line numbers entry got " + classLineNumbers.lineMap().size() + " entries");
+				case NAME_ID -> {
+					if (className != null) {
+						throw new IOException("Duplicate name chunk");
 					}
 
-					lineNumbers = classLineNumbers.lineMap().values().iterator().next();
+					className = new String(chunkData, StandardCharsets.UTF_8);
 				}
-			}
-			default -> {
-				// Skip unknown chunk
-				LOGGER.warn("Skipping unknown chunk: {} of size {}", chunkHeader, chunkLength);
-				inputStream.skip(chunkLength);
-			}
+				case SOURCES_ID -> {
+					if (sources != null) {
+						throw new IOException("Duplicate sources chunk");
+					}
+
+					sources = new String(chunkData, StandardCharsets.UTF_8);
+				}
+				case LINE_NUMBERS_ID -> {
+					if (lineNumbers != null) {
+						throw new IOException("Duplicate line numbers chunk");
+					}
+
+					try (var br = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(chunkData), StandardCharsets.UTF_8))) {
+						ClassLineNumbers classLineNumbers = ClassLineNumbers.readMappings(br);
+
+						if (classLineNumbers.lineMap().size() != 1) {
+							throw new IOException("Expected exactly one class line numbers entry got " + classLineNumbers.lineMap().size() + " entries");
+						}
+
+						lineNumbers = classLineNumbers.lineMap().values().iterator().next();
+					}
+				}
+				default -> {
+					// Skip unknown chunk
+					LOGGER.warn("Skipping unknown chunk: {} of size {}", chunkHeader, chunkLength);
+					inputStream.skip(chunkLength);
+				}
 			}
 		}
 
@@ -189,6 +154,41 @@ public record CachedData(String className, String sources, @Nullable ClassLineNu
 		}
 
 		return bytes;
+	}
+
+	public void write(FileChannel fileChannel) {
+		try (var c = new RiffChunk(HEADER_ID, fileChannel)) {
+			writeClassname(fileChannel);
+			writeSource(fileChannel);
+
+			if (lineNumbers != null) {
+				writeLineNumbers(fileChannel);
+			}
+		} catch (IOException e) {
+			throw new RuntimeException("Failed to write cached data", e);
+		}
+	}
+
+	private void writeClassname(FileChannel fileChannel) throws IOException {
+		try (var c = new RiffChunk(NAME_ID, fileChannel)) {
+			fileChannel.write(ByteBuffer.wrap(className.getBytes(StandardCharsets.UTF_8)));
+		}
+	}
+
+	private void writeSource(FileChannel fileChannel) throws IOException {
+		try (var c = new RiffChunk(SOURCES_ID, fileChannel)) {
+			fileChannel.write(ByteBuffer.wrap(sources.getBytes(StandardCharsets.UTF_8)));
+		}
+	}
+
+	private void writeLineNumbers(FileChannel fileChannel) throws IOException {
+		Objects.requireNonNull(lineNumbers);
+
+		try (var c = new RiffChunk(LINE_NUMBERS_ID, fileChannel);
+			 StringWriter stringWriter = new StringWriter()) {
+			lineNumbers.write(stringWriter);
+			fileChannel.write(ByteBuffer.wrap(stringWriter.toString().getBytes(StandardCharsets.UTF_8)));
+		}
 	}
 
 	static class EntrySerializer implements CachedFileStore.EntrySerializer<CachedData> {

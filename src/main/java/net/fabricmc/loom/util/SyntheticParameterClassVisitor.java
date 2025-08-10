@@ -38,30 +38,10 @@ import org.objectweb.asm.Opcodes;
  * parameter annotations.
  */
 public class SyntheticParameterClassVisitor extends ClassVisitor {
-	private static class SyntheticMethodVisitor extends MethodVisitor {
-		private final int offset;
-
-		SyntheticMethodVisitor(int api, int offset, MethodVisitor methodVisitor) {
-			super(api, methodVisitor);
-			this.offset = offset;
-		}
-
-		@Override
-		public AnnotationVisitor visitParameterAnnotation(int parameter, String descriptor, boolean visible) {
-			return super.visitParameterAnnotation(parameter - offset, descriptor, visible);
-		}
-
-		@Override
-		public void visitAnnotableParameterCount(int parameterCount, boolean visible) {
-			super.visitAnnotableParameterCount(parameterCount - offset, visible);
-		}
-	}
-
 	private String className;
 	private int synthetic;
 	private String syntheticArgs;
 	private boolean backoff = false;
-
 	public SyntheticParameterClassVisitor(int api, ClassVisitor cv) {
 		super(api, cv);
 	}
@@ -109,5 +89,24 @@ public class SyntheticParameterClassVisitor extends ClassVisitor {
 		return mv != null && synthetic != 0 && name.equals("<init>") && descriptor.startsWith(syntheticArgs) && !backoff
 				? new SyntheticMethodVisitor(api, synthetic, mv)
 				: mv;
+	}
+
+	private static class SyntheticMethodVisitor extends MethodVisitor {
+		private final int offset;
+
+		SyntheticMethodVisitor(int api, int offset, MethodVisitor methodVisitor) {
+			super(api, methodVisitor);
+			this.offset = offset;
+		}
+
+		@Override
+		public AnnotationVisitor visitParameterAnnotation(int parameter, String descriptor, boolean visible) {
+			return super.visitParameterAnnotation(parameter - offset, descriptor, visible);
+		}
+
+		@Override
+		public void visitAnnotableParameterCount(int parameterCount, boolean visible) {
+			super.visitAnnotableParameterCount(parameterCount - offset, visible);
+		}
 	}
 }

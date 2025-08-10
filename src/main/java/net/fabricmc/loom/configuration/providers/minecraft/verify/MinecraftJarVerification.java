@@ -43,12 +43,12 @@ public abstract class MinecraftJarVerification {
 	private final String minecraftVersion;
 
 	@Inject
-	protected abstract Project getProject();
-
-	@Inject
 	public MinecraftJarVerification(String minecraftVersion) {
 		this.minecraftVersion = minecraftVersion;
 	}
+
+	@Inject
+	protected abstract Project getProject();
 
 	public void verifyClientJar(Path path) throws IOException, SignatureVerificationFailure {
 		verifyJarSignature(path, KnownJarType.CLIENT);
@@ -97,7 +97,8 @@ public abstract class MinecraftJarVerification {
 
 	private enum KnownJarType {
 		CLIENT(KnownVersions::client),
-		SERVER(KnownVersions::server),;
+		SERVER(KnownVersions::server),
+		;
 
 		private final Function<KnownVersions, Map<String, String>> knownVersions;
 

@@ -24,8 +24,6 @@
 
 package net.fabricmc.loom.util.fmj;
 
-import static net.fabricmc.loom.util.fmj.FabricModJsonUtils.readString;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -36,25 +34,13 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import org.jetbrains.annotations.Nullable;
 
 import net.fabricmc.loom.util.Constants;
-
-import org.jetbrains.annotations.Nullable;
 
 public final class FabricModJsonV1 extends FabricModJson {
 	FabricModJsonV1(JsonObject jsonObject, FabricModJsonSource source) {
 		super(jsonObject, source);
-	}
-
-	@Override
-	public int getVersion() {
-		return 1;
-	}
-
-	@Override
-	@Nullable
-	public JsonElement getCustom(String key) {
-		return getCustom(jsonObject, key);
 	}
 
 	static JsonElement getCustom(JsonObject jsonObject, String key) {
@@ -71,6 +57,27 @@ public final class FabricModJsonV1 extends FabricModJson {
 		return custom.get(key);
 	}
 
+	private static String readMixinElement(JsonElement jsonElement) {
+		if (jsonElement instanceof JsonPrimitive str) {
+			return str.getAsString();
+		} else if (jsonElement instanceof JsonObject obj) {
+			return obj.get("config").getAsString();
+		} else {
+			throw new FabricModJsonUtils.ParseException("Expected mixin element to be an object or string");
+		}
+	}
+
+	@Override
+	public int getVersion() {
+		return 1;
+	}
+
+	@Override
+	@Nullable
+	public JsonElement getCustom(String key) {
+		return getCustom(jsonObject, key);
+	}
+
 	@Override
 	public List<String> getMixinConfigurations() {
 		final JsonArray mixinArray = jsonObject.getAsJsonArray("mixins");
@@ -82,16 +89,6 @@ public final class FabricModJsonV1 extends FabricModJson {
 		return StreamSupport.stream(mixinArray.spliterator(), false)
 				.map(FabricModJsonV1::readMixinElement)
 				.collect(Collectors.toList());
-	}
-
-	private static String readMixinElement(JsonElement jsonElement) {
-		if (jsonElement instanceof JsonPrimitive str) {
-			return str.getAsString();
-		} else if (jsonElement instanceof JsonObject obj) {
-			return obj.get("config").getAsString();
-		} else {
-			throw new FabricModJsonUtils.ParseException("Expected mixin element to be an object or string");
-		}
 	}
 
 	@Override

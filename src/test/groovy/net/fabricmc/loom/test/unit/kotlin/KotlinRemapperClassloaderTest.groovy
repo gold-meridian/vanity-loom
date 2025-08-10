@@ -83,11 +83,12 @@ class KotlinRemapperClassloaderTest extends Specification {
 			return Set.of(
 					kotlin.toURI().toURL(),
 					metadata.toURI().toURL()
-					)
+			)
 		}
 	}
 
 	File tempDir = File.createTempDir()
+
 	File downloadFile(String url, String name) {
 		File dst = new File(tempDir, name)
 		dst.parentFile.mkdirs()

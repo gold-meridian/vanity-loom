@@ -276,7 +276,7 @@ public final class SourceSetHelper {
 		final LoomGradleExtension extension = LoomGradleExtension.get(project);
 
 		if (extension.isConfigurationCacheActive()) {
-			for (File rootDir: sourceSet.getResources().getSrcDirs()) {
+			for (File rootDir : sourceSet.getResources().getSrcDirs()) {
 				final File file = GradleUtils.configurationInputFile(project, new File(rootDir, path));
 
 				if (file.exists()) {

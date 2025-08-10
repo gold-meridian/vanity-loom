@@ -1,9 +1,9 @@
 package net.fabricmc.example.test;
 
-import net.fabricmc.example.client.ExampleModClient;
-
 import net.minecraft.client.MinecraftClient;
 import org.junit.jupiter.api.Test;
+
+import net.fabricmc.example.client.ExampleModClient;
 
 public class ExampleModTest {
 	@Test

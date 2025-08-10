@@ -29,6 +29,7 @@ import java.util.List;
 import org.gradle.api.Project;
 
 import net.fabricmc.loom.api.mappings.layered.MappingsNamespace;
+import net.fabricmc.loom.configuration.providers.minecraft.GluedMinecraftProvider;
 import net.fabricmc.loom.configuration.providers.minecraft.LegacyMergedMinecraftProvider;
 import net.fabricmc.loom.configuration.providers.minecraft.MergedMinecraftProvider;
 import net.fabricmc.loom.configuration.providers.minecraft.MinecraftJar;
@@ -37,7 +38,6 @@ import net.fabricmc.loom.configuration.providers.minecraft.MinecraftSourceSets;
 import net.fabricmc.loom.configuration.providers.minecraft.SingleJarEnvType;
 import net.fabricmc.loom.configuration.providers.minecraft.SingleJarMinecraftProvider;
 import net.fabricmc.loom.configuration.providers.minecraft.SplitMinecraftProvider;
-import net.fabricmc.loom.configuration.providers.minecraft.GluedMinecraftProvider;
 import net.fabricmc.tinyremapper.TinyRemapper;
 
 public abstract class NamedMinecraftProvider<M extends MinecraftProvider> extends AbstractMappedMinecraftProvider<M> {
@@ -63,7 +63,7 @@ public abstract class NamedMinecraftProvider<M extends MinecraftProvider> extend
 		@Override
 		public List<RemappedJars> getRemappedJars() {
 			return List.of(
-				new RemappedJars(minecraftProvider.getMergedJar(), getMergedJar(), minecraftProvider.getOfficialNamespace())
+					new RemappedJars(minecraftProvider.getMergedJar(), getMergedJar(), minecraftProvider.getOfficialNamespace())
 			);
 		}
 
@@ -101,9 +101,9 @@ public abstract class NamedMinecraftProvider<M extends MinecraftProvider> extend
 			if (refreshOutputs) {
 				// then merge them
 				MergedMinecraftProvider.mergeJars(
-							client.getEnvOnlyJar().toFile(),
-							server.getEnvOnlyJar().toFile(),
-							getMergedJar().toFile()
+						client.getEnvOnlyJar().toFile(),
+						server.getEnvOnlyJar().toFile(),
+						getMergedJar().toFile()
 				);
 
 				createBackupJars(minecraftJars);
@@ -130,7 +130,7 @@ public abstract class NamedMinecraftProvider<M extends MinecraftProvider> extend
 		@Override
 		public List<? extends OutputJar> getOutputJars() {
 			return List.of(
-				new SimpleOutputJar(getMergedJar())
+					new SimpleOutputJar(getMergedJar())
 			);
 		}
 
@@ -148,8 +148,8 @@ public abstract class NamedMinecraftProvider<M extends MinecraftProvider> extend
 		@Override
 		public List<RemappedJars> getRemappedJars() {
 			return List.of(
-				new RemappedJars(minecraftProvider.getMinecraftCommonJar(), getCommonJar(), minecraftProvider.getOfficialNamespace()),
-				new RemappedJars(minecraftProvider.getMinecraftClientOnlyJar(), getClientOnlyJar(), minecraftProvider.getOfficialNamespace(), minecraftProvider.getMinecraftCommonJar())
+					new RemappedJars(minecraftProvider.getMinecraftCommonJar(), getCommonJar(), minecraftProvider.getOfficialNamespace()),
+					new RemappedJars(minecraftProvider.getMinecraftClientOnlyJar(), getClientOnlyJar(), minecraftProvider.getOfficialNamespace(), minecraftProvider.getMinecraftCommonJar())
 			);
 		}
 
@@ -183,7 +183,7 @@ public abstract class NamedMinecraftProvider<M extends MinecraftProvider> extend
 		@Override
 		public List<RemappedJars> getRemappedJars() {
 			return List.of(
-				new RemappedJars(minecraftProvider.getMinecraftEnvOnlyJar(), getEnvOnlyJar(), minecraftProvider.getOfficialNamespace())
+					new RemappedJars(minecraftProvider.getMinecraftEnvOnlyJar(), getEnvOnlyJar(), minecraftProvider.getOfficialNamespace())
 			);
 		}
 

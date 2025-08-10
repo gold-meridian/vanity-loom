@@ -39,6 +39,12 @@ import net.fabricmc.loom.util.service.ScopedServiceFactory;
 
 @UntrackedTask(because = "Always rerun this task.")
 public abstract class MigrateMappingsTask extends AbstractLoomTask {
+	public MigrateMappingsTask() {
+		getInputDir().convention(getProject().getLayout().getProjectDirectory().dir("src/main/java"));
+		getOutputDir().convention(getProject().getLayout().getProjectDirectory().dir("remappedSrc"));
+		getMigrationServiceOptions().set(MigrateMappingsService.createOptions(getProject(), getMappings(), getInputDir(), getOutputDir()));
+	}
+
 	@Input
 	@Option(option = "mappings", description = "Target mappings")
 	public abstract Property<String> getMappings();
@@ -53,12 +59,6 @@ public abstract class MigrateMappingsTask extends AbstractLoomTask {
 
 	@Nested
 	protected abstract Property<MigrateMappingsService.Options> getMigrationServiceOptions();
-
-	public MigrateMappingsTask() {
-		getInputDir().convention(getProject().getLayout().getProjectDirectory().dir("src/main/java"));
-		getOutputDir().convention(getProject().getLayout().getProjectDirectory().dir("remappedSrc"));
-		getMigrationServiceOptions().set(MigrateMappingsService.createOptions(getProject(), getMappings(), getInputDir(), getOutputDir()));
-	}
 
 	@TaskAction
 	public void doTask() throws Throwable {

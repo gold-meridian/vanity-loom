@@ -80,15 +80,16 @@ public class LibraryProcessorManager {
 			final LibraryProcessor.ApplicationResult applicationResult = processor.getApplicationResult();
 
 			switch (applicationResult) {
-			case MUST_APPLY -> {
-				processors.add(processor);
-			}
-			case CAN_APPLY -> {
-				if (enabledProcessors.contains(processor.getClass().getSimpleName())) {
+				case MUST_APPLY -> {
 					processors.add(processor);
 				}
-			}
-			case DONT_APPLY -> { }
+				case CAN_APPLY -> {
+					if (enabledProcessors.contains(processor.getClass().getSimpleName())) {
+						processors.add(processor);
+					}
+				}
+				case DONT_APPLY -> {
+				}
 			}
 		}
 

@@ -31,6 +31,8 @@ import net.fabricmc.loom.util.service.ServiceFactory;
 
 public interface ConfigContext {
 	Project project();
+
 	ServiceFactory serviceFactory();
+
 	LoomGradleExtension extension();
 }

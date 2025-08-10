@@ -170,11 +170,16 @@ public final class MinecraftMetadataProvider {
 		return versionEntry.manifest.name() + "_minecraft_info.json";
 	}
 
+	@FunctionalInterface
+	private interface ManifestEntrySupplier {
+		ManifestEntryLocation get() throws IOException;
+	}
+
 	public record Options(String minecraftVersion,
-					ManifestLocations versionsManifests,
-					@Nullable String customManifestUrl,
-					Path userCache,
-					Path workingDir) {
+						  ManifestLocations versionsManifests,
+						  @Nullable String customManifestUrl,
+						  Path userCache,
+						  Path workingDir) {
 		public static Options create(String minecraftVersion, Project project) {
 			final LoomGradleExtension extension = LoomGradleExtension.get(project);
 			final Path userCache = extension.getFiles().getUserCache().toPath();
@@ -191,11 +196,6 @@ public final class MinecraftMetadataProvider {
 					workingDir
 			);
 		}
-	}
-
-	@FunctionalInterface
-	private interface ManifestEntrySupplier {
-		ManifestEntryLocation get() throws IOException;
 	}
 
 	private record ManifestEntryLocation(ManifestLocation manifest, VersionsManifest.Version entry) {

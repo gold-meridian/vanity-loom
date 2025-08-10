@@ -34,12 +34,12 @@ import org.gradle.api.tasks.TaskAction;
 import net.fabricmc.loom.util.Constants;
 
 public abstract class RenderDocRunUITask extends DefaultTask {
-	@InputFile
-	public abstract RegularFileProperty getRenderDocExecutable();
-
 	public RenderDocRunUITask() {
 		setGroup(Constants.TaskGroup.FABRIC);
 	}
+
+	@InputFile
+	public abstract RegularFileProperty getRenderDocExecutable();
 
 	@TaskAction
 	public void run() throws IOException {

@@ -52,6 +52,25 @@ public class MergedMinecraftProvider extends MinecraftProvider {
 		}
 	}
 
+	public static void mergeJars(File clientJar, File serverJar, File mergedJar) throws IOException {
+		LOGGER.info(":merging jars");
+
+		Objects.requireNonNull(clientJar, "Cannot merge null client jar?");
+		Objects.requireNonNull(serverJar, "Cannot merge null server jar?");
+
+		try (var jarMerger = new MinecraftJarMerger(clientJar, serverJar, mergedJar)) {
+			if (syntheticParamsOffsetEnabled) {
+				jarMerger.enableSyntheticParamsOffset();
+			}
+
+			jarMerger.merge();
+		}
+	}
+
+	public static void disableSyntheticParamsOffset() {
+		syntheticParamsOffsetEnabled = false;
+	}
+
 	@Override
 	protected void initFiles() {
 		super.initFiles();
@@ -103,26 +122,7 @@ public class MergedMinecraftProvider extends MinecraftProvider {
 		mergeJars(clientJar, serverJar, minecraftMergedJar.toFile());
 	}
 
-	public static void mergeJars(File clientJar, File serverJar, File mergedJar) throws IOException {
-		LOGGER.info(":merging jars");
-
-		Objects.requireNonNull(clientJar, "Cannot merge null client jar?");
-		Objects.requireNonNull(serverJar, "Cannot merge null server jar?");
-
-		try (var jarMerger = new MinecraftJarMerger(clientJar, serverJar, mergedJar)) {
-			if (syntheticParamsOffsetEnabled) {
-				jarMerger.enableSyntheticParamsOffset();
-			}
-
-			jarMerger.merge();
-		}
-	}
-
 	public Path getMergedJar() {
 		return minecraftMergedJar;
-	}
-
-	public static void disableSyntheticParamsOffset() {
-		syntheticParamsOffsetEnabled = false;
 	}
 }

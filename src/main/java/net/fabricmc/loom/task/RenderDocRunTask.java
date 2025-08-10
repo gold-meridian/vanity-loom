@@ -45,6 +45,21 @@ import net.fabricmc.loom.util.Platform;
 public abstract class RenderDocRunTask extends RunGameTask {
 	private static final Logger LOGGER = LoggerFactory.getLogger(RenderDocRunTask.class);
 
+	@Inject
+	public RenderDocRunTask(RunConfigSettings settings) {
+		super(settings);
+		setGroup(Constants.TaskGroup.FABRIC);
+		dependsOn("configureClientLaunch");
+		getRenderDocArgs().addAll("capture", "--wait-for-exit");
+	}
+
+	public static boolean isSupported(Platform platform) {
+		final Platform.OperatingSystem os = platform.getOperatingSystem();
+		final Platform.Architecture arch = platform.getArchitecture();
+		// RenderDoc does support 32-bit Windows, but I cannot be bothered to test/maintain it
+		return (os.isLinux() || os.isWindows()) && arch.isX64();
+	}
+
 	@InputFile
 	public abstract RegularFileProperty getRenderDocExecutable();
 
@@ -53,14 +68,6 @@ public abstract class RenderDocRunTask extends RunGameTask {
 
 	@Inject
 	protected abstract ExecOperations getExecOperations();
-
-	@Inject
-	public RenderDocRunTask(RunConfigSettings settings) {
-		super(settings);
-		setGroup(Constants.TaskGroup.FABRIC);
-		dependsOn("configureClientLaunch");
-		getRenderDocArgs().addAll("capture", "--wait-for-exit");
-	}
 
 	@Override
 	public void exec() {
@@ -82,12 +89,5 @@ public abstract class RenderDocRunTask extends RunGameTask {
 			LOGGER.info("Running command: {}", exec.getCommandLine());
 		});
 		result.assertNormalExitValue();
-	}
-
-	public static boolean isSupported(Platform platform) {
-		final Platform.OperatingSystem os = platform.getOperatingSystem();
-		final Platform.Architecture arch = platform.getArchitecture();
-		// RenderDoc does support 32-bit Windows, but I cannot be bothered to test/maintain it
-		return (os.isLinux() || os.isWindows()) && arch.isX64();
 	}
 }

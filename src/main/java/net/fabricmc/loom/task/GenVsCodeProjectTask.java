@@ -59,6 +59,13 @@ import net.fabricmc.loom.util.gradle.SyncTaskBuildService;
 // Recommended vscode plugin pack:
 // https://marketplace.visualstudio.com/items?itemName=vscjava.vscode-java-pack
 public abstract class GenVsCodeProjectTask extends AbstractLoomTask {
+	@Inject
+	public GenVsCodeProjectTask() {
+		setGroup(Constants.TaskGroup.IDE);
+		getLaunchConfigurations().set(getProject().provider(this::getConfigurations));
+		getLaunchJson().convention(getProject().getRootProject().getLayout().getProjectDirectory().file(".vscode/launch.json"));
+	}
+
 	// Prevent Gradle from running vscode task asynchronously
 	@ServiceReference(SyncTaskBuildService.NAME)
 	abstract Property<SyncTaskBuildService> getSyncTask();
@@ -68,13 +75,6 @@ public abstract class GenVsCodeProjectTask extends AbstractLoomTask {
 
 	@OutputFile
 	protected abstract RegularFileProperty getLaunchJson();
-
-	@Inject
-	public GenVsCodeProjectTask() {
-		setGroup(Constants.TaskGroup.IDE);
-		getLaunchConfigurations().set(getProject().provider(this::getConfigurations));
-		getLaunchJson().convention(getProject().getRootProject().getLayout().getProjectDirectory().file(".vscode/launch.json"));
-	}
 
 	private List<VsCodeConfiguration> getConfigurations() {
 		List<VsCodeConfiguration> configurations = new ArrayList<>();
@@ -166,18 +166,18 @@ public abstract class GenVsCodeProjectTask extends AbstractLoomTask {
 			Path projectPath = project.getProjectDir().toPath();
 			String relativeRunDir = rootPath.relativize(projectPath).resolve(runConfig.runDir).toString();
 			return new VsCodeConfiguration(
-				"java",
-				runConfig.configName,
-				"launch",
-				"${workspaceFolder}/" + relativeRunDir,
-				"integratedTerminal",
-				false,
-				runConfig.mainClass,
-				RunConfig.joinArguments(runConfig.vmArgs),
-				RunConfig.joinArguments(runConfig.programArgs),
-				new HashMap<>(runConfig.environmentVariables),
-				runConfig.projectName,
-				rootPath.resolve(relativeRunDir).toAbsolutePath().toString()
+					"java",
+					runConfig.configName,
+					"launch",
+					"${workspaceFolder}/" + relativeRunDir,
+					"integratedTerminal",
+					false,
+					runConfig.mainClass,
+					RunConfig.joinArguments(runConfig.vmArgs),
+					RunConfig.joinArguments(runConfig.programArgs),
+					new HashMap<>(runConfig.environmentVariables),
+					runConfig.projectName,
+					rootPath.resolve(relativeRunDir).toAbsolutePath().toString()
 			);
 		}
 	}

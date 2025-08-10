@@ -40,71 +40,8 @@ import net.fabricmc.loom.util.service.ServiceFactory;
 import net.fabricmc.loom.util.service.ServiceType;
 
 public abstract class ClientEntriesService<O extends ClientEntriesService.Options> extends Service<O> {
-	public interface Options extends Service.Options {
-	}
-
 	public ClientEntriesService(O options, ServiceFactory serviceFactory) {
 		super(options, serviceFactory);
-	}
-
-	public abstract List<String> getClientOnlyEntries();
-
-	public static class Source extends ClientEntriesService<Source.Options> {
-		public static final ServiceType<Source.Options, Source> TYPE = new ServiceType<>(Source.Options.class, Source.class);
-
-		public interface Options extends ClientEntriesService.Options {
-			@InputFiles
-			ConfigurableFileCollection getAllSourceFiles();
-			@InputFiles
-			ConfigurableFileCollection getSourceDirectories();
-		}
-
-		public static Provider<Options> createOptions(Project project, SourceSet sourceSet) {
-			return TYPE.create(project, o -> {
-				o.getAllSourceFiles().from(sourceSet.getAllSource().getAsFileTree());
-				o.getSourceDirectories().from(sourceSet.getAllSource().getSourceDirectories());
-			});
-		}
-
-		public Source(Source.Options options, ServiceFactory serviceFactory) {
-			super(options, serviceFactory);
-		}
-
-		@Override
-		public List<String> getClientOnlyEntries() {
-			return getOptions().getAllSourceFiles().getFiles().stream()
-					.map(relativePath(getRootPaths(getOptions().getSourceDirectories().getFiles())))
-					.toList();
-		}
-	}
-
-	public static class Classes extends ClientEntriesService<Classes.Options> {
-		public static final ServiceType<Classes.Options, Classes> TYPE = new ServiceType<>(Classes.Options.class, Classes.class);
-
-		public interface Options extends ClientEntriesService.Options {
-			@InputFiles
-			ConfigurableFileCollection getAllOutputDirs();
-		}
-
-		public static Provider<Classes.Options> createOptions(Project project, SourceSet sourceSet) {
-			return TYPE.create(project, o -> {
-				o.getAllOutputDirs().from(sourceSet.getOutput().getClassesDirs());
-				o.getAllOutputDirs().from(sourceSet.getOutput().getResourcesDir());
-			});
-		}
-
-		public Classes(Options options, ServiceFactory serviceFactory) {
-			super(options, serviceFactory);
-		}
-
-		@Override
-		public List<String> getClientOnlyEntries() {
-			final Set<File> outputFiles = getOptions().getAllOutputDirs().getAsFileTree().getFiles();
-			final List<String> rootPaths = getRootPaths(getOptions().getAllOutputDirs().getFiles());
-			return outputFiles.stream()
-					.map(relativePath(rootPaths))
-					.toList();
-		}
 	}
 
 	static List<String> getRootPaths(Set<File> files) {
@@ -132,5 +69,69 @@ public abstract class ClientEntriesService<O extends ClientEntriesService.Option
 
 			return s;
 		};
+	}
+
+	public abstract List<String> getClientOnlyEntries();
+
+	public interface Options extends Service.Options {
+	}
+
+	public static class Source extends ClientEntriesService<Source.Options> {
+		public static final ServiceType<Source.Options, Source> TYPE = new ServiceType<>(Source.Options.class, Source.class);
+
+		public Source(Source.Options options, ServiceFactory serviceFactory) {
+			super(options, serviceFactory);
+		}
+
+		public static Provider<Options> createOptions(Project project, SourceSet sourceSet) {
+			return TYPE.create(project, o -> {
+				o.getAllSourceFiles().from(sourceSet.getAllSource().getAsFileTree());
+				o.getSourceDirectories().from(sourceSet.getAllSource().getSourceDirectories());
+			});
+		}
+
+		@Override
+		public List<String> getClientOnlyEntries() {
+			return getOptions().getAllSourceFiles().getFiles().stream()
+					.map(relativePath(getRootPaths(getOptions().getSourceDirectories().getFiles())))
+					.toList();
+		}
+
+		public interface Options extends ClientEntriesService.Options {
+			@InputFiles
+			ConfigurableFileCollection getAllSourceFiles();
+
+			@InputFiles
+			ConfigurableFileCollection getSourceDirectories();
+		}
+	}
+
+	public static class Classes extends ClientEntriesService<Classes.Options> {
+		public static final ServiceType<Classes.Options, Classes> TYPE = new ServiceType<>(Classes.Options.class, Classes.class);
+
+		public Classes(Options options, ServiceFactory serviceFactory) {
+			super(options, serviceFactory);
+		}
+
+		public static Provider<Classes.Options> createOptions(Project project, SourceSet sourceSet) {
+			return TYPE.create(project, o -> {
+				o.getAllOutputDirs().from(sourceSet.getOutput().getClassesDirs());
+				o.getAllOutputDirs().from(sourceSet.getOutput().getResourcesDir());
+			});
+		}
+
+		@Override
+		public List<String> getClientOnlyEntries() {
+			final Set<File> outputFiles = getOptions().getAllOutputDirs().getAsFileTree().getFiles();
+			final List<String> rootPaths = getRootPaths(getOptions().getAllOutputDirs().getFiles());
+			return outputFiles.stream()
+					.map(relativePath(rootPaths))
+					.toList();
+		}
+
+		public interface Options extends ClientEntriesService.Options {
+			@InputFiles
+			ConfigurableFileCollection getAllOutputDirs();
+		}
 	}
 }

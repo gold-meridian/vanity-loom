@@ -44,6 +44,19 @@ import net.fabricmc.loom.util.ZipUtils;
  */
 @ApiStatus.Experimental
 public abstract non-sealed class ServerProductionRunTask extends AbstractProductionRunTask {
+	@Inject
+	public ServerProductionRunTask() {
+		getLoaderVersion().convention(getProjectLoaderVersion());
+		getMinecraftVersion().convention(getExtension().getMinecraftVersion());
+		getInstallPropertiesJar().convention(getProject().getLayout().getBuildDirectory().file("server_properties.jar"));
+		getInstallerVersion().convention(LoomVersions.FABRIC_INSTALLER.version());
+
+		getMainClass().convention("net.fabricmc.installer.ServerLauncher");
+		getClasspath().from(detachedConfigurationProvider("net.fabricmc:fabric-installer:%s:server", getInstallerVersion()));
+
+		getProgramArgs().add("nogui");
+	}
+
 	/**
 	 * The version of Fabric Loader to use.
 	 *
@@ -60,6 +73,8 @@ public abstract non-sealed class ServerProductionRunTask extends AbstractProduct
 	@Input
 	public abstract Property<String> getMinecraftVersion();
 
+	// Internal options
+
 	/**
 	 * The version of the Fabric Installer to use.
 	 *
@@ -68,24 +83,9 @@ public abstract non-sealed class ServerProductionRunTask extends AbstractProduct
 	@Input
 	public abstract Property<String> getInstallerVersion();
 
-	// Internal options
-
 	@ApiStatus.Internal
 	@OutputFile
 	public abstract RegularFileProperty getInstallPropertiesJar();
-
-	@Inject
-	public ServerProductionRunTask() {
-		getLoaderVersion().convention(getProjectLoaderVersion());
-		getMinecraftVersion().convention(getExtension().getMinecraftVersion());
-		getInstallPropertiesJar().convention(getProject().getLayout().getBuildDirectory().file("server_properties.jar"));
-		getInstallerVersion().convention(LoomVersions.FABRIC_INSTALLER.version());
-
-		getMainClass().convention("net.fabricmc.installer.ServerLauncher");
-		getClasspath().from(detachedConfigurationProvider("net.fabricmc:fabric-installer:%s:server", getInstallerVersion()));
-
-		getProgramArgs().add("nogui");
-	}
 
 	@Override
 	public void run() throws IOException {
@@ -101,8 +101,8 @@ public abstract non-sealed class ServerProductionRunTask extends AbstractProduct
 	@Override
 	protected Stream<File> streamClasspath() {
 		return Stream.concat(
-			super.streamClasspath(),
-			Stream.of(getInstallPropertiesJar().get().getAsFile())
+				super.streamClasspath(),
+				Stream.of(getInstallPropertiesJar().get().getAsFile())
 		);
 	}
 }

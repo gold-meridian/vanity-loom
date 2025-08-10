@@ -30,10 +30,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import net.fabricmc.loom.api.metadata.ModJson;
-
-import net.fabricmc.loom.util.metadata.ModJsonFactory;
-
 import org.gradle.api.Action;
 import org.gradle.api.NamedDomainObjectContainer;
 import org.gradle.api.NamedDomainObjectList;
@@ -61,6 +57,7 @@ import net.fabricmc.loom.api.decompilers.DecompilerOptions;
 import net.fabricmc.loom.api.mappings.intermediate.IntermediateMappingsProvider;
 import net.fabricmc.loom.api.mappings.layered.MappingsNamespace;
 import net.fabricmc.loom.api.mappings.layered.spec.LayeredMappingSpecBuilder;
+import net.fabricmc.loom.api.metadata.ModJson;
 import net.fabricmc.loom.api.processor.MinecraftJarProcessor;
 import net.fabricmc.loom.api.remapping.RemapperExtension;
 import net.fabricmc.loom.api.remapping.RemapperParameters;
@@ -78,14 +75,14 @@ import net.fabricmc.loom.task.GenerateSourcesTask;
 import net.fabricmc.loom.util.Constants;
 import net.fabricmc.loom.util.DeprecationHelper;
 import net.fabricmc.loom.util.MirrorUtil;
-import net.fabricmc.loom.util.fmj.FabricModJson;
-import net.fabricmc.loom.util.fmj.FabricModJsonFactory;
 import net.fabricmc.loom.util.gradle.SourceSetHelper;
+import net.fabricmc.loom.util.metadata.ModJsonFactory;
 
 /**
  * This class implements the public extension api.
  */
 public abstract class LoomGradleExtensionApiImpl implements LoomGradleExtensionAPI {
+	public static final String DEFAULT_INTERMEDIARY_URL = "https://maven.fabricmc.net/net/fabricmc/intermediary/%1$s/intermediary-%1$s-v2.jar";
 	protected final DeprecationHelper deprecationHelper;
 	@Deprecated()
 	protected final ListProperty<JarProcessor> jarProcessors;
@@ -98,25 +95,21 @@ public abstract class LoomGradleExtensionApiImpl implements LoomGradleExtensionA
 	protected final Property<Boolean> modProvidedJavadoc;
 	protected final Property<String> intermediary;
 	protected final Property<IntermediateMappingsProvider> intermediateMappingsProvider;
+	protected final ListProperty<RemapperExtensionHolder> remapperExtensions;
+	// A common mistake with layered mappings is to call the wrong `officialMojangMappings` method, use this to keep track of when we are building a layered mapping spec.
+	protected final ThreadLocal<Boolean> layeredSpecBuilderScope = ThreadLocal.withInitial(() -> false);
+	protected final Map<LayeredMappingSpec, LayeredMappingsFactory> layeredMappingsDependencyMap = new HashMap<>();
 	private final Property<Boolean> runtimeOnlyLog4j;
 	private final Property<Boolean> splitModDependencies;
 	private final Property<MinecraftJarConfiguration<?, ?, ?>> minecraftJarConfiguration;
 	private final Property<Boolean> splitEnvironmentalSourceSet;
 	private final InterfaceInjectionExtensionAPI interfaceInjectionExtension;
-
 	private final NamedDomainObjectContainer<RunConfigSettings> runConfigs;
 	private final NamedDomainObjectContainer<DecompilerOptions> decompilers;
 	private final NamedDomainObjectContainer<ModSettings> mods;
 	private final NamedDomainObjectList<RemapConfigurationSettings> remapConfigurations;
 	private final ListProperty<MinecraftJarProcessor<?>> minecraftJarProcessors;
-	protected final ListProperty<RemapperExtensionHolder> remapperExtensions;
-
-	// A common mistake with layered mappings is to call the wrong `officialMojangMappings` method, use this to keep track of when we are building a layered mapping spec.
-	protected final ThreadLocal<Boolean> layeredSpecBuilderScope = ThreadLocal.withInitial(() -> false);
-	public static final String DEFAULT_INTERMEDIARY_URL = "https://maven.fabricmc.net/net/fabricmc/intermediary/%1$s/intermediary-%1$s-v2.jar";
-
 	protected boolean hasEvaluatedLayeredMappings = false;
-	protected final Map<LayeredMappingSpec, LayeredMappingsFactory> layeredMappingsDependencyMap = new HashMap<>();
 
 	protected LoomGradleExtensionApiImpl(Project project, LoomFiles directories) {
 		this.jarProcessors = project.getObjects().listProperty(JarProcessor.class)

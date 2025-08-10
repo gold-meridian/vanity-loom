@@ -159,44 +159,6 @@ public class RunConfig {
 		return runConfig;
 	}
 
-	public String fromDummy(String dummy, boolean relativeDir, Project project) throws IOException {
-		String dummyConfig;
-
-		try (InputStream input = IdeaSyncTask.class.getClassLoader().getResourceAsStream(dummy)) {
-			dummyConfig = new String(input.readAllBytes(), StandardCharsets.UTF_8);
-		}
-
-		String runDir = this.runDir;
-
-		if (relativeDir && project.getRootProject() != project) {
-			Path rootPath = project.getRootDir().toPath();
-			Path projectPath = project.getProjectDir().toPath();
-			String relativePath = rootPath.relativize(projectPath).toString();
-
-			runDir = relativePath + "/" + runDir;
-		}
-
-		dummyConfig = dummyConfig.replace("%NAME%", configName);
-		dummyConfig = dummyConfig.replace("%MAIN_CLASS%", mainClass);
-		dummyConfig = dummyConfig.replace("%ECLIPSE_PROJECT%", eclipseProjectName);
-		dummyConfig = dummyConfig.replace("%IDEA_MODULE%", ideaModuleName);
-		dummyConfig = dummyConfig.replace("%RUN_DIRECTORY%", runDir);
-		dummyConfig = dummyConfig.replace("%PROGRAM_ARGS%", joinArguments(programArgs).replaceAll("\"", "&quot;"));
-		dummyConfig = dummyConfig.replace("%VM_ARGS%", joinArguments(vmArgs).replaceAll("\"", "&quot;"));
-		dummyConfig = dummyConfig.replace("%IDEA_ENV_VARS%", getEnvVars("<env name=\"%s\" value=\"%s\"/>"));
-		dummyConfig = dummyConfig.replace("%ECLIPSE_ENV_VARS%", getEnvVars("<mapEntry key=\"%s\" value=\"%s\"/>"));
-		dummyConfig = dummyConfig.replace("%IDEA_FOLDER_NAME%", folderName == null ? "" : "folderName=\"" + XmlUtil.escapeXml(folderName) + "\"");
-
-		return dummyConfig;
-	}
-
-	private String getEnvVars(String pattern) {
-		return environmentVariables.entrySet().stream()
-			.map(entry ->
-				pattern.formatted(entry.getKey(), entry.getValue().toString())
-			).collect(Collectors.joining());
-	}
-
 	public static String joinArguments(List<String> args) {
 		final var sb = new StringBuilder();
 		boolean first = true;
@@ -248,31 +210,6 @@ public class RunConfig {
 		return defaultMainClass;
 	}
 
-	public List<String> getExcludedLibraryPaths(Project project) {
-		if (!environment.equals("server")) {
-			return Collections.emptyList();
-		}
-
-		final BundleMetadata bundleMetadata = LoomGradleExtension.get(project).getMinecraftProvider().getServerBundleMetadata();
-
-		if (bundleMetadata == null) {
-			// Legacy version
-			return Collections.emptyList();
-		}
-
-		final Set<ResolvedArtifact> clientLibraries = getArtifacts(project, Constants.Configurations.MINECRAFT_CLIENT_RUNTIME_LIBRARIES);
-		final Set<ResolvedArtifact> serverLibraries = getArtifacts(project, Constants.Configurations.MINECRAFT_SERVER_RUNTIME_LIBRARIES);
-		final List<String> clientOnlyLibraries = new LinkedList<>();
-
-		for (ResolvedArtifact library : clientLibraries) {
-			if (!containsLibrary(serverLibraries, library.getModuleVersion().getId())) {
-				clientOnlyLibraries.add(library.getFile().getAbsolutePath());
-			}
-		}
-
-		return clientOnlyLibraries;
-	}
-
 	private static Set<ResolvedArtifact> getArtifacts(Project project, String configuration) {
 		return project.getConfigurations().getByName(configuration).getHierarchy()
 				.stream()
@@ -302,5 +239,68 @@ public class RunConfig {
 		}
 
 		return ret.toString();
+	}
+
+	public String fromDummy(String dummy, boolean relativeDir, Project project) throws IOException {
+		String dummyConfig;
+
+		try (InputStream input = IdeaSyncTask.class.getClassLoader().getResourceAsStream(dummy)) {
+			dummyConfig = new String(input.readAllBytes(), StandardCharsets.UTF_8);
+		}
+
+		String runDir = this.runDir;
+
+		if (relativeDir && project.getRootProject() != project) {
+			Path rootPath = project.getRootDir().toPath();
+			Path projectPath = project.getProjectDir().toPath();
+			String relativePath = rootPath.relativize(projectPath).toString();
+
+			runDir = relativePath + "/" + runDir;
+		}
+
+		dummyConfig = dummyConfig.replace("%NAME%", configName);
+		dummyConfig = dummyConfig.replace("%MAIN_CLASS%", mainClass);
+		dummyConfig = dummyConfig.replace("%ECLIPSE_PROJECT%", eclipseProjectName);
+		dummyConfig = dummyConfig.replace("%IDEA_MODULE%", ideaModuleName);
+		dummyConfig = dummyConfig.replace("%RUN_DIRECTORY%", runDir);
+		dummyConfig = dummyConfig.replace("%PROGRAM_ARGS%", joinArguments(programArgs).replaceAll("\"", "&quot;"));
+		dummyConfig = dummyConfig.replace("%VM_ARGS%", joinArguments(vmArgs).replaceAll("\"", "&quot;"));
+		dummyConfig = dummyConfig.replace("%IDEA_ENV_VARS%", getEnvVars("<env name=\"%s\" value=\"%s\"/>"));
+		dummyConfig = dummyConfig.replace("%ECLIPSE_ENV_VARS%", getEnvVars("<mapEntry key=\"%s\" value=\"%s\"/>"));
+		dummyConfig = dummyConfig.replace("%IDEA_FOLDER_NAME%", folderName == null ? "" : "folderName=\"" + XmlUtil.escapeXml(folderName) + "\"");
+
+		return dummyConfig;
+	}
+
+	private String getEnvVars(String pattern) {
+		return environmentVariables.entrySet().stream()
+				.map(entry ->
+						pattern.formatted(entry.getKey(), entry.getValue().toString())
+				).collect(Collectors.joining());
+	}
+
+	public List<String> getExcludedLibraryPaths(Project project) {
+		if (!environment.equals("server")) {
+			return Collections.emptyList();
+		}
+
+		final BundleMetadata bundleMetadata = LoomGradleExtension.get(project).getMinecraftProvider().getServerBundleMetadata();
+
+		if (bundleMetadata == null) {
+			// Legacy version
+			return Collections.emptyList();
+		}
+
+		final Set<ResolvedArtifact> clientLibraries = getArtifacts(project, Constants.Configurations.MINECRAFT_CLIENT_RUNTIME_LIBRARIES);
+		final Set<ResolvedArtifact> serverLibraries = getArtifacts(project, Constants.Configurations.MINECRAFT_SERVER_RUNTIME_LIBRARIES);
+		final List<String> clientOnlyLibraries = new LinkedList<>();
+
+		for (ResolvedArtifact library : clientLibraries) {
+			if (!containsLibrary(serverLibraries, library.getModuleVersion().getId())) {
+				clientOnlyLibraries.add(library.getFile().getAbsolutePath());
+			}
+		}
+
+		return clientOnlyLibraries;
 	}
 }

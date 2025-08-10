@@ -36,11 +36,11 @@ class JarWalkerTest extends Specification {
 	def "find classes in jar"() {
 		given:
 		def jar = ZipTestUtils.createZipFromBytes([
-			"net/fabricmc/Test.class": newClass("net/fabricmc/Test"),
-			"net/fabricmc/other/Test.class": newClass("net/fabricmc/other/Test"),
-			"net/fabricmc/other/Test\$Inner.class": newInnerClass("net/fabricmc/other/Test\$Inner", "net/fabricmc/other/Test", "Inner"),
-			"net/fabricmc/other/Test\$1.class": newInnerClass("net/fabricmc/other/Test\$1", "net/fabricmc/other/Test"),
-			"net/fabricmc/other/Test\$NotInner.class": newClass("net/fabricmc/other/Test\$NotInner"),
+				"net/fabricmc/Test.class"                : newClass("net/fabricmc/Test"),
+				"net/fabricmc/other/Test.class"          : newClass("net/fabricmc/other/Test"),
+				"net/fabricmc/other/Test\$Inner.class"   : newInnerClass("net/fabricmc/other/Test\$Inner", "net/fabricmc/other/Test", "Inner"),
+				"net/fabricmc/other/Test\$1.class"       : newInnerClass("net/fabricmc/other/Test\$1", "net/fabricmc/other/Test"),
+				"net/fabricmc/other/Test\$NotInner.class": newClass("net/fabricmc/other/Test\$NotInner"),
 		])
 		when:
 		def entries = JarWalker.findClasses(jar)
@@ -74,28 +74,28 @@ class JarWalkerTest extends Specification {
 		entries.size() == 1
 		hash == expectedHash
 		where:
-		expectedHash | zipEntries
+		expectedHash                                                       | zipEntries
 		"b055df8d9503b60050f6d0db387c84c47fedb4d9ed82c4f8174b4e465a9c479b" | [
-			"net/fabricmc/Test.class": newClass("net/fabricmc/Test"),
+				"net/fabricmc/Test.class": newClass("net/fabricmc/Test"),
 		]
 		"b49f74dc50847f8fefc0c6f850326bbe39ace0b381b827fe1a1f1ed1dea81330" | [
-			"net/fabricmc/other/Test.class": newClass("net/fabricmc/other/Test"),
-			"net/fabricmc/other/Test\$Inner.class": newInnerClass("net/fabricmc/other/Test\$Inner", "net/fabricmc/other/Test", "Inner"),
-			"net/fabricmc/other/Test\$Inner\$2.class": newInnerClass("net/fabricmc/other/Test\$Inner\$2", "net/fabricmc/other/Test\$Inner", "Inner"),
-			"net/fabricmc/other/Test\$1.class": newInnerClass("net/fabricmc/other/Test\$1", "net/fabricmc/other/Test"),
+				"net/fabricmc/other/Test.class"          : newClass("net/fabricmc/other/Test"),
+				"net/fabricmc/other/Test\$Inner.class"   : newInnerClass("net/fabricmc/other/Test\$Inner", "net/fabricmc/other/Test", "Inner"),
+				"net/fabricmc/other/Test\$Inner\$2.class": newInnerClass("net/fabricmc/other/Test\$Inner\$2", "net/fabricmc/other/Test\$Inner", "Inner"),
+				"net/fabricmc/other/Test\$1.class"       : newInnerClass("net/fabricmc/other/Test\$1", "net/fabricmc/other/Test"),
 		]
 		"b49f74dc50847f8fefc0c6f850326bbe39ace0b381b827fe1a1f1ed1dea81330" | [
-			"net/fabricmc/other/Test.class": newClass("net/fabricmc/other/Test"),
-			"net/fabricmc/other/Test\$Inner.class": newInnerClass("net/fabricmc/other/Test\$Inner", "net/fabricmc/other/Test", "Inner"),
-			"net/fabricmc/other/Test\$Inner\$2.class": newInnerClass("net/fabricmc/other/Test\$Inner\$2", "net/fabricmc/other/Test\$Inner", "Inner"),
-			"net/fabricmc/other/Test\$1.class": newInnerClass("net/fabricmc/other/Test\$1", "net/fabricmc/other/Test"),
+				"net/fabricmc/other/Test.class"          : newClass("net/fabricmc/other/Test"),
+				"net/fabricmc/other/Test\$Inner.class"   : newInnerClass("net/fabricmc/other/Test\$Inner", "net/fabricmc/other/Test", "Inner"),
+				"net/fabricmc/other/Test\$Inner\$2.class": newInnerClass("net/fabricmc/other/Test\$Inner\$2", "net/fabricmc/other/Test\$Inner", "Inner"),
+				"net/fabricmc/other/Test\$1.class"       : newInnerClass("net/fabricmc/other/Test\$1", "net/fabricmc/other/Test"),
 		]
 	}
 
 	def "simple class"() {
 		given:
 		def jarEntries = [
-			"net/fabricmc/Example.class": newClass("net/fabricmc/Example")
+				"net/fabricmc/Example.class": newClass("net/fabricmc/Example")
 		]
 		def jar = ZipTestUtils.createZipFromBytes(jarEntries)
 
@@ -112,7 +112,7 @@ class JarWalkerTest extends Specification {
 	def "class with interfaces"() {
 		given:
 		def jarEntries = [
-			"net/fabricmc/Example.class": newClass("net/fabricmc/Example", ["java/lang/Runnable"] as String[])
+				"net/fabricmc/Example.class": newClass("net/fabricmc/Example", ["java/lang/Runnable"] as String[])
 		]
 		def jar = ZipTestUtils.createZipFromBytes(jarEntries)
 
@@ -129,9 +129,9 @@ class JarWalkerTest extends Specification {
 	def "inner classes"() {
 		given:
 		def jarEntries = [
-			"net/fabricmc/other/Test.class": newClass("net/fabricmc/other/Test"),
-			"net/fabricmc/other/Test\$Inner.class": newInnerClass("net/fabricmc/other/Test\$Inner", "net/fabricmc/other/Test", "Inner", null, "net/fabricmc/other/Super"),
-			"net/fabricmc/other/Test\$1.class": newInnerClass("net/fabricmc/other/Test\$1", "net/fabricmc/other/Test", null, ["java/lang/Runnable"] as String[]),
+				"net/fabricmc/other/Test.class"       : newClass("net/fabricmc/other/Test"),
+				"net/fabricmc/other/Test\$Inner.class": newInnerClass("net/fabricmc/other/Test\$Inner", "net/fabricmc/other/Test", "Inner", null, "net/fabricmc/other/Super"),
+				"net/fabricmc/other/Test\$1.class"    : newInnerClass("net/fabricmc/other/Test\$1", "net/fabricmc/other/Test", null, ["java/lang/Runnable"] as String[]),
 		]
 		def jar = ZipTestUtils.createZipFromBytes(jarEntries)
 
@@ -142,12 +142,12 @@ class JarWalkerTest extends Specification {
 		classes.size() == 1
 		classes[0].name() == "net/fabricmc/other/Test.class"
 		classes[0].innerClasses() == [
-			"net/fabricmc/other/Test\$1.class",
-			"net/fabricmc/other/Test\$Inner.class"
+				"net/fabricmc/other/Test\$1.class",
+				"net/fabricmc/other/Test\$Inner.class"
 		]
 		classes[0].superClasses() == [
-			"java/lang/Runnable.class",
-			"net/fabricmc/other/Super.class"
+				"java/lang/Runnable.class",
+				"net/fabricmc/other/Super.class"
 		]
 	}
 

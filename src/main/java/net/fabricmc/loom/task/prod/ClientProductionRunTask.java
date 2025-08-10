@@ -47,6 +47,32 @@ import net.fabricmc.loom.util.Platform;
  */
 @ApiStatus.Experimental
 public abstract non-sealed class ClientProductionRunTask extends AbstractProductionRunTask {
+	@Inject
+	public ClientProductionRunTask() {
+		getUseXVFB().convention(getProject().getProviders().environmentVariable("CI")
+				.map(value -> Platform.CURRENT.getOperatingSystem().isLinux())
+				.orElse(false)
+		);
+
+		getAssetsIndex().set(getExtension().getMinecraftVersion()
+				.map(minecraftVersion -> getExtension()
+						.getMinecraftProvider()
+						.getVersionInfo()
+						.assetIndex()
+						.fabricId(minecraftVersion)
+				)
+		);
+		getAssetsDir().set(new File(getExtension().getFiles().getUserCache(), "assets"));
+		getMainClass().convention("net.fabricmc.loader.impl.launch.knot.KnotClient");
+
+		getClasspath().from(getExtension().getMinecraftProvider().getMinecraftClientJar());
+		getClasspath().from(detachedConfigurationProvider("net.fabricmc:fabric-loader:%s", getProjectLoaderVersion()));
+		getClasspath().from(detachedConfigurationProvider("net.fabricmc:intermediary:%s", getExtension().getMinecraftVersion()));
+		getClasspath().from(getProject().getConfigurations().named(Constants.Configurations.MINECRAFT_TEST_CLIENT_RUNTIME_LIBRARIES));
+
+		dependsOn("downloadAssets");
+	}
+
 	/**
 	 * Whether to use XVFB to run the game, using a virtual framebuffer. This is useful for CI environments that don't have a display server.
 	 *
@@ -78,32 +104,6 @@ public abstract non-sealed class ClientProductionRunTask extends AbstractProduct
 
 	@InputFiles
 	protected abstract DirectoryProperty getAssetsDir();
-
-	@Inject
-	public ClientProductionRunTask() {
-		getUseXVFB().convention(getProject().getProviders().environmentVariable("CI")
-				.map(value -> Platform.CURRENT.getOperatingSystem().isLinux())
-				.orElse(false)
-		);
-
-		getAssetsIndex().set(getExtension().getMinecraftVersion()
-				.map(minecraftVersion -> getExtension()
-						.getMinecraftProvider()
-						.getVersionInfo()
-						.assetIndex()
-						.fabricId(minecraftVersion)
-				)
-		);
-		getAssetsDir().set(new File(getExtension().getFiles().getUserCache(), "assets"));
-		getMainClass().convention("net.fabricmc.loader.impl.launch.knot.KnotClient");
-
-		getClasspath().from(getExtension().getMinecraftProvider().getMinecraftClientJar());
-		getClasspath().from(detachedConfigurationProvider("net.fabricmc:fabric-loader:%s", getProjectLoaderVersion()));
-		getClasspath().from(detachedConfigurationProvider("net.fabricmc:intermediary:%s", getExtension().getMinecraftVersion()));
-		getClasspath().from(getProject().getConfigurations().named(Constants.Configurations.MINECRAFT_TEST_CLIENT_RUNTIME_LIBRARIES));
-
-		dependsOn("downloadAssets");
-	}
 
 	@Override
 	public void run() throws IOException {

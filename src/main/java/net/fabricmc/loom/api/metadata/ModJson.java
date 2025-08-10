@@ -32,8 +32,8 @@ import com.google.gson.JsonObject;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
-import net.fabricmc.loom.util.fmj.ModEnvironment;
 import net.fabricmc.loom.util.fmj.FabricModJsonSource;
+import net.fabricmc.loom.util.fmj.ModEnvironment;
 
 @ApiStatus.Experimental
 public interface ModJson {

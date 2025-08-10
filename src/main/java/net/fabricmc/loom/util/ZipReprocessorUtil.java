@@ -41,9 +41,10 @@ import org.gradle.api.tasks.bundling.ZipEntryCompression;
 import org.intellij.lang.annotations.MagicConstant;
 
 public class ZipReprocessorUtil {
-	private ZipReprocessorUtil() { }
-
 	private static final String META_INF = "META-INF/";
+
+	private ZipReprocessorUtil() {
+	}
 
 	// See https://docs.oracle.com/en/java/javase/20/docs/specs/jar/jar.html#signed-jar-file
 	public static boolean isSpecialFile(String zipEntryName) {
@@ -99,7 +100,7 @@ public class ZipReprocessorUtil {
 		final Path tempFile = file.resolveSibling(file.getFileName() + ".tmp");
 
 		try (var zipFile = new ZipFile(file.toFile());
-				var fileOutputStream = Files.newOutputStream(tempFile)) {
+			 var fileOutputStream = Files.newOutputStream(tempFile)) {
 			ZipEntry[] entries;
 
 			if (reproducibleFileOrder) {
@@ -145,7 +146,7 @@ public class ZipReprocessorUtil {
 		final Path tempFile = file.resolveSibling(file.getFileName() + ".tmp");
 
 		try (var zipFile = new ZipFile(file.toFile());
-				var fileOutputStream = Files.newOutputStream(tempFile)) {
+			 var fileOutputStream = Files.newOutputStream(tempFile)) {
 			ZipEntry[] entries = zipFile.stream().toArray(ZipEntry[]::new);
 
 			try (var zipOutputStream = new ZipOutputStream(fileOutputStream)) {
@@ -205,16 +206,16 @@ public class ZipReprocessorUtil {
 	@MagicConstant(valuesFromClass = ZipOutputStream.class)
 	private static int zipOutputStreamCompressionMethod(ZipEntryCompression compression) {
 		return switch (compression) {
-		case STORED -> ZipOutputStream.STORED;
-		case DEFLATED -> ZipOutputStream.DEFLATED;
+			case STORED -> ZipOutputStream.STORED;
+			case DEFLATED -> ZipOutputStream.DEFLATED;
 		};
 	}
 
 	@MagicConstant(valuesFromClass = ZipEntry.class)
 	private static int zipEntryCompressionMethod(ZipEntryCompression compression) {
 		return switch (compression) {
-		case STORED -> ZipEntry.STORED;
-		case DEFLATED -> ZipEntry.DEFLATED;
+			case STORED -> ZipEntry.STORED;
+			case DEFLATED -> ZipEntry.DEFLATED;
 		};
 	}
 }

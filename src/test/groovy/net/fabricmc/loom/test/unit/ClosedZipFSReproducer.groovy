@@ -24,13 +24,7 @@
 
 package net.fabricmc.loom.test.unit
 
-import java.nio.file.FileSystem
-import java.nio.file.FileSystemAlreadyExistsException
-import java.nio.file.FileSystemException
-import java.nio.file.FileSystemNotFoundException
-import java.nio.file.FileSystems
-import java.nio.file.Files
-import java.nio.file.Path
+import java.nio.file.*
 
 import spock.lang.Specification
 

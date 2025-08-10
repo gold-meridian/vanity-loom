@@ -54,6 +54,56 @@ import net.fabricmc.loom.task.AbstractLoomTask;
 import net.fabricmc.loom.util.gradle.SourceSetHelper;
 
 public abstract class GenerateDLIConfigTask extends AbstractLoomTask {
+	public GenerateDLIConfigTask() {
+		getVersionInfoJson().set(LoomGradlePlugin.GSON.toJson(getExtension().getMinecraftProvider().getVersionInfo()));
+		getMinecraftVersion().set(getExtension().getMinecraftProvider().minecraftVersion());
+		getSplitSourceSets().set(getExtension().areEnvironmentSourceSetsSplit());
+		getANSISupportedIDE().set(ansiSupportedIde(getProject()));
+		getPlainConsole().set(getProject().getGradle().getStartParameter().getConsoleOutput() == ConsoleOutput.Plain);
+
+		if (!getExtension().getMods().isEmpty()) {
+			getClassPathGroups().set(buildClassPathGroups(getProject()));
+		}
+
+		getLog4jConfigPaths().set(getAllLog4JConfigFiles(getProject()));
+
+		if (getSplitSourceSets().get()) {
+			getClientGameJarPath().set(getGameJarPath("client"));
+			getCommonGameJarPath().set(getGameJarPath("common"));
+		}
+
+		getAssetsDirectoryPath().set(new File(getExtension().getFiles().getUserCache(), "assets").getAbsolutePath());
+		getNativesDirectoryPath().set(getExtension().getFiles().getNativesDirectory(getProject()).getAbsolutePath());
+		getDevLauncherConfig().set(getExtension().getFiles().getDevLauncherConfig());
+	}
+
+	private static String getAllLog4JConfigFiles(Project project) {
+		return LoomGradleExtension.get(project).getLog4jConfigs().getFiles().stream()
+				.map(File::getAbsolutePath)
+				.collect(Collectors.joining(","));
+	}
+
+	/**
+	 * See: https://github.com/FabricMC/fabric-loader/pull/585.
+	 */
+	private static String buildClassPathGroups(Project project) {
+		return LoomGradleExtension.get(project).getMods().stream()
+				.map(modSettings ->
+						SourceSetHelper.getClasspath(modSettings, project).stream()
+								.map(File::getAbsolutePath)
+								.collect(Collectors.joining(File.pathSeparator))
+				)
+				.collect(Collectors.joining(File.pathSeparator + File.pathSeparator));
+	}
+
+	private static boolean ansiSupportedIde(Project project) {
+		File rootDir = project.getRootDir();
+		return new File(rootDir, ".vscode").exists()
+				|| new File(rootDir, ".idea").exists()
+				|| new File(rootDir, ".project").exists()
+				|| (Arrays.stream(rootDir.listFiles()).anyMatch(file -> file.getName().endsWith(".iws")));
+	}
+
 	@Input
 	protected abstract Property<String> getVersionInfoJson();
 
@@ -95,29 +145,6 @@ public abstract class GenerateDLIConfigTask extends AbstractLoomTask {
 
 	@OutputFile
 	protected abstract RegularFileProperty getDevLauncherConfig();
-
-	public GenerateDLIConfigTask() {
-		getVersionInfoJson().set(LoomGradlePlugin.GSON.toJson(getExtension().getMinecraftProvider().getVersionInfo()));
-		getMinecraftVersion().set(getExtension().getMinecraftProvider().minecraftVersion());
-		getSplitSourceSets().set(getExtension().areEnvironmentSourceSetsSplit());
-		getANSISupportedIDE().set(ansiSupportedIde(getProject()));
-		getPlainConsole().set(getProject().getGradle().getStartParameter().getConsoleOutput() == ConsoleOutput.Plain);
-
-		if (!getExtension().getMods().isEmpty()) {
-			getClassPathGroups().set(buildClassPathGroups(getProject()));
-		}
-
-		getLog4jConfigPaths().set(getAllLog4JConfigFiles(getProject()));
-
-		if (getSplitSourceSets().get()) {
-			getClientGameJarPath().set(getGameJarPath("client"));
-			getCommonGameJarPath().set(getGameJarPath("common"));
-		}
-
-		getAssetsDirectoryPath().set(new File(getExtension().getFiles().getUserCache(), "assets").getAbsolutePath());
-		getNativesDirectoryPath().set(getExtension().getFiles().getNativesDirectory(getProject()).getAbsolutePath());
-		getDevLauncherConfig().set(getExtension().getFiles().getDevLauncherConfig());
-	}
 
 	@TaskAction
 	public void run() throws IOException {
@@ -172,41 +199,14 @@ public abstract class GenerateDLIConfigTask extends AbstractLoomTask {
 		FileUtils.writeStringToFile(getDevLauncherConfig().getAsFile().get(), launchConfig.asString(), StandardCharsets.UTF_8);
 	}
 
-	private static String getAllLog4JConfigFiles(Project project) {
-		return LoomGradleExtension.get(project).getLog4jConfigs().getFiles().stream()
-				.map(File::getAbsolutePath)
-				.collect(Collectors.joining(","));
-	}
-
 	private String getGameJarPath(String env) {
 		MappedMinecraftProvider.Split split = (MappedMinecraftProvider.Split) getExtension().getNamedMinecraftProvider();
 
 		return switch (env) {
-		case "client" -> split.getClientOnlyJar().getPath().toAbsolutePath().toString();
-		case "common" -> split.getCommonJar().getPath().toAbsolutePath().toString();
-		default -> throw new UnsupportedOperationException();
+			case "client" -> split.getClientOnlyJar().getPath().toAbsolutePath().toString();
+			case "common" -> split.getCommonJar().getPath().toAbsolutePath().toString();
+			default -> throw new UnsupportedOperationException();
 		};
-	}
-
-	/**
-	 * See: https://github.com/FabricMC/fabric-loader/pull/585.
-	 */
-	private static String buildClassPathGroups(Project project) {
-		return LoomGradleExtension.get(project).getMods().stream()
-				.map(modSettings ->
-						SourceSetHelper.getClasspath(modSettings, project).stream()
-							.map(File::getAbsolutePath)
-							.collect(Collectors.joining(File.pathSeparator))
-				)
-				.collect(Collectors.joining(File.pathSeparator+File.pathSeparator));
-	}
-
-	private static boolean ansiSupportedIde(Project project) {
-		File rootDir = project.getRootDir();
-		return new File(rootDir, ".vscode").exists()
-				|| new File(rootDir, ".idea").exists()
-				|| new File(rootDir, ".project").exists()
-				|| (Arrays.stream(rootDir.listFiles()).anyMatch(file -> file.getName().endsWith(".iws")));
 	}
 
 	public static class LaunchConfig {

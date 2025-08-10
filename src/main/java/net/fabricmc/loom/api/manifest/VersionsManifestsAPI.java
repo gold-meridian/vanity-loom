@@ -30,9 +30,10 @@ import org.jetbrains.annotations.ApiStatus;
 public interface VersionsManifestsAPI {
 	/**
 	 * Adds a URL to a versions manifest json with the default priority of {@code 0}.
+	 *
 	 * @param name a string that uniquely identifies this versions manifest,
-	 *        to be used in cache file paths
-	 * @param url the String-representation of the URL to the manifest json
+	 *             to be used in cache file paths
+	 * @param url  the String-representation of the URL to the manifest json
 	 */
 	default void add(String name, String url) {
 		add(name, url, 0);
@@ -40,11 +41,12 @@ public interface VersionsManifestsAPI {
 
 	/**
 	 * Adds a URL to a versions manifest json with the given priority.
-	 * @param name a string that uniquely identifies this versions manifest,
-	 *             to be used in cache file paths
-	 * @param url the String-representation of the URL to the manifest json
+	 *
+	 * @param name     a string that uniquely identifies this versions manifest,
+	 *                 to be used in cache file paths
+	 * @param url      the String-representation of the URL to the manifest json
 	 * @param priority the priority with which this URL gets sorted against other entries
-	 *        entries are sorted by priority, from lowest to highest
+	 *                 entries are sorted by priority, from lowest to highest
 	 */
 	void add(String name, String url, int priority);
 }

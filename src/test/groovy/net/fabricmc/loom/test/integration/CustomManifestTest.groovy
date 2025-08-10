@@ -29,7 +29,7 @@ import spock.lang.Unroll
 
 import net.fabricmc.loom.test.util.GradleProjectTestTrait
 
-import static net.fabricmc.loom.test.LoomTestConstants.*
+import static net.fabricmc.loom.test.LoomTestConstants.STANDARD_TEST_VERSIONS
 import static org.gradle.testkit.runner.TaskOutcome.SUCCESS
 
 class CustomManifestTest extends Specification implements GradleProjectTestTrait {
